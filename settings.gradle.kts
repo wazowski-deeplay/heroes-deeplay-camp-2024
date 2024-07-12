@@ -1,4 +1,4 @@
 rootProject.name = "deeplay-camp-2024"
-include("Client")
-include("Server")
-include("Game")
+include("client")
+include("server")
+include("game")

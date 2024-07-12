@@ -9,9 +9,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Client" />
-            <option value="$PROJECT_DIR$/Game" />
-            <option value="$PROJECT_DIR$/Server" />
+            <option value="$PROJECT_DIR$/client" />
+            <option value="$PROJECT_DIR$/game" />
+            <option value="$PROJECT_DIR$/server" />
           </set>
         </option>
       </GradleProjectSettings>
