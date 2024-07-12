@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 
 class MainTest {
 
-    @Test
-    void createInstanceTest() {
-        Assertions.assertDoesNotThrow(Main::new);
-    }
-
+  @Test
+  void createInstanceTest() {
+    Assertions.assertDoesNotThrow(Main::new);
+  }
 }

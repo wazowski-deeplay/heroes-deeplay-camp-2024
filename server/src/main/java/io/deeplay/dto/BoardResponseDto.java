@@ -1,4 +1,3 @@
 package io.deeplay.dto;
 
-public class BoardResponseDto {
-}
+public class BoardResponseDto {}

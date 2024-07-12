@@ -1,4 +1,3 @@
 package io.deeplay.controller;
 
-public class UserRequest {
-}
+public class UserRequest {}
