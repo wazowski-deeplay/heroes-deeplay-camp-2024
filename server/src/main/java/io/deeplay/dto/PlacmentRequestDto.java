@@ -1,4 +1,3 @@
 package io.deeplay.dto;
 
-public class PlacmentRequestDto {
-}
+public class PlacmentRequestDto {}

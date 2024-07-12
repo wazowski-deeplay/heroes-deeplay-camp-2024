@@ -3,6 +3,7 @@ plugins {
     java
     id("net.ltgt.errorprone") version "4.0.1"
     jacoco
+    checkstyle
 }
 
 group = "io.deeplay.camp"
@@ -47,5 +48,24 @@ allprojects {
             html.required.set(false)
         }
     }
+
+    apply(plugin = "checkstyle")
+
+    checkstyle {
+        toolVersion = "10.17.0"
+        configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    }
+
+    tasks.withType<Checkstyle> {
+        ignoreFailures = false
+        reports {
+            xml.required.set(false)
+            html.required.set(true)
+        }
+    }
+
 }
-// subprojects {} Для всех подмодулей кроме текущего
+
+tasks.build {
+    dependsOn(tasks.withType<Checkstyle>())
+}

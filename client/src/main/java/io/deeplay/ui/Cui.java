@@ -1,4 +1,3 @@
 package io.deeplay.ui;
 
-public class CUI {
-}
+public class Cui {}
