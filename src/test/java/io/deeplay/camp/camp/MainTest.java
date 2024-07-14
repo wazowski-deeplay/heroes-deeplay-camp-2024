@@ -1,4 +1,4 @@
-package io.deeplay.camp;
+package io.deeplay.camp.camp;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
