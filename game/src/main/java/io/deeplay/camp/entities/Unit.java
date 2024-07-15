@@ -1,19 +1,25 @@
 package io.deeplay.camp.entities;
 
 public abstract class Unit {
-  protected int maxHP, nowHP, damage, accuracy, armor;
+  protected int maxHp;
+  protected int nowHp;
+  protected int damage;
+  protected int accuracy;
+  protected int armor;
   protected boolean isGeneral = false;
 
   // Сеттеры
-  protected void setMaxHP(int health) {
-    this.maxHP = health;
+  protected void setMaxHp(int health) {
+    this.maxHp = health;
   }
 
-  protected void setNowHP(int health) {
-    this.nowHP = health;
-    if (this.nowHP < 0) this.nowHP = 0;
-    if (this.nowHP > maxHP) {
-      this.nowHP = maxHP;
+  protected void setNowHp(int health) {
+    this.nowHp = health;
+    if (this.nowHp < 0) {
+      this.nowHp = 0;
+    }
+    if (this.nowHp > maxHp) {
+      this.nowHp = maxHp;
     }
   }
 
@@ -34,12 +40,12 @@ public abstract class Unit {
   }
 
   // Геттеры
-  public int getMaxHP() {
-    return maxHP;
+  public int getMaxHp() {
+    return maxHp;
   }
 
-  public int getNowHP() {
-    return nowHP;
+  public int getNowHp() {
+    return nowHp;
   }
 
   public int getDamage() {
@@ -55,7 +61,7 @@ public abstract class Unit {
   }
 
   public boolean isAlive() {
-    return nowHP > 0;
+    return nowHp > 0;
   }
 
   public boolean isGeneral() {

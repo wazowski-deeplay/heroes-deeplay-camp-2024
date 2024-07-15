@@ -4,32 +4,31 @@ import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Healer;
 import io.deeplay.camp.entities.Knight;
 import io.deeplay.camp.entities.Mage;
-import io.deeplay.camp.entities.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class UnitTest {
 
   @Test
-  void getMaxHPArcher() {
+  void getMaxHpArcher() {
     Archer unit = new Archer();
-    int expected = unit.getMaxHP();
+    int expected = unit.getMaxHp();
     int actual = 10;
     Assertions.assertEquals(expected, actual);
   }
 
   @Test
-  void getMaxHPHealer() {
+  void getMaxHpHealer() {
     Healer unit = new Healer();
-    int expected = unit.getMaxHP();
+    int expected = unit.getMaxHp();
     int actual = 10;
     Assertions.assertEquals(expected, actual);
   }
 
   @Test
-  void getNowHPKnight() {
+  void getNowHpKnight() {
     Knight unit = new Knight();
-    int expected = unit.getNowHP();
+    int expected = unit.getNowHp();
     int actual = 10;
     Assertions.assertEquals(expected, actual);
   }
