@@ -1,3 +1,3 @@
-package io.deeplay.dto;
+package io.deeplay.camp.dto;
 
 public class MoveRequestDto {}
