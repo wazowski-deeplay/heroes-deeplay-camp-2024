@@ -1,4 +1,4 @@
-package io.deeplay.entities;
+package io.deeplay.camp.entities;
 
 public class Archer extends Unit {
   public Archer() {
