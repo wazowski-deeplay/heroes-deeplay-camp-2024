@@ -1,7 +1,7 @@
-package io.deeplay.entities;
+package io.deeplay.camp.entities;
 
-public class Healer extends Unit {
-  public Healer() {
+public class Knight extends Unit {
+  public Knight() {
     setMaxHP(10);
     setNowHP(10);
     setDamage(5);

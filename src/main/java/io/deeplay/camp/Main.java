@@ -1,4 +1,4 @@
-package io.deeplay.camp.camp;
+package io.deeplay.camp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

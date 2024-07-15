@@ -1,4 +1,4 @@
-package io.deeplay.entities;
+package io.deeplay.camp.entities;
 
 public abstract class Unit {
   protected int maxHP, nowHP, damage, accuracy, armor;
