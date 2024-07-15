@@ -2,8 +2,8 @@ package io.deeplay.camp.entities;
 
 public class Healer extends Unit {
   public Healer() {
-    setMaxHP(10);
-    setNowHP(10);
+    setMaxHp(10);
+    setNowHp(10);
     setDamage(5);
     setAccuracy(5);
     setArmor(12);
