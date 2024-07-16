@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class Board {
-  public static final int ROWS = 6;
+  public static final int ROWS = 4;
   public static final int COLUMNS = 3;
 
   private Unit[][] units;
+
+  public Board() {
+    units = new Unit[ROWS][COLUMNS];
+  }
 
   public void setUnit(int x, int y, Unit unit) {
     units[x][y] = unit;
