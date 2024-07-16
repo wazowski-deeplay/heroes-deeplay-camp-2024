@@ -1,3 +1,4 @@
 package io.deeplay.camp.events;
 
-public class MakeMoveEvent extends Event {}
+public class MakeMoveEvent extends Event{}
+
