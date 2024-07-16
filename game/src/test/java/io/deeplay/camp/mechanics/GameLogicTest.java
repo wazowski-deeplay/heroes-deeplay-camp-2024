@@ -7,16 +7,17 @@ import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.events.MakeMoveEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameLogicTest {
 
-    static GameState gameState = new GameState();
+    GameState gameState = new GameState();
 
-    @BeforeAll
-    public static void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() throws Exception {
         gameState.getBoard().setUnit(0,0,new Archer(PlayerType.FIRST_PLAYER));
         gameState.getBoard().setUnit(1,0,new Archer(PlayerType.FIRST_PLAYER));
         gameState.getBoard().setUnit(2,0,new Archer(PlayerType.FIRST_PLAYER));
@@ -71,8 +72,7 @@ class GameLogicTest {
         Position posDefender = new Position(2,2);
         MakeMoveEvent makeMove = new MakeMoveEvent(posAttacker,posDefender,gameState.getBoard().getUnit(posAttacker.x(),posAttacker.y()));
         Assertions.assertEquals(GameLogic.isValidMove(gameState,makeMove),actual);
-        gameState.getBoard().getUnit(0,2).setNowHp(5);
-        gameState.getBoard().getUnit(1,2).setNowHp(5);
+
     }
     @Test
     void isValidMoveAttackKnightToArcherWithOneKnight() {
@@ -83,8 +83,7 @@ class GameLogicTest {
         Position posDefender = new Position(2,3);
         MakeMoveEvent makeMove = new MakeMoveEvent(posAttacker,posDefender,gameState.getBoard().getUnit(posAttacker.x(),posAttacker.y()));
         Assertions.assertEquals(GameLogic.isValidMove(gameState,makeMove),actual);
-        gameState.getBoard().getUnit(0,2).setNowHp(5);
-        gameState.getBoard().getUnit(1,2).setNowHp(5);
+
     }
     @Test
     void isValidMoveAttackKnightToArcherWithNullKnight() {
@@ -96,9 +95,7 @@ class GameLogicTest {
         Position posDefender = new Position(2,3);
         MakeMoveEvent makeMove = new MakeMoveEvent(posAttacker,posDefender,gameState.getBoard().getUnit(posAttacker.x(),posAttacker.y()));
         Assertions.assertEquals(GameLogic.isValidMove(gameState,makeMove),actual);
-        gameState.getBoard().getUnit(0,2).setNowHp(5);
-        gameState.getBoard().getUnit(1,2).setNowHp(5);
-        gameState.getBoard().getUnit(2,2).setNowHp(5);
+
     }
 
     @Test

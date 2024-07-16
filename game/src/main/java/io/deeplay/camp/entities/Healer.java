@@ -9,5 +9,7 @@ public class Healer extends Unit {
   }
 
   @Override
-  public void playMove(Unit targetUnit) {}
+  public void playMove(Unit targetUnit) {
+    targetUnit.setNowHp(targetUnit.getNowHp() + damage);
+  }
 }

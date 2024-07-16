@@ -9,5 +9,10 @@ public class Archer extends Unit {
   }
 
   @Override
-  public void playMove(Unit targetUnit) {}
+  public void playMove(Unit targetUnit) {
+    int diceRoll = (int) (Math.random()*20);
+    if(diceRoll + accuracy > targetUnit.getArmor()){
+      targetUnit.setNowHp(targetUnit.getNowHp() - damage);
+    }
+  }
 }
