@@ -1,5 +1,7 @@
 package io.deeplay.camp.entities;
 
+import io.deeplay.camp.mechanics.PlayerType;
+
 public abstract class Unit {
   protected int maxHp;
   protected int nowHp;
@@ -7,13 +9,25 @@ public abstract class Unit {
   protected int accuracy;
   protected int armor;
   protected boolean isGeneral = false;
+  protected UnitType unitType;
+  protected PlayerType playerType;
+
+  public Unit(UnitType unitType,int maxHp, int nowHp, int damage, int accuracy, int armor, boolean isGeneral){
+    this.unitType = unitType;
+    this.maxHp = maxHp;
+    this.nowHp = nowHp;
+    this.damage = damage;
+    this.accuracy = accuracy;
+    this.armor = armor;
+    this.isGeneral = isGeneral;
+  }
 
   // Сеттеры
   protected void setMaxHp(int health) {
     this.maxHp = health;
   }
 
-  protected void setNowHp(int health) {
+  public void setNowHp(int health) {
     this.nowHp = health;
     if (this.nowHp < 0) {
       this.nowHp = 0;
@@ -59,6 +73,10 @@ public abstract class Unit {
   public int getArmor() {
     return armor;
   }
+
+  public UnitType getUnitType() { return unitType; }
+
+  public PlayerType getPlayerType() { return playerType; }
 
   public boolean isAlive() {
     return nowHp > 0;
