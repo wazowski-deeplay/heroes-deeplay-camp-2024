@@ -11,10 +11,12 @@ public class Game implements GameListener {
 
   GameState gameState;
 
-  @Override
-  public void startGame(StartGameEvent startGameEvent) {
+  public Game() {
     gameState = new GameState();
   }
+
+  @Override
+  public void startGame(StartGameEvent startGameEvent) {}
 
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) {
