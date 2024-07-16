@@ -36,4 +36,8 @@ public class GameState {
   }
 
   public void makePlacement(PlaceUnitEvent placeUnit) {}
+
+  public Board getBoard() {
+    return board;
+  }
 }

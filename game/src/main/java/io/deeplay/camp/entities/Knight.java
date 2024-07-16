@@ -1,13 +1,11 @@
 package io.deeplay.camp.entities;
 
+import io.deeplay.camp.mechanics.PlayerType;
+
 public class Knight extends Unit {
-  public Knight() {
-    setMaxHp(10);
-    setNowHp(10);
-    setDamage(5);
-    setAccuracy(5);
-    setArmor(12);
-    setGeneral(false);
+  public Knight(PlayerType playerType) {
+    super(UnitType.KNIGHT, 15, 15,7,4,15,false);
+    this.playerType = playerType;
   }
 
   @Override
