@@ -1,3 +1,11 @@
 package io.deeplay.camp.events;
 
-public class ChangePlayerEvent extends Event{}
+import io.deeplay.camp.mechanics.PlayerType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
+public class ChangePlayerEvent extends Event {
+  PlayerType requester;
+}
