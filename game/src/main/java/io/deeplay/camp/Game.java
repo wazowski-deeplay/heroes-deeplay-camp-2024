@@ -18,9 +18,20 @@ public class Game implements GameListener {
 
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) {
-    if (GameLogic.isValidPlacement(gameState, placeUnitEvent)) {
-      gameState.makePlacement(placeUnitEvent);
+    for(int i = 0; i < 6;) {
+      // Проверка правильности хода для правил
+      if (GameLogic.isValidPlacement(gameState, placeUnitEvent)) {
+        gameState.makePlacement(placeUnitEvent);
+        gameState.getCurrentBoard();
+        // Считаем только допустимые ходы
+        i++;
+      }
+      else {
+        // Если ход не коректен то мы возвращаем томуже самому игроку доску
+        gameState.getCurrentBoard();
+      }
     }
+    gameState.changeCurrentPlayer();
   }
 
   @Override
