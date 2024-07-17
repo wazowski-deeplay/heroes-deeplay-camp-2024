@@ -24,16 +24,11 @@ public class GameLogic {
     Position to = move.getTo();
     Unit attacker = move.getAttacker();
 
-    boolean fullUnitInRow = (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getBoard().countUnitsRow(from.y()+1) > 1 && to.y() == from.y()+1) ||
-            (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getBoard().countUnitsRow(from.y()-1) > 1 && to.y() == from.y()-1);
+    boolean fullUnitInRow = fullUnitMeleeRow(gameState,from,to,attacker);
+    boolean oneUnitInRow = oneUnitMeleeRow(gameState,from,to,attacker);
+    boolean nullUnitInRow = nullUnitMeleeRow(gameState,from,to,attacker);
 
-    boolean oneUnitInRow = (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getBoard().countUnitsRow(from.y()+1) == 1 && to.y() == from.y()+1 )||
-            (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getBoard().countUnitsRow(from.y()-1) == 1  && to.y() == from.y()-1) ;
-
-    boolean nullUnitInRow = (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getBoard().countUnitsRow(from.y()+1) == 0) ||
-            (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getBoard().countUnitsRow(from.y()-1) == 0);
-
-    if(gameState.getBoard().getUnit(to.x(),to.y()).getPlayerType() != attacker.getPlayerType()) {
+    if(gameState.getCurrentBoard().getUnit(to.x(),to.y()).getPlayerType() != attacker.getPlayerType()) {
       if (attacker.getUnitType() == UnitType.KNIGHT) {
         int radius = 1;
         if(oneUnitInRow  || nullUnitInRow){
@@ -59,4 +54,18 @@ public class GameLogic {
     }
     return result;
   }
-}
+
+  //Методы для проверки количества вражеских юнитов во вражеской ближней линии
+  public static boolean fullUnitMeleeRow(GameState gameState, Position from, Position to, Unit attacker){
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y()+1) > 1 && to.y() == from.y()+1) ||
+             (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y()-1) > 1 && to.y() == from.y()-1);
+  }
+  public static boolean oneUnitMeleeRow(GameState gameState, Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y() + 1) == 1 && to.y() == from.y() + 1) ||
+            (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y() - 1) == 1 && to.y() == from.y() - 1);
+    }
+  public static boolean nullUnitMeleeRow(GameState gameState, Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y() + 1) == 0) ||
+            (attacker.getPlayerType() == PlayerType.SECOND_PLAYER && gameState.getCurrentBoard().countUnitsRow(from.y() - 1) == 0);
+  }
+  }
