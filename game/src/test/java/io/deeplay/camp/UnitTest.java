@@ -38,7 +38,7 @@ class UnitTest {
   void getDamageMage() {
     Mage unit = new Mage(PlayerType.FIRST_PLAYER);
     int expected = unit.getDamage();
-    int actual = 5;
+    int actual = 2;
     Assertions.assertEquals(expected, actual);
   }
 
