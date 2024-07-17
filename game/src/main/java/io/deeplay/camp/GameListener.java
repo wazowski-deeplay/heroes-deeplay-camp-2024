@@ -1,5 +1,6 @@
 package io.deeplay.camp;
 
+import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
