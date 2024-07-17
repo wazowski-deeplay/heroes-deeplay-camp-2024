@@ -1,15 +1,18 @@
 package io.deeplay.camp.entities;
 
+import io.deeplay.camp.mechanics.PlayerType;
+
 public class Archer extends Unit {
-  public Archer() {
-    setMaxHp(10);
-    setNowHp(10);
-    setDamage(5);
-    setAccuracy(6);
-    setArmor(12);
-    setGeneral(false);
+  public Archer(PlayerType playerType) {
+    super(UnitType.ARCHER, 10, 10, 5, 6, 12, false);
+    this.playerType = playerType;
   }
 
   @Override
-  public void playMove(Unit targetUnit) {}
+  public void playMove(Unit targetUnit) {
+    int diceRoll = (int) (Math.random() * 20);
+    if (diceRoll + accuracy > targetUnit.getArmor()) {
+      targetUnit.setNowHp(targetUnit.getNowHp() - damage);
+    }
+  }
 }
