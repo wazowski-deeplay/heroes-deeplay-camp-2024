@@ -5,7 +5,11 @@ import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class GameState {
 
   private Board board;
@@ -50,4 +54,5 @@ public class GameState {
   public Board getCurrentBoard() {
     return board;
   }
+
 }

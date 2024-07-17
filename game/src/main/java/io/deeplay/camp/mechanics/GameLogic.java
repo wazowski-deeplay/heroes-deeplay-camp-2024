@@ -15,7 +15,7 @@ public class GameLogic {
   }
 
   public static boolean isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer) {
-    return true;
+    return gameState.getCurrentPlayer() == changePlayer.getRequester()&&gameState.getGameStage()!=GameStage.PLACEMENT_STAGE;
   }
 
   public static boolean isValidMove(GameState gameState, MakeMoveEvent move) {
