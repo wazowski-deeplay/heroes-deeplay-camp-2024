@@ -10,7 +10,7 @@ public class Board {
   private Unit[][] units;
 
   public Board() {
-    units = new Unit[ROWS][COLUMNS];
+    units = new Unit[COLUMNS][ROWS];
   }
 
   public void setUnit(int x, int y, Unit unit) {
@@ -30,5 +30,19 @@ public class Board {
       }
     }
     return true;
+  }
+
+  public int countUnitsRow(int row) {
+    int count = 0;
+    for (int i = 0; i < COLUMNS; i++) {
+      if (units[i][row].isAlive()) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  public Unit[][] getUnits() {
+    return units;
   }
 }

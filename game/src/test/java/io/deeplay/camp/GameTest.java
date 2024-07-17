@@ -23,7 +23,7 @@ class GameTest {
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
     game.changePlayer(changePlayerEvent);
 
-    //Если запрос сделал второй игрок, текущий не должен поменяться
+    // Если запрос сделал второй игрок, текущий не должен поменяться
     assertEquals(game.gameState.getCurrentPlayer(), PlayerType.FIRST_PLAYER);
   }
 
@@ -34,8 +34,7 @@ class GameTest {
     game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
     game.changePlayer(changePlayerEvent);
 
-    //Если запрос сделал первый игрок, текущий не должен поменяться
+    // Если запрос сделал первый игрок, текущий не должен поменяться
     assertEquals(game.gameState.getCurrentPlayer(), PlayerType.SECOND_PLAYER);
   }
-
 }
