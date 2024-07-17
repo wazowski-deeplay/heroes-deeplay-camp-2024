@@ -40,4 +40,8 @@ public class Board {
     }
     return count;
   }
+
+  public Unit[][] getUnits(){
+    return units;
+  }
 }
