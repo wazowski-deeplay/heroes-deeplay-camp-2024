@@ -35,6 +35,7 @@ allprojects {
         implementation("org.slf4j:slf4j-api:2.0.13")
         // кодогенерация
         compileOnly("org.projectlombok:lombok:1.18.32")
+        annotationProcessor("org.projectlombok:lombok:1.18.32")
     }
 
     tasks.test {
