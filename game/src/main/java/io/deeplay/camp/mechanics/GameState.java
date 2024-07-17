@@ -31,6 +31,15 @@ public class GameState {
     // что-то вроде достать атакующего и атакуемого юнита и сделать attacker.playMove(attacked)
   }
 
-  public void makePlacement(PlaceUnitEvent placeUnit) {}
+  public void makePlacement(PlaceUnitEvent placeUnit) {
+    // Применяется поставновка фигуры к доске
+    board.setUnit(placeUnit.getX(),placeUnit.getY(),placeUnit.getUnit());
+  }
+
+  public Board getCurrentBoard() {
+    return board;
+  }
+
+  public PlayerType getCurrentPlayer() {return currentPlayer;}
 
 }

@@ -1,3 +1,16 @@
 package io.deeplay.camp.events;
 
-public class PlaceUnitEvent extends Event {}
+import io.deeplay.camp.entities.Knight;
+import io.deeplay.camp.entities.Unit;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class PlaceUnitEvent extends Event {
+  private int x;
+  private int y;
+  private Unit unit;
+}

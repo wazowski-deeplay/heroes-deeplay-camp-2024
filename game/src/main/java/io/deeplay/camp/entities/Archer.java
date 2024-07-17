@@ -8,6 +8,8 @@ public class Archer extends Unit {
     setAccuracy(6);
     setArmor(12);
     setGeneral(false);
+    setAttack(AttackType.LONG_ATTACK);
+    setPlayerType(this.playerType);
   }
 
   @Override

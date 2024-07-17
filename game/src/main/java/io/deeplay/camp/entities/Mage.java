@@ -8,6 +8,8 @@ public class Mage extends Unit {
     setAccuracy(5);
     setArmor(12);
     setGeneral(false);
+    setAttack(AttackType.MASS_ATTACK);
+    setPlayerType(this.playerType);
   }
 
   @Override

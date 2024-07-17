@@ -8,6 +8,8 @@ public class Knight extends Unit {
     setAccuracy(5);
     setArmor(12);
     setGeneral(false);
+    setAttack(AttackType.CLOSE_ATTACK);
+    setPlayerType(this.playerType);
   }
 
   @Override
