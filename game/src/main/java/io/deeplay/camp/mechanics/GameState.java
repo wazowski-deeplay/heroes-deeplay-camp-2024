@@ -54,4 +54,5 @@ public class GameState {
   public Board getCurrentBoard() {
     return board;
   }
+
 }
