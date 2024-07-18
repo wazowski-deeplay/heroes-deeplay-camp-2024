@@ -51,15 +51,13 @@ public class GameLogic {
     }
   }
 
-  public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer) throws GameException {
-    String message;
-    if (gameState.getCurrentPlayer() == changePlayer.getRequester()
-        && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
-      message = changePlayer.getRequester().name() + " the player has completed his turn";
-      logger.atInfo().log(message);
+
+  public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayerEvent) throws GameException {
+    if (gameState.getCurrentPlayer() == changePlayerEvent.getRequester()
+            && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
+      logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
     } else {
-      message = changePlayer.getRequester().name() + " passes the move out of his turn";
-      logger.atInfo().log(message);
+      logger.atInfo().log("{} passes the move out of his turn", changePlayerEvent.getRequester().name());
       throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
     }
   }
