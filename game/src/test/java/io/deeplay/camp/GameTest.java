@@ -1,8 +1,8 @@
 package io.deeplay.camp;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
@@ -11,8 +11,6 @@ import io.deeplay.camp.mechanics.GameStage;
 import io.deeplay.camp.mechanics.PlayerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-
 
 class GameTest {
   private Game game;
@@ -28,15 +26,12 @@ class GameTest {
     game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
 
-    try {
-      game.changePlayer(changePlayerEvent);
-    } catch (GameException e) {
-      assertAll(
-          () -> {
-            assertEquals(e.getErrorCode(), ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
-            assertEquals(game.gameState.getCurrentPlayer(), PlayerType.FIRST_PLAYER);
-          });
-    }
+    GameException gameException = assertThrows(
+            GameException.class,
+            () -> game.changePlayer(changePlayerEvent)
+    );
+    assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
+    assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
   }
 
   @Test
@@ -44,12 +39,23 @@ class GameTest {
     game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.FIRST_PLAYER);
     game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
-    try {
-      game.changePlayer(changePlayerEvent);
-    } catch (GameException e) {
-      fail();
-    }
-    // Если запрос сделал первый игрок, текущий должен поменяться
-    assertEquals(game.gameState.getCurrentPlayer(), PlayerType.SECOND_PLAYER);
+
+    assertDoesNotThrow(() -> game.changePlayer(changePlayerEvent));
+    // Если запрос сделал первый игрок, текущий игрок остается первым
+    assertEquals(PlayerType.SECOND_PLAYER, game.gameState.getCurrentPlayer());
+  }
+
+  @Test
+  void testChangePlayerAtPlacementStage() {
+    game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
+    game.gameState.setGameStage(GameStage.PLACEMENT_STAGE);
+    ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
+
+    GameException gameException = assertThrows(
+            GameException.class,
+            () -> game.changePlayer(changePlayerEvent)
+    );
+    assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
+    assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
   }
 }
