@@ -53,13 +53,14 @@ public class GameLogic {
 
   /**
    * Метод проверяет событие перехода хода другому игроку.
+   *
    * @param gameState Актуальное игровое состояние.
    * @param changePlayerEvent Событие передачи хода.
    * @throws GameException Если расстановка не завершена, либо переход запросил не тот игрок.
    */
   public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayerEvent) throws GameException {
     if (gameState.getCurrentPlayer() == changePlayerEvent.getRequester()
-            && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
+        && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
       logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
     } else {
       logger.atInfo().log("{} passes the move out of his turn", changePlayerEvent.getRequester().name());
