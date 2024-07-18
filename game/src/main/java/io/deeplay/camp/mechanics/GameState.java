@@ -50,7 +50,20 @@ public class GameState {
     }
   }
 
-  public void makePlacement(PlaceUnitEvent placeUnit) {}
+  public void makePlacement(PlaceUnitEvent placeUnit) {
+    // Применяется поставновка фигуры к доске
+    board.setUnit(placeUnit.getX(),placeUnit.getY(),placeUnit.getUnit());
+  }
+
+  public Board getCurrentBoard() {
+    return board;
+  }
+
+  public PlayerType getCurrentPlayer() {return currentPlayer;}
+
+  public void setCurrentPlayer(PlayerType playerType){
+    this.currentPlayer = playerType;
+  }
 
   public Board getCurrentBoard() {
     return board;

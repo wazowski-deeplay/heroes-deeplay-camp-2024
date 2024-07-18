@@ -1,4 +1,4 @@
-package io.deeplay.camp;
+package io.deeplay.camp.entites;
 
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Healer;

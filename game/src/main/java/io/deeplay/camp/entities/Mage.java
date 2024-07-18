@@ -6,6 +6,7 @@ public class Mage extends Unit {
   public Mage(PlayerType playerType) {
     super(UnitType.MAGE, 10, 10, 2, 5, 12, false);
     this.playerType = playerType;
+    setAttack(AttackType.MASS_ATTACK);
   }
 
   @Override

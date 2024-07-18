@@ -11,6 +11,7 @@ public abstract class Unit {
   protected boolean isGeneral = false;
   protected UnitType unitType;
   protected PlayerType playerType;
+  protected AttackType attackType;
 
   public Unit(
       UnitType unitType,
@@ -60,6 +61,14 @@ public abstract class Unit {
     this.isGeneral = isGeneral;
   }
 
+  public void setAttack(AttackType attackType) {
+    this.attackType = attackType;
+  }
+
+  public void setPlayerType(PlayerType playerType) {
+    this.playerType = playerType;
+  }
+
   // Геттеры
   public int getMaxHp() {
     return maxHp;
@@ -88,7 +97,9 @@ public abstract class Unit {
   public PlayerType getPlayerType() {
     return playerType;
   }
-
+  public AttackType getAttackType() {
+      return attackType;
+  }
   public boolean isAlive() {
     return nowHp > 0;
   }
