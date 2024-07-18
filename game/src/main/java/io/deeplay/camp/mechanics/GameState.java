@@ -42,4 +42,8 @@ public class GameState {
 
   public PlayerType getCurrentPlayer() {return currentPlayer;}
 
+  public void setCurrentPlayer(PlayerType playerType){
+    this.currentPlayer = playerType;
+  }
+
 }

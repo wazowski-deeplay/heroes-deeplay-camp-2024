@@ -25,44 +25,57 @@ public class GameLogicTest {
   @Test
   void testBoardIsFull_IsValid() {
     Unit mili = new Knight();
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili);
+    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili,gameState.getCurrentPlayer());
     assertTrue(GameLogic.isValidPlacement(gameState, event));
   }
   @Test
   void testBoardIsFull_IsNotValid() {
     Unit mili = new Knight();
     makeFullBoard();
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili);
+    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili,gameState.getCurrentPlayer());
     assertFalse(GameLogic.isValidPlacement(gameState, event));
   }
   @Test
   void testTakenCell_IsValid() {
     Unit mili = new Knight();
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili);
+    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili,gameState.getCurrentPlayer());
     assertTrue(GameLogic.isValidPlacement(gameState, event));
   }
   @Test
   void testTakenCell_IsNotValid() {
     Unit mili = new Knight();
     gameState.getCurrentBoard().setUnit(1, 1, mili);
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili);
+    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, mili,gameState.getCurrentPlayer());
     assertFalse(GameLogic.isValidPlacement(gameState, event));
   }
   @Test
-  void testLongAttackUnitPlacedAccordingRules_IsNotValid(){
-    Unit reng = new Archer();
-    PlaceUnitEvent event = new PlaceUnitEvent(1,1,reng);
+  void testCorrectSideFirstPlayer_IsNotValid(){
+    Unit mili = new Knight();
+    PlaceUnitEvent event = new PlaceUnitEvent(2,2,mili,gameState.getCurrentPlayer());
     assertFalse(GameLogic.isValidPlacement(gameState,event));
   }
-
   @Test
-  void testLongAttackUnitPlacedAccordingRules_IsValid(){
+  void testCorrectSideFirstPlayer_IsValid(){
     Unit reng = new Archer();
-    PlaceUnitEvent event = new PlaceUnitEvent(0,0,reng);
+    PlaceUnitEvent event = new PlaceUnitEvent(1,1,reng,gameState.getCurrentPlayer());
+    assertTrue(GameLogic.isValidPlacement(gameState,event));
+  }
+  @Test
+  void testCorrectSideSecondPlayer_IsNotValid(){
+    gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
+    Unit reng = new Knight();
+    PlaceUnitEvent event = new PlaceUnitEvent(1,1,reng,gameState.getCurrentPlayer());
+    assertFalse(GameLogic.isValidPlacement(gameState,event));
+  }
+  @Test
+  void testCorrectSideSecondPlayer_IsValid(){
+    gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
+    Unit reng = new Knight();
+    PlaceUnitEvent event = new PlaceUnitEvent(0,2,reng,gameState.getCurrentPlayer());
     assertTrue(GameLogic.isValidPlacement(gameState,event));
   }
 
-  // ТO DO добавить тест на разных игроков
+
 
   private void makeFullBoard() {
     Unit reng = new Archer();

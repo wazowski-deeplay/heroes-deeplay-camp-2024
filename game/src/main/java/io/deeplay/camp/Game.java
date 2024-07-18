@@ -1,5 +1,6 @@
 package io.deeplay.camp;
 
+import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
@@ -18,8 +19,7 @@ public class Game implements GameListener {
 
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) {
-    for(int i = 0; i < 6;) {
-      // Проверка правильности хода для правил
+    for(int i = 0; i < ((Board.ROWS*Board.COLUMNS)/2);) {
       if (GameLogic.isValidPlacement(gameState, placeUnitEvent)) {
         gameState.makePlacement(placeUnitEvent);
         gameState.getCurrentBoard();
@@ -27,7 +27,6 @@ public class Game implements GameListener {
         i++;
       }
       else {
-        // Если ход не коректен то мы возвращаем томуже самому игроку доску
         gameState.getCurrentBoard();
       }
     }

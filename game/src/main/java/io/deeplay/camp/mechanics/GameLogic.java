@@ -11,20 +11,11 @@ public class GameLogic {
 
   public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement) {
 
-    // У нас уже есть юнит и координаты и текущая доска
-
-    // Текущая доска
     Board board = gameState.getCurrentBoard();
-
-    // Координаты на доске
-    int x = placement.getY();
-    int y = placement.getX();
-
-    // Юнит
     Unit unit = placement.getUnit();
     AttackType unitAttackType = placement.getUnit().getAttackType();
-
-    // Результат
+    int x = placement.getX();
+    int y = placement.getY();
     boolean result = false;
 
     // Проверка есть ли место на доске
@@ -37,23 +28,22 @@ public class GameLogic {
       return result;
     }
 
-    // TO DO  Проверка с какой стороны стоит юнит
-    // В нам понятно какой player ходит но не понятно клетка его или нет
-    // Это дописать в board ?
-
-    // Проверка соответсвует ли юнит тому куда он ставиться по правилам
-    if (unitAttackType == AttackType.CLOSE_ATTACK) {
-      if (placement.getY() == 1 || placement.getY() == 2) {
+    // Проверка на сторону юнита
+    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+      if (y < (Board.ROWS/2)) {
+        return result = true;
+      } else {
+        return result;
+      }
+    }
+    else {
+      if (y > ((Board.ROWS/2)-1) && y < Board.ROWS){
         return result = true;
       }
-    } else if (placement.getY() == 0 || placement.getY() == 3) {
-      return result = true;
+      else
+        return result;
     }
 
-
-
-
-    return result;
   }
 
   public static boolean isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer) {
