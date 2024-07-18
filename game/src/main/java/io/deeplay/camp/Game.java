@@ -5,6 +5,7 @@ import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.events.StartGameEvent;
+import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.GameLogic;
 import io.deeplay.camp.mechanics.GameState;
 
@@ -35,10 +36,9 @@ public class Game implements GameListener {
   }
 
   @Override
-  public void changePlayer(ChangePlayerEvent changePlayerEvent) {
-    if (GameLogic.isValidChangePlayer(gameState, changePlayerEvent)) {
-      gameState.changeCurrentPlayer();
-    }
+  public void changePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
+    GameLogic.isValidChangePlayer(gameState, changePlayerEvent);
+    gameState.changeCurrentPlayer();
   }
 
   @Override

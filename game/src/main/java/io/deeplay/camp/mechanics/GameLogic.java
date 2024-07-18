@@ -8,8 +8,14 @@ import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
+import io.deeplay.camp.exceptions.ErrorCode;
+import io.deeplay.camp.exceptions.GameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GameLogic {
+  private static final Logger log = LoggerFactory.getLogger(GameLogic.class);
+
   public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement) {
 
     Board board = gameState.getCurrentBoard();
@@ -45,9 +51,18 @@ public class GameLogic {
     }
   }
 
-  public static boolean isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer) {
-    return gameState.getCurrentPlayer() == changePlayer.getRequester()
-        && gameState.getGameStage() != GameStage.PLACEMENT_STAGE;
+  public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer)
+      throws GameException {
+    String message;
+    if (gameState.getCurrentPlayer() == changePlayer.getRequester()
+        && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
+      message = changePlayer.getRequester().name() + " the player has completed his turn";
+      log.atInfo().log(message);
+    } else {
+      message = changePlayer.getRequester().name() + " passes the move out of his turn";
+      log.atInfo().log(message);
+      throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
+    }
   }
 
   public static boolean isValidMove(GameState gameState, MakeMoveEvent move) {
