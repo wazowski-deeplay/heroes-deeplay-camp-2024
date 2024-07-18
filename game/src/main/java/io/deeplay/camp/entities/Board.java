@@ -21,7 +21,7 @@ public class Board {
     return units[x][y];
   }
 
-  public boolean isFull() {
+  public boolean isFullBoard() {
     for (Unit[] row : units) {
       for (Unit unit : row) {
         if (unit == null) {
@@ -30,6 +30,10 @@ public class Board {
       }
     }
     return true;
+  }
+
+  public boolean isTakenCell(int x, int y) {
+    return units[x][y] != null;
   }
 
   public int countUnitsRow(int row) {
