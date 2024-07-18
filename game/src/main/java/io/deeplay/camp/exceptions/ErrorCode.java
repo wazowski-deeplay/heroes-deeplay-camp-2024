@@ -8,7 +8,7 @@ public enum ErrorCode {
 
   // Пример того, что может быть у Дениса
   MOVE_IS_NOT_AVAILABLE("Сейчас нельзя сделать ход!"),
-  MOVE_IS_NOT_CORRECT("Сейчас нельзя сделать ход!");
+  MOVE_IS_NOT_CORRECT("Некорректный ход!");
 
   private final String message;
 
