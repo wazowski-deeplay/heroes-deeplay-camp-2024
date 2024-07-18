@@ -6,6 +6,7 @@ public class Archer extends Unit {
   public Archer(PlayerType playerType) {
     super(UnitType.ARCHER, 10, 10, 5, 6, 12, false);
     this.playerType = playerType;
+    setAttack(AttackType.LONG_ATTACK);
   }
 
   @Override

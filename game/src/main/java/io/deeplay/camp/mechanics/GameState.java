@@ -1,7 +1,6 @@
 package io.deeplay.camp.mechanics;
 
 import io.deeplay.camp.entities.Board;
-import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
@@ -50,9 +49,20 @@ public class GameState {
     }
   }
 
-  public void makePlacement(PlaceUnitEvent placeUnit) {}
+  public void makePlacement(PlaceUnitEvent placeUnit) {
+    // Применяется поставновка фигуры к доске
+    board.setUnit(placeUnit.getColums(), placeUnit.getRows(), placeUnit.getUnit());
+  }
 
   public Board getCurrentBoard() {
     return board;
+  }
+
+  public PlayerType getCurrentPlayer() {
+    return currentPlayer;
+  }
+
+  public void setCurrentPlayer(PlayerType playerType) {
+    this.currentPlayer = playerType;
   }
 }

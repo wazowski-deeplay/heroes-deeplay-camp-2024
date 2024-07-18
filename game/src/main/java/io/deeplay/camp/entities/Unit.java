@@ -11,6 +11,7 @@ public abstract class Unit {
   protected boolean isGeneral = false;
   protected UnitType unitType;
   protected PlayerType playerType;
+  protected AttackType attackType;
 
   public Unit(
       UnitType unitType,
@@ -29,9 +30,22 @@ public abstract class Unit {
     this.isGeneral = isGeneral;
   }
 
+  public void setAttack(AttackType attackType) {
+    this.attackType = attackType;
+  }
+
+  // Геттеры
+  public int getMaxHp() {
+    return maxHp;
+  }
+
   // Сеттеры
   protected void setMaxHp(int health) {
     this.maxHp = health;
+  }
+
+  public int getNowHp() {
+    return nowHp;
   }
 
   public void setNowHp(int health) {
@@ -44,41 +58,28 @@ public abstract class Unit {
     }
   }
 
-  protected void setDamage(int damage) {
-    this.damage = damage;
-  }
-
-  protected void setAccuracy(int accuracy) {
-    this.accuracy = accuracy;
-  }
-
-  protected void setArmor(int armor) {
-    this.armor = armor;
-  }
-
-  public void setGeneral(boolean isGeneral) {
-    this.isGeneral = isGeneral;
-  }
-
-  // Геттеры
-  public int getMaxHp() {
-    return maxHp;
-  }
-
-  public int getNowHp() {
-    return nowHp;
-  }
-
   public int getDamage() {
     return damage;
+  }
+
+  protected void setDamage(int damage) {
+    this.damage = damage;
   }
 
   public int getAccuracy() {
     return accuracy;
   }
 
+  protected void setAccuracy(int accuracy) {
+    this.accuracy = accuracy;
+  }
+
   public int getArmor() {
     return armor;
+  }
+
+  protected void setArmor(int armor) {
+    this.armor = armor;
   }
 
   public UnitType getUnitType() {
@@ -89,12 +90,24 @@ public abstract class Unit {
     return playerType;
   }
 
+  public void setPlayerType(PlayerType playerType) {
+    this.playerType = playerType;
+  }
+
+  public AttackType getAttackType() {
+    return attackType;
+  }
+
   public boolean isAlive() {
     return nowHp > 0;
   }
 
   public boolean isGeneral() {
     return isGeneral;
+  }
+
+  public void setGeneral(boolean isGeneral) {
+    this.isGeneral = isGeneral;
   }
 
   // Методы для реализации в дочерних классах
