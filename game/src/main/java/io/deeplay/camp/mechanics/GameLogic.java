@@ -51,7 +51,12 @@ public class GameLogic {
     }
   }
 
-
+  /**
+   * Метод проверяет событие перехода хода другому игроку.
+   * @param gameState Актуальное игровое состояние.
+   * @param changePlayerEvent Событие передачи хода.
+   * @throws GameException Если расстановка не завершена, либо переход запросил не тот игрок.
+   */
   public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayerEvent) throws GameException {
     if (gameState.getCurrentPlayer() == changePlayerEvent.getRequester()
             && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
