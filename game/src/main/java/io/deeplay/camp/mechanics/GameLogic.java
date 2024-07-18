@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GameLogic {
-  private static final Logger log = LoggerFactory.getLogger(GameLogic.class);
+  private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
 
   public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement) {
 
@@ -51,16 +51,15 @@ public class GameLogic {
     }
   }
 
-  public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer)
-      throws GameException {
+  public static void isValidChangePlayer(GameState gameState, ChangePlayerEvent changePlayer) throws GameException {
     String message;
     if (gameState.getCurrentPlayer() == changePlayer.getRequester()
         && gameState.getGameStage() != GameStage.PLACEMENT_STAGE) {
       message = changePlayer.getRequester().name() + " the player has completed his turn";
-      log.atInfo().log(message);
+      logger.atInfo().log(message);
     } else {
       message = changePlayer.getRequester().name() + " passes the move out of his turn";
-      log.atInfo().log(message);
+      logger.atInfo().log(message);
       throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
     }
   }
