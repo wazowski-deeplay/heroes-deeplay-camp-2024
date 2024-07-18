@@ -64,8 +64,4 @@ public class GameState {
   public void setCurrentPlayer(PlayerType playerType){
     this.currentPlayer = playerType;
   }
-
-  public Board getCurrentBoard() {
-    return board;
-  }
 }
