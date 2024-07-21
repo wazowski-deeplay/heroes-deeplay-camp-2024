@@ -33,4 +33,29 @@ public class Army {
       }
     }
   }
+
+  public boolean isAliveGeneral() {
+    isAliveGeneral = false;
+    for (Unit unit : units) {
+      if (unit.isGeneral() && unit.isAlive()) {
+        generalType = unit.getUnitType();
+        isAliveGeneral = true;
+        break;
+      }
+    }
+    if (isAliveGeneral) {
+      if (!isBuffed) {
+        for (Unit unit : units) {
+          unit.applyBuff(unit, generalType);
+        }
+      }
+      isBuffed = true;
+    } else if (isBuffed) {
+      for (Unit unit : units) {
+        unit.removeBuff(unit, generalType);
+      }
+      isBuffed = false;
+    }
+    return isAliveGeneral;
+  }
 }

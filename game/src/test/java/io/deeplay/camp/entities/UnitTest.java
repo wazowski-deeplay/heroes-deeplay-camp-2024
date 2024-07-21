@@ -1,9 +1,5 @@
-package io.deeplay.camp.entites;
+package io.deeplay.camp.entities;
 
-import io.deeplay.camp.entities.Archer;
-import io.deeplay.camp.entities.Healer;
-import io.deeplay.camp.entities.Knight;
-import io.deeplay.camp.entities.Mage;
 import io.deeplay.camp.mechanics.PlayerType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
