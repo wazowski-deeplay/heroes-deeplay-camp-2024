@@ -13,5 +13,5 @@ public interface GameListener {
 
   void changePlayer(ChangePlayerEvent event) throws GameException;
 
-  void makeMove(MakeMoveEvent event);
+  void makeMove(MakeMoveEvent event) throws GameException;
 }

@@ -42,7 +42,7 @@ public class Game implements GameListener {
   }
 
   @Override
-  public void makeMove(MakeMoveEvent makeMoveEvent) {
+  public void makeMove(MakeMoveEvent makeMoveEvent) throws GameException {
     if (GameLogic.isValidMove(gameState, makeMoveEvent)) {
       gameState.makeMove(makeMoveEvent);
     }
