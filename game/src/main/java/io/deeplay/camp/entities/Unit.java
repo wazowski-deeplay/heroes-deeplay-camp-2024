@@ -2,7 +2,7 @@ package io.deeplay.camp.entities;
 
 import io.deeplay.camp.mechanics.PlayerType;
 
-public abstract class Unit {
+public abstract class Unit implements GeneralBuff {
   protected int maxHp;
   protected int nowHp;
   protected int damage;

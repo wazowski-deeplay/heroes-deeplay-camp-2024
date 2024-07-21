@@ -1,6 +1,8 @@
 package io.deeplay.camp.mechanics;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Healer;
@@ -18,7 +20,7 @@ class GameLogicTest {
   GameState gameState = new GameState();
 
   @BeforeEach
-  public void setUp() throws Exception {
+  public void setUp(){
     gameState.getCurrentBoard().setUnit(0, 0, new Archer(PlayerType.FIRST_PLAYER));
     gameState.getCurrentBoard().setUnit(1, 0, new Archer(PlayerType.FIRST_PLAYER));
     gameState.getCurrentBoard().setUnit(2, 0, new Archer(PlayerType.FIRST_PLAYER));
@@ -48,8 +50,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToArcher() throws GameException {
-    boolean actual = false;
+  void isValidMoveAttackKnightToArcher()  {
     Position posAttacker = new Position(1, 1);
     Position posDefender = new Position(2, 3);
     MakeMoveEvent makeMove =
@@ -77,7 +78,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToFarKnight() throws GameException {
+  void isValidMoveAttackKnightToFarKnight() {
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(2, 2);
     MakeMoveEvent makeMove =
@@ -106,8 +107,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToArcherWithOneKnight() throws GameException {
-    boolean actual = false;
+  void isValidMoveAttackKnightToArcherWithOneKnight() {
     gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
     gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
     Position posAttacker = new Position(0, 1);
@@ -139,8 +139,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackAllyKnightToAllyKnight() throws GameException {
-    boolean actual = false;
+  void isValidMoveAttackAllyKnightToAllyKnight() {
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(1, 1);
     MakeMoveEvent makeMove =
@@ -167,8 +166,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveHealAllyHealerToEnemyKnight() throws GameException {
-    boolean actual = false;
+  void isValidMoveHealAllyHealerToEnemyKnight()  {
     Position posAttacker = new Position(1, 3);
     Position posDefender = new Position(1, 1);
     MakeMoveEvent makeMove =
