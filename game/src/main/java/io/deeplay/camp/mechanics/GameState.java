@@ -1,7 +1,8 @@
 package io.deeplay.camp.mechanics;
 
+import io.deeplay.camp.entities.Army;
+import io.deeplay.camp.entities.AttackType;
 import io.deeplay.camp.entities.Board;
-import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import lombok.Getter;
@@ -15,10 +16,14 @@ public class GameState {
 
   private PlayerType currentPlayer;
 
+  private Army armyFirst;
+  private Army armySecond;
   private GameStage gameStage;
 
   public GameState() {
     board = new Board();
+    armyFirst = new Army(PlayerType.FIRST_PLAYER);
+    armySecond = new Army(PlayerType.SECOND_PLAYER);
     currentPlayer = PlayerType.FIRST_PLAYER;
     gameStage = GameStage.PLACEMENT_STAGE;
   }
@@ -33,19 +38,22 @@ public class GameState {
 
   // методы чисто для применения, проверка происходит до их использования
   public void makeMove(MakeMoveEvent move) {
-    // Проверка на то, не является ли атакующий Магом
-    if (move.getAttacker().getUnitType() != UnitType.MAGE) {
+    if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getAttackType()
+        == AttackType.MASS_ATTACK) {
+      if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getPlayerType()
+          == PlayerType.FIRST_PLAYER) {
+        for (int i = 0; i < armySecond.getUnits().length; i++) {
+          board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armySecond.getUnits()[i]);
+        }
+      } else {
+        for (int i = 0; i < armyFirst.getUnits().length; i++) {
+          board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armyFirst.getUnits()[i]);
+        }
+      }
+    } else {
       board
           .getUnit(move.getFrom().x(), move.getFrom().y())
           .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
-    } else {
-      for (int i = 0; i < board.getUnits().length; i++) {
-        for (int j = 0; j < board.getUnits()[i].length; j++) {
-          if (board.getUnits()[i][j].getPlayerType() != move.getAttacker().getPlayerType()) {
-            board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(board.getUnit(i, j));
-          }
-        }
-      }
     }
   }
 
