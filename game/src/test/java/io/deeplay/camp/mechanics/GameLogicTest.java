@@ -1,10 +1,14 @@
 package io.deeplay.camp.mechanics;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Healer;
 import io.deeplay.camp.entities.Knight;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.events.MakeMoveEvent;
+import io.deeplay.camp.exceptions.ErrorCode;
+import io.deeplay.camp.exceptions.GameException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +34,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToKnight() {
+  void isValidMoveAttackKnightToKnight() throws GameException {
     boolean actual = true;
     Position posAttacker = new Position(1, 1);
     Position posDefender = new Position(1, 2);
@@ -39,11 +43,12 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
+    assertDoesNotThrow(() -> GameLogic.isValidMove(gameState, makeMove));
     Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
   }
 
   @Test
-  void isValidMoveAttackKnightToArcher() {
+  void isValidMoveAttackKnightToArcher() throws GameException {
     boolean actual = false;
     Position posAttacker = new Position(1, 1);
     Position posDefender = new Position(2, 3);
@@ -52,11 +57,13 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+    assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
   @Test
-  void isValidMoveAttackArcherToArcher() {
+  void isValidMoveAttackArcherToArcher() throws GameException {
     boolean actual = true;
     Position posAttacker = new Position(1, 0);
     Position posDefender = new Position(2, 3);
@@ -65,12 +72,12 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
+    assertDoesNotThrow(() -> GameLogic.isValidMove(gameState, makeMove));
     Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
   }
 
   @Test
-  void isValidMoveAttackKnightToFarKnight() {
-    boolean actual = false;
+  void isValidMoveAttackKnightToFarKnight() throws GameException {
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(2, 2);
     MakeMoveEvent makeMove =
@@ -78,11 +85,13 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+    assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
   @Test
-  void isValidMoveAttackKnightToOneKnight() {
+  void isValidMoveAttackKnightToOneKnight() throws GameException {
     boolean actual = true;
     gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
     gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
@@ -97,7 +106,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToArcherWithOneKnight() {
+  void isValidMoveAttackKnightToArcherWithOneKnight() throws GameException {
     boolean actual = false;
     gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
     gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
@@ -108,11 +117,13 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+    assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
   @Test
-  void isValidMoveAttackKnightToArcherWithNullKnight() {
+  void isValidMoveAttackKnightToArcherWithNullKnight() throws GameException {
     final boolean actual = true;
     gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
     gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
@@ -128,7 +139,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackAllyKnightToAllyKnight() {
+  void isValidMoveAttackAllyKnightToAllyKnight() throws GameException {
     boolean actual = false;
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(1, 1);
@@ -137,11 +148,13 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+    assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
   @Test
-  void isValidMoveHealAllyHealerToAllyKnight() {
+  void isValidMoveHealAllyHealerToAllyKnight() throws GameException {
     boolean actual = true;
     Position posAttacker = new Position(1, 3);
     Position posDefender = new Position(1, 2);
@@ -154,7 +167,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveHealAllyHealerToEnemyKnight() {
+  void isValidMoveHealAllyHealerToEnemyKnight() throws GameException {
     boolean actual = false;
     Position posAttacker = new Position(1, 3);
     Position posDefender = new Position(1, 1);
@@ -163,6 +176,8 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+    assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 }
