@@ -2,6 +2,7 @@ package io.deeplay.camp.mechanics;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Knight;

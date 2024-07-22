@@ -11,10 +11,9 @@ import io.deeplay.camp.entities.Knight;
 import io.deeplay.camp.entities.Mage;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
-
+import io.deeplay.camp.exceptions.GameException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -289,7 +288,7 @@ public class GamePlayerTest {
   }
 
   @Test
-  public void testUnitsPossibleActions() {
+  public void testUnitsPossibleActions() throws GameException {
     Board board = gameState.getCurrentBoard();
     // First palyer
     Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);
