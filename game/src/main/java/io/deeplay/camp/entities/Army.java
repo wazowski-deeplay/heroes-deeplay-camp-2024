@@ -37,6 +37,9 @@ public class Army {
   public boolean isAliveGeneral() {
     isAliveGeneral = false;
     for (Unit unit : units) {
+      if (unit == null) {
+        continue;
+      }
       if (unit.isGeneral() && unit.isAlive()) {
         generalType = unit.getUnitType();
         isAliveGeneral = true;
