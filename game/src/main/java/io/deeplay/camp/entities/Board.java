@@ -21,15 +21,34 @@ public class Board {
     return units[x][y];
   }
 
-  public boolean isFullBoard() {
-    for (Unit[] row : units) {
-      for (Unit unit : row) {
-        if (unit == null) {
+  public boolean isFullFirstPlyerPart() {
+    for (int i = 0; i < Board.ROWS / 2; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
+        if (getUnit(j, i) == null) {
           return false;
         }
       }
     }
     return true;
+  }
+
+  public boolean isFullSecondPlyerPart() {
+    for (int i = 2; i < Board.ROWS; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
+        if (getUnit(j, i) == null) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  public boolean isFullBoard() {
+    if (isFullFirstPlyerPart() && isFullSecondPlyerPart()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public boolean isTakenCell(int x, int y) {
