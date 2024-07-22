@@ -39,11 +39,18 @@ public class Board {
   public int countUnitsRow(int row) {
     int count = 0;
     for (int i = 0; i < COLUMNS; i++) {
+      if (isEmptyCell(i, row)) {
+        continue;
+      }
       if (units[i][row].isAlive()) {
         count++;
       }
     }
     return count;
+  }
+
+  public boolean isEmptyCell(int x, int y) {
+    return units[x][y] == null;
   }
 
   public Unit[][] getUnits() {

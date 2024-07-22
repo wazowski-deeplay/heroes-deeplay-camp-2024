@@ -2,7 +2,6 @@ package io.deeplay.camp.mechanics;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Knight;
@@ -83,12 +82,12 @@ public class GameLogicPlacementTest {
   private void makeFullBoard() {
     Unit reng = new Archer(gameState.getCurrentPlayer());
     Unit mili = new Knight(gameState.getCurrentPlayer());
-    for (int i = 0; i < Board.COLUMNS; i++) {
-      for (int j = 0; j < Board.ROWS; j++) {
+    for (int i = 0; i < Board.ROWS; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
         if (i == 0 || i == 3) {
-          gameState.getCurrentBoard().setUnit(i, j, reng);
+          gameState.getCurrentBoard().setUnit(j, i, reng);
         } else {
-          gameState.getCurrentBoard().setUnit(i, j, mili);
+          gameState.getCurrentBoard().setUnit(j, i, mili);
         }
       }
     }
