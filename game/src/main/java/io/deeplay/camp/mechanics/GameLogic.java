@@ -1,6 +1,5 @@
 package io.deeplay.camp.mechanics;
 
-import io.deeplay.camp.entities.AttackType;
 import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
@@ -13,8 +12,7 @@ public class GameLogic {
   public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement) {
 
     Board board = gameState.getCurrentBoard();
-    Unit unit = placement.getUnit();
-    AttackType unitAttackType = placement.getUnit().getAttackType();
+
     int x = placement.getColums();
     int y = placement.getRows();
     boolean result = false;
@@ -23,6 +21,14 @@ public class GameLogic {
     if (board.isFullBoard()) {
       return result;
     }
+
+    // Проверка на генерала,а так же что их не 6 шт
+    // генерала нельзя дать одному и тому же юниту
+    // Пройтись по массиву enumirationsPlayersUnits
+    // и првоерить наличее хотябы одного генерала
+    // прийдётся дополнять
+    // if (placement.getUnit().isGeneral()){
+    // }
 
     // Проверка занята ли клетка
     if (board.isTakenCell(x, y)) {
