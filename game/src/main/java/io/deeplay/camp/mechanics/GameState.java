@@ -59,7 +59,7 @@ public class GameState {
 
   public void makePlacement(PlaceUnitEvent placeUnit) {
     // Применяется поставновка фигуры к доске
-    board.setUnit(placeUnit.getColums(), placeUnit.getRows(), placeUnit.getUnit());
+    board.setUnit(placeUnit.getColumns(), placeUnit.getRows(), placeUnit.getUnit());
   }
 
   public Board getCurrentBoard() {

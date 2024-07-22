@@ -9,7 +9,7 @@ import io.deeplay.camp.exceptions.GameException;
 public interface GameListener {
   void startGame(StartGameEvent event);
 
-  void placeUnit(PlaceUnitEvent event);
+  void placeUnit(PlaceUnitEvent event) throws GameException;
 
   void changePlayer(ChangePlayerEvent event) throws GameException;
 

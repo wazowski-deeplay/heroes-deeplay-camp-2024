@@ -15,11 +15,20 @@ import org.slf4j.LoggerFactory;
 public class GameLogic {
   private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
 
-  public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement) {
+  /**
+   * Метод проверяет корректность постановки юнита на доску
+   *
+   * @param gameState Актуальное игровое состояние
+   * @param placement Событие расстановки
+   * @throws GameException Не корректные координаты, за пределами поля или с чужой стороны. Не
+   *     заполненное игровое поле. Отсутствие генерала в расстановке
+   */
+  public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement)
+      throws GameException {
 
     Board board = gameState.getCurrentBoard();
 
-    int x = placement.getColums();
+    int x = placement.getColumns();
     int y = placement.getRows();
     boolean result = false;
 
