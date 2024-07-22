@@ -20,7 +20,7 @@ class GameLogicTest {
   GameState gameState = new GameState();
 
   @BeforeEach
-  public void setUp(){
+  public void setUp() {
     gameState.getCurrentBoard().setUnit(0, 0, new Archer(PlayerType.FIRST_PLAYER));
     gameState.getCurrentBoard().setUnit(1, 0, new Archer(PlayerType.FIRST_PLAYER));
     gameState.getCurrentBoard().setUnit(2, 0, new Archer(PlayerType.FIRST_PLAYER));
@@ -50,7 +50,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToArcher()  {
+  void isValidMoveAttackKnightToArcher() {
     Position posAttacker = new Position(1, 1);
     Position posDefender = new Position(2, 3);
     MakeMoveEvent makeMove =
@@ -166,7 +166,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveHealAllyHealerToEnemyKnight()  {
+  void isValidMoveHealAllyHealerToEnemyKnight() {
     Position posAttacker = new Position(1, 3);
     Position posDefender = new Position(1, 1);
     MakeMoveEvent makeMove =

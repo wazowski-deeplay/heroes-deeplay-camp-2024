@@ -6,6 +6,7 @@ import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.MakeMoveEvent;
+import io.deeplay.camp.exceptions.GameException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class GamePlayer {
         if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {
           for (Position to : unitsCurrentPlayer) {
             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
-            if (isValidMove(gameState, move)) {
+            if (canAct(gameState, move)) {
               map.put(from, to);
             }
           }
@@ -62,7 +63,7 @@ public class GamePlayer {
         } else {
           for (Position to : unitsOpponentPlayer) {
             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
-            if (isValidMove(gameState, move)) {
+            if (canAct(gameState, move)) {
               map.put(from, to);
             }
           }
@@ -78,7 +79,7 @@ public class GamePlayer {
         if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {
           for (Position to : unitsCurrentPlayer) {
             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
-            if (isValidMove(gameState, move)) {
+            if (canAct(gameState, move)) {
               map.put(from, to);
             }
           }
@@ -86,12 +87,23 @@ public class GamePlayer {
         // Возможные атаки для юнитов выбранного игрока по живым юнитам соперника
         for (Position to : unitsOpponentPlayer) {
           MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
-          if (isValidMove(gameState, move)) {
+          if (canAct(gameState, move)) {
             map.put(from, to);
           }
         }
       }
     }
     return map;
+  }
+
+  public static boolean canAct(GameState gameState, MakeMoveEvent move) {
+    boolean result = false;
+    try {
+      isValidMove(gameState, move);
+      result = true;
+    } catch (GameException e) {
+      result = false;
+    }
+    return result;
   }
 }
