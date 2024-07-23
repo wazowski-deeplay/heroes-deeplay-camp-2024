@@ -26,12 +26,11 @@ public class Board {
     return units[x][y];
   }
 
-
-  private boolean isFullPart(int startRow,int endRow){
-    for(int i = startRow; i < endRow; i++) {
-      for(int j = 0; j < Board.COLUMNS; j++) {
-        if(isEmptyCell(j,i)){
-          logger.atInfo().log("Empty cell (X-{},Y-{})",j,i);
+  private boolean isFullPart(int startRow, int endRow) {
+    for (int i = startRow; i < endRow; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
+        if (isEmptyCell(j, i)) {
+          logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);
           return false;
         }
       }
@@ -40,32 +39,30 @@ public class Board {
   }
 
   public boolean isFullFirstPlayerPart() {
-    return isFullPart(0,Board.ROWS/2);
+    return isFullPart(0, Board.ROWS / 2);
   }
 
   public boolean isFullSecondPlayerPart() {
-    return isFullPart(Board.ROWS/2,Board.ROWS);
+    return isFullPart(Board.ROWS / 2, Board.ROWS);
   }
 
-  public List<Position> enumerateUnits (int startRow,int endRow){
+  public List<Position> enumerateUnits(int startRow, int endRow) {
     List<Position> unitPositions = new ArrayList<>();
-    for(int i = startRow; i < endRow; i++) {
-      for(int j = 0; j < Board.COLUMNS; j++) {
-        if(isEmptyCell(j,i)){
-          logger.atInfo().log("Empty cell (X-{},Y-{})",j,i);
-        continue;
+    for (int i = startRow; i < endRow; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
+        if (isEmptyCell(j, i)) {
+          logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);
+          continue;
         }
-        if (getUnit(j,i).isAlive()){
-          unitPositions.add(new Position(j,i));
-        }
-        else {
-          logger.atInfo().log("Dead unit (X-{},Y-{})",j,i);
+        if (getUnit(j, i).isAlive()) {
+          unitPositions.add(new Position(j, i));
+        } else {
+          logger.atInfo().log("Dead unit (X-{},Y-{})", j, i);
         }
       }
     }
     return unitPositions;
   }
-
 
   public int countUnitsRow(int row) {
     int count = 0;

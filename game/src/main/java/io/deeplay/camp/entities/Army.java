@@ -27,7 +27,7 @@ public class Army {
     }
     if (this.owner == PlayerType.SECOND_PLAYER) {
       for (int i = 0; i < board.getUnits().length; i++) {
-        for (int j = board.getUnits().length / 2; j < board.getUnits()[i].length; j++) {
+        for (int j = board.getUnits()[i].length / 2; j < board.getUnits()[i].length; j++) {
           units[index++] = board.getUnit(i, j);
         }
       }

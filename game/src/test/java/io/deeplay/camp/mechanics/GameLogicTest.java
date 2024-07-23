@@ -11,7 +11,6 @@ import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,8 +44,7 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    assertDoesNotThrow(() -> GameLogic.isValidMove(gameState, makeMove));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    assertDoesNotThrow(() -> gameState.makeMove( makeMove));
   }
 
   @Test
@@ -59,7 +57,7 @@ class GameLogicTest {
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
     GameException gameException =
-        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+        assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
@@ -73,8 +71,7 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    assertDoesNotThrow(() -> GameLogic.isValidMove(gameState, makeMove));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    assertDoesNotThrow(() -> gameState.makeMove( makeMove));
   }
 
   @Test
@@ -87,7 +84,7 @@ class GameLogicTest {
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
     GameException gameException =
-        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+        assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
@@ -103,7 +100,7 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    assertDoesNotThrow(() -> gameState.makeMove( makeMove));
   }
 
   @Test
@@ -118,7 +115,7 @@ class GameLogicTest {
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
     GameException gameException =
-        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+        assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
@@ -135,7 +132,7 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    assertDoesNotThrow(() -> gameState.makeMove( makeMove));
   }
 
   @Test
@@ -148,7 +145,7 @@ class GameLogicTest {
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
     GameException gameException =
-        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+        assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 
@@ -162,7 +159,7 @@ class GameLogicTest {
             posAttacker,
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    Assertions.assertEquals(GameLogic.isValidMove(gameState, makeMove), actual);
+    assertDoesNotThrow(() -> gameState.makeMove( makeMove));
   }
 
   @Test
@@ -175,7 +172,7 @@ class GameLogicTest {
             posDefender,
             gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
     GameException gameException =
-        assertThrows(GameException.class, () -> GameLogic.isValidMove(gameState, makeMove));
+        assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
 }
