@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class Army {
-  Unit[] units;
   public PlayerType owner;
   public UnitType generalType;
   public boolean isAliveGeneral = false;
   public boolean isBuffed = false;
+  Unit[] units;
 
   public Army(PlayerType owner) {
     this.owner = owner;

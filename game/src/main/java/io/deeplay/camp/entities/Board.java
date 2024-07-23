@@ -1,11 +1,10 @@
 package io.deeplay.camp.entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 public class Board {
