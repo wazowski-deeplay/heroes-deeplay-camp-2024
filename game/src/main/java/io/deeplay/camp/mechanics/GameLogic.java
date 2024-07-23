@@ -16,80 +16,6 @@ public class GameLogic {
   private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
 
   /**
-   * Метод проверяет корректность постановки юнита на доску
-   *
-   * @param gameState Актуальное игровое состояние
-   * @param placement Событие расстановки
-   * @throws GameException Не корректные координаты, за пределами поля или с чужой стороны. Не
-   *     заполненное игровое поле. Отсутствие генерала в расстановке
-   */
-  public static boolean isValidPlacement(GameState gameState, PlaceUnitEvent placement)
-      throws GameException {
-
-    Board board = gameState.getCurrentBoard();
-
-    int x = placement.getColumns();
-    int y = placement.getRows();
-    boolean result = false;
-
-    logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
-
-    // Проверка стартующая когда расстановка по мнению игрока окончена
-    if (!placement.isInProcess()) {
-      board.setUnit(x, y, placement.getUnit());
-      logger.atInfo().log("Placement process finished. Checking board and general presence.");
-      // Проверка на то что на доске есть генерал
-      if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-        if (!board.isFullFirstPlayerPart()) {
-          logger.atError().log("First player board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!GameLogic.currentPlayerHaveGeneral(board, gameState)) {
-          logger.atError().log("First player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-        }
-      } else {
-        if (!board.isFullSecondPlayerPart()) {
-          logger.atError().log("Second player's board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!GameLogic.currentPlayerHaveGeneral(board, gameState)) {
-          logger.atError().log("Second player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-        }
-      }
-    }
-
-    if (x > Board.COLUMNS) {
-      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-    }
-    if (y > Board.ROWS) {
-      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-    }
-    // Проверка на сторону юнита
-    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-      if (y < (Board.ROWS / 2)) {
-        result = true;
-        logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
-      } else {
-        logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
-        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-      }
-    } else {
-      if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
-        logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
-        result = true;
-      } else {
-        logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
-        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-      }
-    }
-    return result;
-  }
-
-  /**
    * Метод проверяет событие перехода хода другому игроку.
    *
    * @param gameState Актуальное игровое состояние.
@@ -223,32 +149,4 @@ public class GameLogic {
             && gameState.getCurrentBoard().countUnitsRow(from.y() - 2) == 0);
   }
 
-  public static boolean currentPlayerHaveGeneral(Board board, GameState gameState) {
-    boolean result = false;
-    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < Board.ROWS / 2; i++) {
-        for (int j = 0; j < Board.COLUMNS; j++) {
-          if (board.getUnit(j, i) == null) {
-            continue;
-          }
-          if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
-          }
-        }
-      }
-      return result;
-    } else {
-      for (int i = 2; i < Board.ROWS; i++) {
-        for (int j = 0; j < Board.COLUMNS; j++) {
-          if (board.getUnit(j, i) == null) {
-            continue;
-          }
-          if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
-          }
-        }
-      }
-      return result;
-    }
-  }
 }

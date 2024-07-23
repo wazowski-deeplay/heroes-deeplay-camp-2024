@@ -22,10 +22,7 @@ public class Game implements GameListener {
   // Пока не сказанно что ход последний можно сколько угодно переставлять фигуры
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) throws GameException {
-    // Проверка на корректность расстановки
-    if (GameLogic.isValidPlacement(gameState, placeUnitEvent)) {
       gameState.makePlacement(placeUnitEvent);
-    }
   }
 
   @Override
