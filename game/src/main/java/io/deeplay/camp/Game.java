@@ -10,11 +10,12 @@ import io.deeplay.camp.mechanics.GameLogic;
 import io.deeplay.camp.mechanics.GameState;
 
 public class Game implements GameListener {
-
-  GameState gameState;
+  GameLogic gameLogic;
+  private GameState gameState;
 
   public Game() {
     gameState = new GameState();
+    gameLogic = new GameLogic(gameState);
   }
 
   @Override
@@ -37,7 +38,7 @@ public class Game implements GameListener {
 
   @Override
   public void changePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
-    GameLogic.isValidChangePlayer(gameState, changePlayerEvent);
+    gameLogic.isValidChangePlayer(changePlayerEvent);
     gameState.changeCurrentPlayer();
   }
 
