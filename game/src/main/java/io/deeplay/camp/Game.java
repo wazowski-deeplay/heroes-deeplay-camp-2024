@@ -19,7 +19,6 @@ public class Game implements GameListener {
   @Override
   public void startGame(StartGameEvent startGameEvent) {}
 
-  // Пока не сказанно что ход последний можно сколько угодно переставлять фигуры
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) throws GameException {
       gameState.makePlacement(placeUnitEvent);

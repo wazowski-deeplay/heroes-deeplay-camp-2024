@@ -62,37 +62,19 @@ public class GameState {
     }
   }
 
+  /**
+   *
+   * @param placement Событие расстановки (координаты, юнит, ещё не закончил ли ход игрок, гнерал юнит или нет)
+   * @return Доска с актуальными изменениями
+   * @throws GameException Не корректные координаты, за пределами поля или с чужой стороны.Не
+   * заполненное игровое поле. Отсутствие генерала
+   */
   public void makePlacement(PlaceUnitEvent placement) throws GameException {
-
     int x = placement.getColumns();
     int y = placement.getRows();
     boolean result = false;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
-    // Проверка стартующая когда расстановка по мнению игрока окончена
-    if (!placement.isInProcess()) {
-      board.setUnit(x, y, placement.getUnit());
-      logger.atInfo().log("Placement process finished. Checking board and general presence.");
-      // Проверка на то что на доске есть генерал
-      if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-        if (!board.isFullFirstPlayerPart()) {
-          logger.atError().log("First player board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
-          logger.atError().log("First player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-        }
-      } else {
-        if (!board.isFullSecondPlayerPart()) {
-          logger.atError().log("Second player's board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
-          logger.atError().log("Second player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-        }
-      }
-    }
+
     if (x > Board.COLUMNS) {
       logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
       throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
@@ -119,6 +101,33 @@ public class GameState {
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
     }
+    // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность правил
+    board.setUnit(x, y, placement.getUnit());
+
+    // Проверка стартующая когда расстановка по мнению игрока окончена
+    if (!placement.isInProcess()) {
+      logger.atInfo().log("Placement process finished. Checking board and general presence.");
+      // Проверка на то что на доске есть генерал
+      if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+        if (!board.isFullFirstPlayerPart()) {
+          logger.atError().log("First player board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
+          logger.atError().log("First player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+        }
+      } else {
+        if (!board.isFullSecondPlayerPart()) {
+          logger.atError().log("Second player's board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
+          logger.atError().log("Second player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+        }
+      }
+    }
   }
 
   public Board getCurrentBoard() {
@@ -132,6 +141,7 @@ public class GameState {
   public void setCurrentPlayer(PlayerType playerType) {
     this.currentPlayer = playerType;
   }
+
   private boolean currentPlayerHaveGeneral(Board board,PlayerType playerType) {
     boolean result = false;
     if (playerType == PlayerType.FIRST_PLAYER) {
