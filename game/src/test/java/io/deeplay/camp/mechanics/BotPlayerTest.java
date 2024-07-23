@@ -17,12 +17,13 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class GamePlayerTest {
+public class BotPlayerTest {
   private GameState gameState;
-
+  private BotPlayer botPlayer;
   @BeforeEach
   void setUp() {
     gameState = new GameState();
+    botPlayer = new BotPlayer();
   }
 
   @Test
@@ -36,7 +37,7 @@ public class GamePlayerTest {
     board.setUnit(0, 1, firstPlayerKnight1);
     board.setUnit(1, 1, firstPlayerKnight2);
     board.setUnit(2, 1, firstPlayerKnight3);
-    List<Position> unitPositions = GamePlayer.enumerationPlayerUnits(playerType, board);
+    List<Position> unitPositions = botPlayer.enumerationPlayerUnits(playerType, board);
 
     List<Position> expectrdPositions =
         List.of(new Position(0, 1), new Position(1, 1), new Position(2, 1));
@@ -56,7 +57,7 @@ public class GamePlayerTest {
     board.setUnit(0, 2, secondPlayerKnight1);
     board.setUnit(1, 2, secondPlayerKnight2);
     board.setUnit(2, 2, secondPlayerKnight3);
-    List<Position> unitPositions = GamePlayer.enumerationPlayerUnits(playerType, board);
+    List<Position> unitPositions = botPlayer.enumerationPlayerUnits(playerType, board);
 
     List<Position> expectrdPositions =
         List.of(new Position(0, 2), new Position(1, 2), new Position(2, 2));
@@ -82,7 +83,7 @@ public class GamePlayerTest {
     board.setUnit(2, 2, secondPlayerKnight3);
 
     List<Position> unitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
 
     List<Position> expectrdPositions =
         List.of(new Position(0, 1), new Position(1, 1), new Position(2, 1));
@@ -108,7 +109,7 @@ public class GamePlayerTest {
     board.setUnit(2, 2, secondPlayerKnight3);
 
     List<Position> unitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
 
     List<Position> expectrdPositions =
         List.of(new Position(0, 2), new Position(1, 2), new Position(2, 2));
@@ -128,7 +129,7 @@ public class GamePlayerTest {
     board.setUnit(0, 1, firstPlayerKnight1);
     board.setUnit(1, 1, firstPlayerKnight2);
     board.setUnit(2, 1, firstPlayerKnight3);
-    List<Position> unitPositions = GamePlayer.enumerationPlayerUnits(playerType, board);
+    List<Position> unitPositions = botPlayer.enumerationPlayerUnits(playerType, board);
     List<Position> expectrdPositions = List.of(new Position(0, 1), new Position(2, 1));
 
     assertEquals(expectrdPositions.size(), unitPositions.size());
@@ -146,7 +147,7 @@ public class GamePlayerTest {
     board.setUnit(0, 2, secondPlayerKnight1);
     board.setUnit(1, 2, secondPlayerKnight2);
     board.setUnit(2, 2, secondPlayerKnight3);
-    List<Position> unitPositions = GamePlayer.enumerationPlayerUnits(playerType, board);
+    List<Position> unitPositions = botPlayer.enumerationPlayerUnits(playerType, board);
     List<Position> expectrdPositions = List.of(new Position(0, 2), new Position(2, 2));
 
     assertEquals(expectrdPositions.size(), unitPositions.size());
@@ -172,7 +173,7 @@ public class GamePlayerTest {
     board.setUnit(2, 2, secondPlayerKnight3);
 
     List<Position> unitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
 
     List<Position> expectrdPositions = List.of(new Position(1, 1), new Position(2, 1));
 
@@ -199,7 +200,7 @@ public class GamePlayerTest {
     board.setUnit(2, 2, secondPlayerKnight3);
 
     List<Position> unitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
 
     List<Position> expectrdPositions = List.of(new Position(0, 2), new Position(1, 2));
 
@@ -233,9 +234,9 @@ public class GamePlayerTest {
     board.setUnit(1, 3, secondPlayerHealer);
 
     List<Position> firstPlayerUnitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
     List<Position> secondPlayerUnitPositions =
-        GamePlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
+        botPlayer.enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
 
     List<Position> expectrdPositionsFirstPlayer =
         List.of(new Position(2, 1), new Position(2, 0), new Position(1, 1));
@@ -333,7 +334,7 @@ public class GamePlayerTest {
     board.setUnit(1, 3, secondPlayerHealer);
 
     PossibleActions<Position, Position> positionPossibleActions =
-        GamePlayer.unitsPossibleActions(gameState);
+            botPlayer.unitsPossibleActions(gameState);
 
     List<Position> firstPlayerKnightAttacks = new ArrayList<>();
     firstPlayerKnightAttacks.add(position1);

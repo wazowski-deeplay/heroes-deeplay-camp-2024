@@ -32,38 +32,61 @@ public class GameLogic {
     int y = placement.getRows();
     boolean result = false;
 
-    // Проверка есть ли место на доске
-    if (board.isFullBoard()) {
-      return result;
+    logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
+
+    // Проверка стартующая когда расстановка по мнению игрока окончена
+    if (!placement.isInProcess()) {
+      board.setUnit(x, y, placement.getUnit());
+      logger.atInfo().log("Placement process finished. Checking board and general presence.");
+      // Проверка на то что на доске есть генерал
+      if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+        if (!board.isFullFirstPlyerPart()) {
+          logger.atError().log("First player board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!GameLogic.currentPlayerHaveGeneral(board, gameState)) {
+          logger.atError().log("First player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+        }
+      } else {
+        if (!board.isFullSecondPlyerPart()) {
+          logger.atError().log("Second player's board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!GameLogic.currentPlayerHaveGeneral(board, gameState)) {
+          logger.atError().log("Second player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+        }
+      }
     }
 
-    // Проверка на генерала,а так же что их не 6 шт
-    // генерала нельзя дать одному и тому же юниту
-    // Пройтись по массиву enumirationsPlayersUnits
-    // и првоерить наличее хотябы одного генерала
-    // прийдётся дополнять
-    // if (placement.getUnit().isGeneral()){
-    // }
-
-    // Проверка занята ли клетка
-    if (board.isTakenCell(x, y)) {
-      return result;
+    if (x > Board.COLUMNS) {
+      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
+      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
     }
-
+    if (y > Board.ROWS) {
+      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
+      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+    }
     // Проверка на сторону юнита
     if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       if (y < (Board.ROWS / 2)) {
-        return result = true;
+        result = true;
+        logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
       } else {
-        return result;
+        logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
+        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
     } else {
       if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
-        return result = true;
+        logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
+        result = true;
       } else {
-        return result;
+        logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
+        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
     }
+    return result;
   }
 
   /**
@@ -198,5 +221,34 @@ public class GameLogic {
             && gameState.getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && gameState.getCurrentBoard().countUnitsRow(from.y() - 2) == 0);
+  }
+
+  public static boolean currentPlayerHaveGeneral(Board board, GameState gameState) {
+    boolean result = false;
+    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+      for (int i = 0; i < Board.ROWS / 2; i++) {
+        for (int j = 0; j < Board.COLUMNS; j++) {
+          if (board.getUnit(j, i) == null) {
+            continue;
+          }
+          if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
+            return result = true;
+          }
+        }
+      }
+      return result;
+    } else {
+      for (int i = 2; i < Board.ROWS; i++) {
+        for (int j = 0; j < Board.COLUMNS; j++) {
+          if (board.getUnit(j, i) == null) {
+            continue;
+          }
+          if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
+            return result = true;
+          }
+        }
+      }
+      return result;
+    }
   }
 }
