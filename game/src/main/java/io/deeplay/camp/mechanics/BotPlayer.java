@@ -22,48 +22,44 @@ public class BotPlayer implements GamePlayer {
   public List<Position> enumerationPlayerUnits(PlayerType playerType, Board board) {
     List<Position> unitPositions = new ArrayList<>();
     if (playerType == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < (Board.ROWS / 2); i++) {
-        for (int j = 0; j < Board.COLUMNS; j++) {
-          if (board.isEmptyCell(j, i)) {
-            logger.atInfo().log("Empty cell at ({}, {})", j, i);
-            continue;
-          }
-          if (board.getUnit(j, i).isAlive()) {
-            unitPositions.add(new Position(j, i));
-          } else {
-            logger.atInfo().log("Dead unit at ({}, {})", j, i);
-          }
-        }
-      }
-    } else if (playerType == PlayerType.SECOND_PLAYER) {
-      for (int i = (Board.ROWS / 2); i < Board.ROWS; i++) {
-        for (int j = 0; j < Board.COLUMNS; j++) {
-          if (board.isEmptyCell(j, i)) {
-            logger.atInfo().log("Empty cell at ({}, {})", j, i);
-            continue;
-          }
-          if (board.getUnit(j, i).isAlive()) {
-            unitPositions.add(new Position(j, i));
-          } else {
-            logger.atInfo().log("Dead unit at ({}, {})", j, i);
-          }
-        }
-      }
+      unitPositions.addAll(board.enumerateUnits(0,Board.ROWS/2));
+    } else {
+      unitPositions.addAll(board.enumerateUnits(Board.ROWS/2,Board.ROWS));
     }
     return unitPositions;
   }
+  // Подсчёт юнитов по переданным значениям
+//  private List<Position> enumerateUnits (Board board,int startRow, int endRow){
+//    List<Position> unitsPositions = new ArrayList<>();
+//    for(int i = startRow; i < endRow; i++) {
+//      for(int j = 0; j < Board.COLUMNS; j++) {
+//        if(board.isEmptyCell(j,i)){
+//          logger.atInfo().log("Empty at (X-{},Y-{})",j,i);
+//          continue;
+//        }
+//        if(board.getUnit(j,i).isAlive()){
+//          unitsPositions.add(new Position(j,i));
+//        } else {
+//          logger.atInfo().log("Dead unit at (X-{},Y-{})",j,i);
+//        }
+//      }
+//    }
+//    return unitsPositions;
+//  }
 
   // Возможные варианты действий юнитов. Ключ это какой юнит атакует, значение возможные валидные
   // атаки этого юнита
   public PossibleActions<Position, Position> unitsPossibleActions(GameState gameState) {
     Board board = gameState.getCurrentBoard();
     PossibleActions<Position, Position> map = new PossibleActions<>();
-    // Если тот кто ходить или тот с чей стороны мы хотим узнать возможные ходы
+    List<Position> unitsCurrentPlayer = new ArrayList<>();
+    List<Position> unitsOpponentPlayer = new ArrayList<>();
+    // Ключ - это атакующий юнит, значение - это все возможные атаки данного юнита
     // Для первого игрока
     if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       logger.atInfo().log("Calculating possible actions for First Player");
-      List<Position> unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
-      List<Position> unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
+      unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER,board);
+      unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER,board);
       for (Position from : unitsCurrentPlayer) {
         // Хилер проходиться не по юнитам противника, а по своим
         if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {
@@ -80,7 +76,7 @@ public class BotPlayer implements GamePlayer {
                   to.y());
             }
           }
-          // Возможные атаки дляG юнитов выбранного игрока по живым юнитам соперника
+          // Возможные атаки для юнитов выбранного игрока по живым юнитам соперника
         } else {
           for (Position to : unitsOpponentPlayer) {
             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
@@ -97,8 +93,8 @@ public class BotPlayer implements GamePlayer {
       // Для второго
     } else if (gameState.getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
       logger.atInfo().log("Calculating possible actions for Second Player");
-      List<Position> unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
-      List<Position> unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+      unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
+      unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
       for (Position from : unitsCurrentPlayer) {
         // Хилер проходиться не по юнитам противника, а по своим
         if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {

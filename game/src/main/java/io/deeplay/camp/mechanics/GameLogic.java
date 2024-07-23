@@ -40,7 +40,7 @@ public class GameLogic {
       logger.atInfo().log("Placement process finished. Checking board and general presence.");
       // Проверка на то что на доске есть генерал
       if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-        if (!board.isFullFirstPlyerPart()) {
+        if (!board.isFullFirstPlayerPart()) {
           logger.atError().log("First player board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
@@ -49,7 +49,7 @@ public class GameLogic {
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       } else {
-        if (!board.isFullSecondPlyerPart()) {
+        if (!board.isFullSecondPlayerPart()) {
           logger.atError().log("Second player's board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }

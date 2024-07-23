@@ -1,11 +1,17 @@
 package io.deeplay.camp.entities;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 public class Board {
   public static final int ROWS = 4;
   public static final int COLUMNS = 3;
+  private static final Logger logger = LoggerFactory.getLogger(Board.class);
 
   private Unit[][] units;
 
@@ -21,10 +27,12 @@ public class Board {
     return units[x][y];
   }
 
-  public boolean isFullFirstPlyerPart() {
-    for (int i = 0; i < Board.ROWS / 2; i++) {
-      for (int j = 0; j < Board.COLUMNS; j++) {
-        if (getUnit(j, i) == null) {
+
+  private boolean isFullPart(int startRow,int endRow){
+    for(int i = startRow; i < endRow; i++) {
+      for(int j = 0; j < Board.COLUMNS; j++) {
+        if(isEmptyCell(j,i)){
+          logger.atInfo().log("Empty cell (X-{},Y-{})",j,i);
           return false;
         }
       }
@@ -32,28 +40,33 @@ public class Board {
     return true;
   }
 
-  public boolean isFullSecondPlyerPart() {
-    for (int i = 2; i < Board.ROWS; i++) {
-      for (int j = 0; j < Board.COLUMNS; j++) {
-        if (getUnit(j, i) == null) {
-          return false;
+  public boolean isFullFirstPlayerPart() {
+    return isFullPart(0,Board.ROWS/2);
+  }
+
+  public boolean isFullSecondPlayerPart() {
+    return isFullPart(Board.ROWS/2,Board.ROWS);
+  }
+
+  public List<Position> enumerateUnits (int startRow,int endRow){
+    List<Position> unitPositions = new ArrayList<>();
+    for(int i = startRow; i < endRow; i++) {
+      for(int j = 0; j < Board.COLUMNS; j++) {
+        if(isEmptyCell(j,i)){
+          logger.atInfo().log("Empty cell (X-{},Y-{})",j,i);
+        continue;
+        }
+        if (getUnit(j,i).isAlive()){
+          unitPositions.add(new Position(j,i));
+        }
+        else {
+          logger.atInfo().log("Dead unit (X-{},Y-{})",j,i);
         }
       }
     }
-    return true;
+    return unitPositions;
   }
 
-  public boolean isFullBoard() {
-    if (isFullFirstPlyerPart() && isFullSecondPlyerPart()) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public boolean isTakenCell(int x, int y) {
-    return units[x][y] != null;
-  }
 
   public int countUnitsRow(int row) {
     int count = 0;
