@@ -26,10 +26,8 @@ class GameTest {
     game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
 
-    GameException gameException = assertThrows(
-            GameException.class,
-            () -> game.changePlayer(changePlayerEvent)
-    );
+    GameException gameException =
+        assertThrows(GameException.class, () -> game.changePlayer(changePlayerEvent));
     assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
     assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
   }
@@ -51,10 +49,8 @@ class GameTest {
     game.gameState.setGameStage(GameStage.PLACEMENT_STAGE);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
 
-    GameException gameException = assertThrows(
-            GameException.class,
-            () -> game.changePlayer(changePlayerEvent)
-    );
+    GameException gameException =
+        assertThrows(GameException.class, () -> game.changePlayer(changePlayerEvent));
     assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
     assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
   }

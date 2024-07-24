@@ -22,4 +22,10 @@ public class PlaceUnitEvent extends Event {
     this.unit = unit;
     unit.setPlayerType(playerType);
   }
+
+  public PlaceUnitEvent(int x, int y, Unit unit) {
+    this.colums = x;
+    this.rows = y;
+    this.unit = unit;
+  }
 }
