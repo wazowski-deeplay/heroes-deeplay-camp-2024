@@ -22,10 +22,10 @@ public class GameState {
   private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
 
   private Board board;
-  private GameStage gameStage;
   private PlayerType currentPlayer;
   private Army armyFirst;
   private Army armySecond;
+  private GameStage gameStage;
 
   public GameState() {
     board = new Board();

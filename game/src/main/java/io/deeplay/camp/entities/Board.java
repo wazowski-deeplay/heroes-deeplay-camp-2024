@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 public class Board {
   public static final int ROWS = 4;
   public static final int COLUMNS = 3;
-  private static final Logger logger = LoggerFactory.getLogger(Board.class);
 
   private Unit[][] units;
 
