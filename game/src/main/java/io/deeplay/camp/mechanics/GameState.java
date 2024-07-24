@@ -3,6 +3,9 @@ package io.deeplay.camp.mechanics;
 import io.deeplay.camp.entities.Army;
 import io.deeplay.camp.entities.AttackType;
 import io.deeplay.camp.entities.Board;
+import io.deeplay.camp.entities.Position;
+import io.deeplay.camp.entities.Unit;
+import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
@@ -42,33 +45,102 @@ public class GameState {
   }
 
   // методы чисто для применения, проверка происходит до их использования
-  public void makeMove(MakeMoveEvent move) {
-    if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getAttackType()
-        == AttackType.MASS_ATTACK) {
-      if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getPlayerType()
-          == PlayerType.FIRST_PLAYER) {
-        for (int i = 0; i < armySecond.getUnits().length; i++) {
-          board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armySecond.getUnits()[i]);
+  public void makeMove(MakeMoveEvent move) throws GameException {
+    if (isValidMove(move)) {
+      if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getAttackType()
+          == AttackType.MASS_ATTACK) {
+        if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getPlayerType()
+            == PlayerType.FIRST_PLAYER) {
+          for (int i = 0; i < armySecond.getUnits().length; i++) {
+            board
+                .getUnit(move.getFrom().x(), move.getFrom().y())
+                .playMove(armySecond.getUnits()[i]);
+          }
+        } else {
+          for (int i = 0; i < armyFirst.getUnits().length; i++) {
+            board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armyFirst.getUnits()[i]);
+          }
         }
       } else {
-        for (int i = 0; i < armyFirst.getUnits().length; i++) {
-          board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armyFirst.getUnits()[i]);
-        }
+        board
+            .getUnit(move.getFrom().x(), move.getFrom().y())
+            .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
       }
-    } else {
-      board
-          .getUnit(move.getFrom().x(), move.getFrom().y())
-          .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
     }
   }
 
-  /**
-   *
-   * @param placement Событие расстановки (координаты, юнит, ещё не закончил ли ход игрок, гнерал юнит или нет)
-   * @return Доска с актуальными изменениями
-   * @throws GameException Не корректные координаты, за пределами поля или с чужой стороны.Не
-   * заполненное игровое поле. Отсутствие генерала
-   */
+  private boolean isValidMove(MakeMoveEvent move) throws GameException {
+    boolean result = false;
+    Position from = move.getFrom();
+    Position to = move.getTo();
+    Unit attacker = move.getAttacker();
+
+    boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
+    boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
+    boolean nullUnitInRow = nullUnitMeleeRow(from, to, attacker);
+    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, to, attacker);
+    boolean attackEnemyUnit =
+            getCurrentBoard().getUnit(to.x(), to.y()).getPlayerType()
+                    != attacker.getPlayerType();
+    boolean isAliveDefender = getCurrentBoard().getUnit(to.x(), to.y()).isAlive();
+
+    if (attacker.getUnitType() == UnitType.KNIGHT) {
+      if (attackEnemyUnit && isAliveDefender) {
+        int radius = 1;
+        if (oneUnitInRow || nullUnitInRow) {
+          radius = 2;
+        }
+        if (nullUnitInNextRow) {
+          radius = 3;
+        }
+        if (Math.abs(from.y() - to.y()) <= radius && Math.abs(from.x() - to.x()) <= radius) {
+          if (fullUnitInRow || oneUnitInRow || nullUnitInRow || nullUnitInNextRow) {
+            result = true;
+          }
+        } else {
+          logger.atInfo().log(
+                  "This Knight({}) try attack ({}), who outside his radius",
+                  from.x() + "," + from.y(),
+                  to.x() + "," + to.y());
+          throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+        }
+      } else {
+        logger.atInfo().log(
+                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+      }
+    }
+    if (attacker.getUnitType() == UnitType.ARCHER) {
+      if (attackEnemyUnit && isAliveDefender) {
+        result = true;
+      } else {
+        logger.atInfo().log(
+                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+      }
+    }
+    if (attacker.getUnitType() == UnitType.MAGE) {
+      if (attackEnemyUnit && isAliveDefender) {
+        result = true;
+      } else {
+        logger.atInfo().log(
+                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+      }
+    }
+    if (attacker.getUnitType() == UnitType.HEALER) {
+      if (!attackEnemyUnit && isAliveDefender) {
+        result = true;
+      } else {
+        logger.atInfo().log(
+                "This {} try heal enemy or dead unit", move.getAttacker().getUnitType());
+        throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+      }
+    }
+    return result;
+  }
+
+
   public void makePlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
@@ -113,7 +185,7 @@ public class GameState {
           logger.atError().log("First player board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
+        if (!currentPlayerHaveGeneral(board, PlayerType.FIRST_PLAYER)){
           logger.atError().log("First player general is missing.");
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
@@ -122,7 +194,7 @@ public class GameState {
           logger.atError().log("Second player's board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-        if (!currentPlayerHaveGeneral(board, getCurrentPlayer())) {
+        if (!currentPlayerHaveGeneral(board, PlayerType.SECOND_PLAYER)) {
           logger.atError().log("Second player general is missing.");
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
@@ -171,5 +243,37 @@ public class GameState {
     }
   }
 
+  private boolean fullUnitMeleeRow(Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() + 1) > 1
+            && to.y() == from.y() + 1)
+            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() - 1) > 1
+            && to.y() == from.y() - 1);
+  }
+
+  private boolean oneUnitMeleeRow(
+          Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() + 1) == 1
+            && to.y() == from.y() + 1)
+            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() - 1) == 1
+            && to.y() == from.y() - 1);
+  }
+
+  private boolean nullUnitMeleeRow(Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
+            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() - 1) == 0);
+  }
+
+  private boolean nullUnitNextMeleeRow(Position from, Position to, Unit attacker) {
+    return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
+            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+            && getCurrentBoard().countUnitsRow(from.y() - 2) == 0);
+  }
 
 }

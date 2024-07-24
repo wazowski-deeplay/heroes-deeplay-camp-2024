@@ -1,7 +1,5 @@
 package io.deeplay.camp.mechanics;
 
-import static io.deeplay.camp.mechanics.GameLogic.isValidMove;
-
 import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.UnitType;
@@ -113,7 +111,7 @@ public class BotPlayer implements GamePlayer {
   private boolean canAct(GameState gameState, MakeMoveEvent move) {
     boolean result = false;
     try {
-      isValidMove(gameState, move);
+      gameState.makeMove(move);
       result = true;
     } catch (GameException e) {
       logger.atError().log("Move is invalid: {}", e.getMessage());

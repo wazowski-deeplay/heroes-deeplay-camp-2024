@@ -21,14 +21,18 @@ public class Army {
     if (this.owner == PlayerType.FIRST_PLAYER) {
       for (int i = 0; i < board.getUnits().length; i++) {
         for (int j = 0; j < board.getUnits()[i].length / 2; j++) {
-          units[index++] = board.getUnit(i, j);
+          if (board.getUnit(i, j) != null) {
+            units[index++] = board.getUnit(i, j);
+          }
         }
       }
     }
     if (this.owner == PlayerType.SECOND_PLAYER) {
       for (int i = 0; i < board.getUnits().length; i++) {
-        for (int j = board.getUnits().length / 2; j < board.getUnits()[i].length; j++) {
-          units[index++] = board.getUnit(i, j);
+        for (int j = board.getUnits()[i].length / 2; j < board.getUnits()[i].length; j++) {
+          if (board.getUnit(i, j) != null) {
+            units[index++] = board.getUnit(i, j);
+          }
         }
       }
     }

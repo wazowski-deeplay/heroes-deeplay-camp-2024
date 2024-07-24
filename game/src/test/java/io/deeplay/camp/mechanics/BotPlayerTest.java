@@ -11,6 +11,7 @@ import io.deeplay.camp.entities.Knight;
 import io.deeplay.camp.entities.Mage;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
+import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
 import java.util.ArrayList;
 import java.util.List;
@@ -290,47 +291,76 @@ public class BotPlayerTest {
   @Test
   public void testUnitsPossibleActions() throws GameException {
     final Board board = gameState.getCurrentBoard();
+
     // First palyer
     final Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
-    final Unit firstPlayerKnight = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight3= new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
     firstPlayerArcher.setNowHp(0);
-    board.setUnit(0, 0, firstPlayerArcher);
-    board.setUnit(2, 0, firstPlayerMage);
-    board.setUnit(2, 1, firstPlayerHealer);
-    board.setUnit(1, 1, firstPlayerKnight);
-    // Возможные атаки рыцаря
-    final Position knight = new Position(1, 1);
-    final Position position1 = new Position(1, 2);
-    final Position position2 = new Position(2, 2);
-    // Возможные атаки(лечение) хилера
-    final Position healer = new Position(2, 1);
-    final Position position3 = new Position(1, 1);
-    // Себя тоже можно хилить
-    final Position position4 = new Position(2, 1);
-    final Position position9 = new Position(2, 0);
 
-    // Возможные атаки мага
-    final Position mage = new Position(2, 0);
-    final Position position5 = new Position(0, 3);
-    final Position position6 = new Position(1, 2);
-    final Position position7 = new Position(2, 2);
-    final Position position8 = new Position(2, 3);
-    // Лучник мёртв у него не должно быть атак проверить assertFalse обращаясь к нему по ключу
-    final Position archer = new Position(0, 0);
+    PlaceUnitEvent place1 = new PlaceUnitEvent(0,1,firstPlayerKnight1,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place2 = new PlaceUnitEvent(1,1,firstPlayerKnight2,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place3 = new PlaceUnitEvent(2,1,firstPlayerKnight3,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place4 = new PlaceUnitEvent(0,0,firstPlayerArcher,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place5 = new PlaceUnitEvent(1,0,firstPlayerMage,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place6 = new PlaceUnitEvent(2,0,firstPlayerHealer,gameState.getCurrentPlayer(),false,true);
 
-    final Unit secondPlayerKnight = new Knight(PlayerType.SECOND_PLAYER);
+    gameState.makePlacement(place1);
+    gameState.makePlacement(place2);
+    gameState.makePlacement(place3);
+    gameState.makePlacement(place4);
+    gameState.makePlacement(place5);
+    gameState.makePlacement(place6);
+
+    gameState.changeCurrentPlayer();
+
+    final Unit secondPlayerKnight1 = new Knight(PlayerType.SECOND_PLAYER);
+    final Unit secondPlayerKnight2 = new Knight(PlayerType.SECOND_PLAYER);
+    final Unit secondPlayerKnight3 = new Knight(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerArcher = new Archer(PlayerType.SECOND_PLAYER);
-    final Unit secondPlayerMage1 = new Mage(PlayerType.SECOND_PLAYER);
-    final Unit secondPlayerMage2 = new Mage(PlayerType.SECOND_PLAYER);
+    final Unit secondPlayerMage = new Mage(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerHealer = new Healer(PlayerType.SECOND_PLAYER);
-    secondPlayerHealer.setNowHp(0);
-    board.setUnit(1, 2, secondPlayerKnight);
-    board.setUnit(2, 3, secondPlayerMage1);
-    board.setUnit(0, 3, secondPlayerMage2);
-    board.setUnit(2, 2, secondPlayerArcher);
-    board.setUnit(1, 3, secondPlayerHealer);
+    secondPlayerMage.setNowHp(0);
+
+    PlaceUnitEvent place7 = new PlaceUnitEvent(0,2,secondPlayerKnight1,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place8 = new PlaceUnitEvent(1,2,secondPlayerKnight2,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place9 = new PlaceUnitEvent(2,2,secondPlayerKnight3,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place10 = new PlaceUnitEvent(0,3,secondPlayerArcher,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place11 = new PlaceUnitEvent(1,3,secondPlayerMage,gameState.getCurrentPlayer(),true,false);
+    PlaceUnitEvent place12 = new PlaceUnitEvent(2,3,secondPlayerHealer,gameState.getCurrentPlayer(),false,true);
+
+    gameState.makePlacement(place7);
+    gameState.makePlacement(place8);
+    gameState.makePlacement(place9);
+    gameState.makePlacement(place10);
+    gameState.makePlacement(place11);
+    gameState.makePlacement(place12);
+
+    gameState.changeCurrentPlayer();
+    gameState.changeCurrentPlayer();
+    gameState.changeCurrentPlayer();
+
+    // Возможные атаки рыцаря 0 1 Первого игрока
+    final Position knight = new Position(0, 1);
+    final Position position1 = new Position(0, 2);
+    final Position position2 = new Position(1, 2);
+    // Возможные лечение хилера 2 0 Первого игрока
+    final Position healer = new Position(2, 0);
+    final Position position3 = new Position(1, 0);
+    final Position position4 = new Position(2, 0);
+    final Position position5 = new Position(0, 1);
+    final Position position6 = new Position(1, 1);
+    final Position position7 = new Position(2, 1);
+    // Возможные атаки мага 1 0 Первого игрока
+    final Position mage = new Position(1,0 );
+    final Position position8 = new Position(0, 2);
+    final Position position9 = new Position(1, 2);
+    final Position position10 = new Position(2, 2);
+    final Position position11 = new Position(0, 3);
+    final Position position12 = new Position(2, 3);
 
     final PossibleActions<Position, Position> positionPossibleActions =
         botPlayer.unitsPossibleActions(gameState);
@@ -341,12 +371,15 @@ public class BotPlayerTest {
     final List<Position> firstPlayerHealerAttacks = new ArrayList<>();
     firstPlayerHealerAttacks.add(position3);
     firstPlayerHealerAttacks.add(position4);
-    firstPlayerHealerAttacks.add(position9);
+    firstPlayerHealerAttacks.add(position5);
+    firstPlayerHealerAttacks.add(position6);
+    firstPlayerHealerAttacks.add(position7);
     final List<Position> firstPlayerMageAttacks = new ArrayList<>();
-    firstPlayerMageAttacks.add(position5);
-    firstPlayerMageAttacks.add(position6);
-    firstPlayerMageAttacks.add(position7);
     firstPlayerMageAttacks.add(position8);
+    firstPlayerMageAttacks.add(position9);
+    firstPlayerMageAttacks.add(position10);
+    firstPlayerMageAttacks.add(position11);
+    firstPlayerMageAttacks.add(position12);
 
     assertEquals(firstPlayerKnightAttacks.size(), positionPossibleActions.get(knight).size());
     assertEquals(firstPlayerHealerAttacks.size(), positionPossibleActions.get(healer).size());
@@ -354,6 +387,5 @@ public class BotPlayerTest {
     assertTrue(positionPossibleActions.get(knight).containsAll(firstPlayerKnightAttacks));
     assertTrue(positionPossibleActions.get(healer).containsAll(firstPlayerHealerAttacks));
     assertTrue(positionPossibleActions.get(mage).containsAll(firstPlayerMageAttacks));
-    assertFalse(positionPossibleActions.get(archer).containsAll(firstPlayerMageAttacks));
   }
 }
