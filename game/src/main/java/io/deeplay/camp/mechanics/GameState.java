@@ -142,6 +142,20 @@ public class GameState {
 
 
   public void makePlacement(PlaceUnitEvent placement) throws GameException {
+    if (isValidPlacement(placement)){
+      board.setUnit(placement.getColumns(), placement.getRows(), placement.getUnit());
+    }
+    if (getCurrentPlayer() == PlayerType.FIRST_PLAYER){
+      armyFirst.fillArmy(board);
+    }
+    else {
+      armySecond.fillArmy(board);
+    }
+  }
+
+
+
+  private boolean isValidPlacement(PlaceUnitEvent placement) throws GameException{
     int x = placement.getColumns();
     int y = placement.getRows();
     boolean result = false;
@@ -173,8 +187,11 @@ public class GameState {
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
     }
-    // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность правил
-    board.setUnit(x, y, placement.getUnit());
+
+    // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность
+    // правил
+      board.setUnit(x, y, placement.getUnit());
+
 
     // Проверка стартующая когда расстановка по мнению игрока окончена
     if (!placement.isInProcess()) {
@@ -199,9 +216,10 @@ public class GameState {
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       }
+      result = true;
     }
+    return result;
   }
-
   public Board getCurrentBoard() {
     return board;
   }
