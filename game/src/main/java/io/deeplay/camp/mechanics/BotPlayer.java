@@ -111,7 +111,7 @@ public class BotPlayer implements GamePlayer {
   private boolean canAct(GameState gameState, MakeMoveEvent move) {
     boolean result = false;
     try {
-      gameState.makeMove(move);
+      gameState.isValidMove(move);
       result = true;
     } catch (GameException e) {
       logger.atError().log("Move is invalid: {}", e.getMessage());

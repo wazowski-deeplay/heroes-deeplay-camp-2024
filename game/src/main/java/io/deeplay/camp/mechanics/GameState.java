@@ -68,7 +68,7 @@ public class GameState {
     }
   }
 
-  private boolean isValidMove(MakeMoveEvent move) throws GameException {
+  public boolean isValidMove(MakeMoveEvent move) throws GameException {
     boolean result = false;
     Position from = move.getFrom();
     Position to = move.getTo();
