@@ -1,8 +1,8 @@
 package io.deeplay.camp.mechanics;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.*;
 
 import io.deeplay.camp.entities.Archer;
 import io.deeplay.camp.entities.Healer;
@@ -11,7 +11,6 @@ import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
