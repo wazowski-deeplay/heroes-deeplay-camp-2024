@@ -6,6 +6,10 @@ import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.*;
+import java.awt.*;
+import java.io.*;
+import javax.swing.*;
+import lombok.SneakyThrows;
 
 public class BotFight {
 
@@ -13,13 +17,20 @@ public class BotFight {
   private static int winsSecondPlayer = 0;
   private static int countDraw = 0;
   private final int countGame;
+
+  private final int timeSkeep = 250;
   Game game;
   GameAnalisys gameAnalisys;
   BotPlayer botFirst;
   BotPlayer botSecond;
-  boolean consoleOut = false;
+  boolean consoleOut = true;
   boolean outInfoGame;
+  String separator = System.getProperty("line.separator");
   PlaceUnitEvent[] placementEvents = new PlaceUnitEvent[12];
+
+  JFrame frame;
+  JTextArea area1;
+  JPanel contents;
 
   public BotFight(BotPlayer botFirst, BotPlayer botSecond, int countGame, boolean infoGame) {
     this.botFirst = botFirst;
@@ -28,8 +39,18 @@ public class BotFight {
     game = new Game();
     gameAnalisys = new GameAnalisys(countGame);
     this.outInfoGame = infoGame;
+    frame = new JFrame();
+    frame.setSize(800, 500);
+    area1 = new JTextArea(20, 50);
+    area1.setFont(new Font("Dialog", Font.PLAIN, 14));
+    area1.setTabSize(10);
+    contents = new JPanel();
+    contents.add(area1);
+    frame.add(contents);
+    frame.show();
   }
 
+  @SneakyThrows
   public void playGames() throws GameException {
     for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
@@ -48,7 +69,7 @@ public class BotFight {
       game.gameState.getArmyFirst().fillArmy(game.gameState.getCurrentBoard());
       game.gameState.getArmySecond().fillArmy(game.gameState.getCurrentBoard());
       game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
-      consoleView();
+      consoleView(null);
       for (int z = 0; z < 10; z++) {
         game.gameState.getArmyFirst().isAliveGeneral();
         game.gameState.getArmySecond().isAliveGeneral();
@@ -116,6 +137,7 @@ public class BotFight {
     }
   }
 
+  @SneakyThrows
   public void executeMove(PlayerType playerType, int countGame) throws GameException {
     if (playerType == PlayerType.FIRST_PLAYER) {
       for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
@@ -134,7 +156,8 @@ public class BotFight {
                   pos1, pos2, game.gameState.getCurrentBoard().getUnit(pos1.x(), pos1.y()));
 
           game.makeMove(move);
-          consoleView();
+          Thread.sleep(timeSkeep);
+          consoleView(move);
         }
       }
     } else if (playerType == PlayerType.SECOND_PLAYER) {
@@ -155,7 +178,8 @@ public class BotFight {
               new MakeMoveEvent(
                   pos1, pos2, game.gameState.getCurrentBoard().getUnit(pos1.x(), pos1.y()));
           game.makeMove(move);
-          consoleView();
+          Thread.sleep(timeSkeep);
+          consoleView(move);
         }
       }
     }
@@ -245,87 +269,173 @@ public class BotFight {
     return unit;
   }
 
-  public void consoleView() {
+  public void consoleView(MakeMoveEvent move) throws IOException {
     if (consoleOut) {
-      System.out.println();
-      System.out.format("%-13s", "3");
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(0, 3).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(0, 3).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(1, 3).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(1, 3).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(2, 3).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(2, 3).getNowHp());
-      System.out.println();
-      System.out.format("%-13s", "2");
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(0, 2).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(0, 2).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(1, 2).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(1, 2).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(2, 2).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(2, 2).getNowHp());
-      System.out.println();
-      System.out.format("%-13s", "1");
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(0, 1).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(0, 1).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(1, 1).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(1, 1).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(2, 1).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(2, 1).getNowHp());
-      System.out.println();
-      System.out.format("%-13s", "0");
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(0, 0).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(0, 0).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(1, 0).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(1, 0).getNowHp());
-      System.out.format(
-          "%-13s",
-          game.gameState.getCurrentBoard().getUnit(2, 0).getUnitType().name()
-              + ""
-              + game.gameState.getCurrentBoard().getUnit(2, 0).getNowHp());
-      System.out.println();
-      System.out.format("%-13s", "");
-      System.out.format("%-13s", "0");
-      System.out.format("%-13s", "1");
-      System.out.format("%-13s", "2");
-      System.out.println();
+      area1.setText(null);
+      if (move == null) {
+        area1.append("BEGIN NEW GAME!");
+      }
+      area1.append(separator);
+      area1.append(separator);
+      String s = "20";
+      area1.append(String.format("%-" + s + "s", "3"));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 3).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(0, 3).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(0, 3).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 3).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(1, 3).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(1, 3).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 3).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(2, 3).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(2, 3).getNowHp()));
+      area1.append(separator);
+      area1.append(separator);
+      area1.append(String.format("%-" + s + "s", "2"));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 2).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(0, 2).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(0, 2).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 2).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(1, 2).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(1, 2).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 2).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(2, 2).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(2, 2).getNowHp()));
+      area1.append(separator);
+      area1.append(separator);
+      area1.append(String.format("%-" + s + "s", "1"));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 1).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(0, 1).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(0, 1).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 1).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(1, 1).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(1, 1).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 1).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(2, 1).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(2, 1).getNowHp()));
+      area1.append(separator);
+      area1.append(separator);
+      area1.append(String.format("%-" + s + "s", "0"));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 0).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(0, 0).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(0, 0).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 0).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(1, 0).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(1, 0).getNowHp()));
+      area1.append(
+          String.format(
+              "%-" + s + "s",
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 0).getMoved())
+                  + game.gameState.getCurrentBoard().getUnit(2, 0).getUnitType().name()
+                  + ""
+                  + game.gameState.getCurrentBoard().getUnit(2, 0).getNowHp()));
+      area1.append(separator);
+      area1.append(separator);
+      area1.append(String.format("%-25s", "#"));
+      area1.append(String.format("%-25s", "0"));
+      area1.append(String.format("%-27s", "1"));
+      area1.append(String.format("%-26s", "2"));
+      area1.append(separator);
+      area1.append(separator);
+      if (move != null) {
+        if (move.getAttacker().getUnitType() == UnitType.MAGE) {
+          area1.append(
+              "Unit "
+                  + move.getAttacker().getUnitType().name()
+                  + "("
+                  + move.getFrom().x()
+                  + ","
+                  + move.getFrom().y()
+                  + ") attack all enemys units");
+        } else if (move.getAttacker().getUnitType() == UnitType.HEALER) {
+          area1.append(
+              "Unit "
+                  + move.getAttacker().getUnitType().name()
+                  + "("
+                  + move.getFrom().x()
+                  + ","
+                  + move.getFrom().y()
+                  + ") heal "
+                  + move.getAttacker().getUnitType().name()
+                  + "("
+                  + move.getTo().x()
+                  + ","
+                  + move.getTo().y()
+                  + ")");
+        } else {
+          area1.append(
+              "Unit "
+                  + move.getAttacker().getUnitType().name()
+                  + "("
+                  + move.getFrom().x()
+                  + ","
+                  + move.getFrom().y()
+                  + ") attack "
+                  + move.getAttacker().getUnitType().name()
+                  + "("
+                  + move.getTo().x()
+                  + ","
+                  + move.getTo().y()
+                  + ")");
+        }
+        area1.append(separator);
+      }
     }
   }
 
   public static int rnd(int min, int max) {
     max -= min;
     return (int) (Math.random() * ++max) + min;
+  }
+
+  private String markIsMoved(boolean isMoved) {
+    String result = "?";
+    if (isMoved) {
+      result = "!";
+    }
+    return result;
   }
 }

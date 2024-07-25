@@ -67,10 +67,10 @@ public class GameState {
             .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
       }
       logger.atInfo().log(
-              "This {}({}) attack enemy or heal ({})",
-              move.getAttacker().getUnitType(),
-              move.getFrom().x() + "," + move.getFrom().y(),
-              move.getTo().x() + "," + move.getTo().y());
+          "This {}({}) attack enemy or heal ({})",
+          move.getAttacker().getUnitType(),
+          move.getFrom().x() + "," + move.getFrom().y(),
+          move.getTo().x() + "," + move.getTo().y());
     }
   }
 
@@ -82,9 +82,9 @@ public class GameState {
 
     if (!attacker.isAlive()) {
       logger.atInfo().log(
-              "This units {}({}) already dead, he wont move",
-              move.getAttacker().getUnitType(),
-              from.x() + "," + from.y());
+          "This units {}({}) already dead, he wont move",
+          move.getAttacker().getUnitType(),
+          from.x() + "," + from.y());
     }
 
     if (outOfBorder(from.x(), from.y()) || outOfBorder(to.x(), to.y())) {
@@ -103,6 +103,14 @@ public class GameState {
     if (attacker.getMoved()) {
       logger.atInfo().log(
           "This units {}({}) already moved this round",
+          move.getAttacker().getUnitType(),
+          from.x() + "," + from.y());
+      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+    }
+
+    if (from.x() == to.x() && from.y() == to.y()) {
+      logger.atInfo().log(
+          "This units {}({}) cant attack yourself",
           move.getAttacker().getUnitType(),
           from.x() + "," + from.y());
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
