@@ -164,6 +164,71 @@ public class GameLogicPlacementTest {
 
 
 
+  @Test
+  void testFullBoard_IsNotValide() throws GameException {
+    Board board = gameState.getCurrentBoard();
+    Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight3 = new Mage(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight1 = new Healer(PlayerType.FIRST_PLAYER);
+    Unit secondPlayerKnight2 = new Archer(PlayerType.SECOND_PLAYER);
+    Unit secondPlayerKnight3 = new Healer(PlayerType.SECOND_PLAYER);
+    Unit secondPlayerKnight1 = new Knight(PlayerType.SECOND_PLAYER);
+    board.setUnit(0, 1, firstPlayerKnight1);
+    board.setUnit(1, 1, firstPlayerKnight2);
+    board.setUnit(2, 1, firstPlayerKnight3);
+    board.setUnit(0, 2, secondPlayerKnight1);
+    board.setUnit(1, 2, secondPlayerKnight2);
+    board.setUnit(2, 2, secondPlayerKnight3);
+    Unit archer = new Archer(gameState.getCurrentPlayer());
+    // inProcess false это значит что пользовател решил что он закочил расстановку
+    // Написал например end в конце строки или нажал на кнопку что закончил UI
+    PlaceUnitEvent event = new PlaceUnitEvent(0, 0, archer, gameState.getCurrentPlayer(), false,false);
+    GameException gameException =
+        assertThrows(GameException.class, () -> GameLogic.isValidPlacement(gameState, event));
+    assertEquals(ErrorCode.BOARD_IS_NOT_FULL, gameException.getErrorCode());
+  }
+
+  @Test
+  void testFullBoard_IsValide() throws GameException {
+    Board board = gameState.getCurrentBoard();
+    Unit knight = new Knight(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight2 = new Mage(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight3 = new Healer(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight4 = new Knight(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight5 = new Mage(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight6 = new Healer(PlayerType.FIRST_PLAYER);
+    board.setUnit(1, 0, firstPlayerKnight2);
+    board.setUnit(2, 0, firstPlayerKnight3);
+    board.setUnit(0, 1, firstPlayerKnight4);
+    board.setUnit(1, 1, firstPlayerKnight5);
+    board.setUnit(2, 1, firstPlayerKnight6);
+    // Юзер напсисал такую строку
+    // 0 0 Knight end где end это означает что он считает что он закончил
+    PlaceUnitEvent event = new PlaceUnitEvent(0,0,knight,gameState.getCurrentPlayer(),false,true);
+    assertDoesNotThrow(()->GameLogic.isValidPlacement(gameState,event));
+    }
+    @Test
+    void testHaveGeneral_IsNotValide() throws GameException {
+    Board board = gameState.getCurrentBoard();
+    Unit knight = new Knight(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight2 = new Mage(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight3 = new Healer(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight4 = new Knight(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight5 = new Mage(PlayerType.FIRST_PLAYER);
+    Unit firstPlayerKnight6 = new Healer(PlayerType.FIRST_PLAYER);
+    board.setUnit(1, 0, firstPlayerKnight2);
+    board.setUnit(2, 0, firstPlayerKnight3);
+    board.setUnit(0, 1, firstPlayerKnight4);
+    board.setUnit(1, 1, firstPlayerKnight5);
+    board.setUnit(2, 1, firstPlayerKnight6);
+    // Доска заполнена, но нет генерала
+    PlaceUnitEvent event = new PlaceUnitEvent(0,0,knight,gameState.getCurrentPlayer(),false,false);
+    GameException gameException = assertThrows(GameException.class,()->GameLogic.isValidPlacement(gameState,event));
+    assertEquals(ErrorCode.GENERAL_IS_MISSING,gameException.getErrorCode());
+    }
+
+
+
   private void makeFullBoard() {
     Unit reng = new Archer(gameState.getCurrentPlayer());
     Unit mili = new Knight(gameState.getCurrentPlayer());
