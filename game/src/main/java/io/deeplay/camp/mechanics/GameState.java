@@ -6,6 +6,7 @@ import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.entities.UnitType;
+import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
@@ -19,14 +20,13 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class GameState {
 
-  private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
+  private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
   private Board board;
   private GameStage gameStage;
-  private PlayerType currentPlayer;
+  @Getter @Setter private PlayerType currentPlayer;
   private Army armyFirst;
   private Army armySecond;
-
 
   public GameState() {
     board = new Board();
@@ -77,11 +77,10 @@ public class GameState {
 
     boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
     boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInRow = nullUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, to, attacker);
+    boolean nullUnitInRow = nullUnitMeleeRow(from, attacker);
+    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, attacker);
     boolean attackEnemyUnit =
-            getCurrentBoard().getUnit(to.x(), to.y()).getPlayerType()
-                    != attacker.getPlayerType();
+        getCurrentBoard().getUnit(to.x(), to.y()).getPlayerType() != attacker.getPlayerType();
     boolean isAliveDefender = getCurrentBoard().getUnit(to.x(), to.y()).isAlive();
 
     if (attacker.getUnitType() == UnitType.KNIGHT) {
@@ -99,14 +98,14 @@ public class GameState {
           }
         } else {
           logger.atInfo().log(
-                  "This Knight({}) try attack ({}), who outside his radius",
-                  from.x() + "," + from.y(),
-                  to.x() + "," + to.y());
+              "This Knight({}) try attack ({}), who outside his radius",
+              from.x() + "," + from.y(),
+              to.x() + "," + to.y());
           throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
         }
       } else {
         logger.atInfo().log(
-                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -115,7 +114,7 @@ public class GameState {
         result = true;
       } else {
         logger.atInfo().log(
-                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -124,7 +123,7 @@ public class GameState {
         result = true;
       } else {
         logger.atInfo().log(
-                "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -133,32 +132,27 @@ public class GameState {
         result = true;
       } else {
         logger.atInfo().log(
-                "This {} try heal enemy or dead unit", move.getAttacker().getUnitType());
+            "This {} try heal enemy or dead unit", move.getAttacker().getUnitType());
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
     return result;
   }
 
-
   public void makePlacement(PlaceUnitEvent placement) throws GameException {
-    if (isValidPlacement(placement)){
+    if (isValidPlacement(placement)) {
       board.setUnit(placement.getColumns(), placement.getRows(), placement.getUnit());
     }
-    if (getCurrentPlayer() == PlayerType.FIRST_PLAYER){
+    if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       armyFirst.fillArmy(board);
-    }
-    else {
+    } else {
       armySecond.fillArmy(board);
     }
   }
 
-
-
-  private boolean isValidPlacement(PlaceUnitEvent placement) throws GameException{
+  private boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    boolean result = false;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
 
     if (x > Board.COLUMNS) {
@@ -169,10 +163,10 @@ public class GameState {
       logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
       throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
     }
+
     // Проверка на сторону юнита
     if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       if (y < (Board.ROWS / 2)) {
-        result = true;
         logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
       } else {
         logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
@@ -181,7 +175,6 @@ public class GameState {
     } else {
       if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
         logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
-        result = true;
       } else {
         logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
@@ -190,8 +183,7 @@ public class GameState {
 
     // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность
     // правил
-      board.setUnit(x, y, placement.getUnit());
-
+    board.setUnit(x, y, placement.getUnit());
 
     // Проверка стартующая когда расстановка по мнению игрока окончена
     if (!placement.isInProcess()) {
@@ -202,7 +194,7 @@ public class GameState {
           logger.atError().log("First player board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-        if (!currentPlayerHaveGeneral(board, PlayerType.FIRST_PLAYER)){
+        if (!currentPlayerHaveGeneral(board, PlayerType.FIRST_PLAYER)) {
           logger.atError().log("First player general is missing.");
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
@@ -216,23 +208,40 @@ public class GameState {
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       }
-      result = true;
     }
-    return result;
+    return true;
   }
+
+  public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
+    if (isValidChangePlayer(changePlayerEvent)) {
+      changeCurrentPlayer();
+    } else {
+      throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
+    }
+  }
+
+  /**
+   * Метод проверяет событие перехода хода другому игроку.
+   *
+   * @param changePlayerEvent Событие передачи хода.
+   */
+  public boolean isValidChangePlayer(ChangePlayerEvent changePlayerEvent) {
+    if (getCurrentPlayer() == changePlayerEvent.getRequester()
+        && getGameStage() != GameStage.PLACEMENT_STAGE) {
+      logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
+      return true;
+    } else {
+      logger.atInfo().log(
+          "{} passes the move out of his turn", changePlayerEvent.getRequester().name());
+      return false;
+    }
+  }
+
   public Board getCurrentBoard() {
     return board;
   }
 
-  public PlayerType getCurrentPlayer() {
-    return currentPlayer;
-  }
-
-  public void setCurrentPlayer(PlayerType playerType) {
-    this.currentPlayer = playerType;
-  }
-
-  private boolean currentPlayerHaveGeneral(Board board,PlayerType playerType) {
+  private boolean currentPlayerHaveGeneral(Board board, PlayerType playerType) {
     boolean result = false;
     if (playerType == PlayerType.FIRST_PLAYER) {
       for (int i = 0; i < Board.ROWS / 2; i++) {
@@ -241,7 +250,7 @@ public class GameState {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
+            return true;
           }
         }
       }
@@ -253,7 +262,7 @@ public class GameState {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
+            return true;
           }
         }
       }
@@ -265,33 +274,31 @@ public class GameState {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) > 1
             && to.y() == from.y() + 1)
-            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+        || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 1) > 1
             && to.y() == from.y() - 1);
   }
 
-  private boolean oneUnitMeleeRow(
-          Position from, Position to, Unit attacker) {
+  private boolean oneUnitMeleeRow(Position from, Position to, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 1
             && to.y() == from.y() + 1)
-            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+        || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 1) == 1
             && to.y() == from.y() - 1);
   }
 
-  private boolean nullUnitMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
-            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+        || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 1) == 0);
   }
 
-  private boolean nullUnitNextMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitNextMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
-            || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
+        || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 2) == 0);
   }
-
 }

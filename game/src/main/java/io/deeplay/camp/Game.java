@@ -5,7 +5,6 @@ import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.events.StartGameEvent;
 import io.deeplay.camp.exceptions.GameException;
-import io.deeplay.camp.mechanics.GameLogic;
 import io.deeplay.camp.mechanics.GameState;
 
 public class Game implements GameListener {
@@ -21,17 +20,16 @@ public class Game implements GameListener {
 
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) throws GameException {
-      gameState.makePlacement(placeUnitEvent);
+    gameState.makePlacement(placeUnitEvent);
   }
 
   @Override
   public void changePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
-    GameLogic.isValidChangePlayer(gameState, changePlayerEvent);
-    gameState.changeCurrentPlayer();
+    gameState.makeChangePlayer(changePlayerEvent);
   }
 
   @Override
   public void makeMove(MakeMoveEvent makeMoveEvent) throws GameException {
-      gameState.makeMove(makeMoveEvent);
+    gameState.makeMove(makeMoveEvent);
   }
 }
