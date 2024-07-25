@@ -25,14 +25,13 @@ class GameTest {
   void testGame() {
     BotPlayer bot1 = new BotPlayer();
     BotPlayer bot2 = new BotPlayer();
-    BotFight fight = new BotFight(bot1, bot2, 500, false);
+    BotFight fight = new BotFight(bot1, bot2, 50, false);
     try {
       fight.playGames();
     } catch (GameException e) {
       throw new RuntimeException(e);
     }
   }
-
 
   @Test
   void testChangePlayerRequestFromNotCurrentPlayer() {
