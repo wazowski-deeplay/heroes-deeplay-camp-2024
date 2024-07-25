@@ -41,5 +41,4 @@ public class GameLogic {
    * @param move Событие совершения хода юнитом.
    * @throws GameException Если атакующий юнит атакует своего союзника, либо бьёт по мёртвому.
    */
-
 }

@@ -29,7 +29,8 @@ public class GameLogicPlacementTest {
   @Test
   void testCorrectedCoordinatesX_IsNotValide() throws GameException {
     Unit knight = new Knight(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(5, 0, knight, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(5, 0, knight, gameState.getCurrentPlayer(), true, false);
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.PLACEMENT_INCORRECT, gameException.getErrorCode());
@@ -38,7 +39,8 @@ public class GameLogicPlacementTest {
   @Test
   void testCorrectedCoordinatesY_IsNotValide() {
     Unit knight = new Knight(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(0, 5, knight, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(0, 5, knight, gameState.getCurrentPlayer(), true, false);
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.PLACEMENT_INCORRECT, gameException.getErrorCode());
@@ -49,14 +51,16 @@ public class GameLogicPlacementTest {
     Unit knight = new Knight(gameState.getCurrentPlayer());
     Unit mage = new Mage(gameState.getCurrentPlayer());
 
-    PlaceUnitEvent event1 = new PlaceUnitEvent(1, 1, knight, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event1 =
+        new PlaceUnitEvent(1, 1, knight, gameState.getCurrentPlayer(), true, false);
     assertDoesNotThrow(() -> gameState.makePlacement(event1));
 
     gameState.getCurrentBoard().setUnit(1, 1, knight);
 
     Unit first = gameState.getCurrentBoard().getUnit(1, 1);
 
-    PlaceUnitEvent event2 = new PlaceUnitEvent(1, 1, mage, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event2 =
+        new PlaceUnitEvent(1, 1, mage, gameState.getCurrentPlayer(), true, false);
     assertDoesNotThrow(() -> gameState.makePlacement(event2));
     gameState.getCurrentBoard().setUnit(1, 1, mage);
 
@@ -67,7 +71,8 @@ public class GameLogicPlacementTest {
   @Test
   void testCorrectSideFirstPlayer_IsNotValid() throws GameException {
     Unit knight = new Knight(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(2, 2, knight, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(2, 2, knight, gameState.getCurrentPlayer(), true, false);
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.PLACEMENT_INCORRECT, gameException.getErrorCode());
@@ -76,7 +81,8 @@ public class GameLogicPlacementTest {
   @Test
   void testCorrectSideFirstPlayer_IsValid() throws GameException {
     Unit reng = new Archer(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, reng, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(1, 1, reng, gameState.getCurrentPlayer(), true, false);
     assertDoesNotThrow(() -> gameState.makePlacement(event));
   }
 
@@ -84,7 +90,8 @@ public class GameLogicPlacementTest {
   void testCorrectSideSecondPlayer_IsNotValid() throws GameException {
     gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
     Unit reng = new Knight(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(1, 1, reng, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(1, 1, reng, gameState.getCurrentPlayer(), true, false);
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.PLACEMENT_INCORRECT, gameException.getErrorCode());
@@ -94,7 +101,8 @@ public class GameLogicPlacementTest {
   void testCorrectSideSecondPlayer_IsValid() throws GameException {
     gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
     Unit reng = new Knight(gameState.getCurrentPlayer());
-    PlaceUnitEvent event = new PlaceUnitEvent(0, 2, reng, gameState.getCurrentPlayer(), true,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(0, 2, reng, gameState.getCurrentPlayer(), true, false);
     assertDoesNotThrow(() -> gameState.makePlacement(event));
   }
 
@@ -114,40 +122,47 @@ public class GameLogicPlacementTest {
     board.setUnit(2, 1, firstPlayerKnight6);
     // Юзер напсисал такую строку
     // 0 0 Knight end где end это означает что он считает что он закончил
-    PlaceUnitEvent event = new PlaceUnitEvent(0,0,knight,gameState.getCurrentPlayer(),false,true);
-    assertDoesNotThrow(()->gameState.makePlacement(event));
-    }
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(0, 0, knight, gameState.getCurrentPlayer(), false, true);
+    assertDoesNotThrow(() -> gameState.makePlacement(event));
+  }
 
-    @Test
-    void testHaveGeneral_IsNotValide() throws GameException {
-      final Board board = gameState.getCurrentBoard();
+  @Test
+  void testHaveGeneral_IsNotValide() throws GameException {
+    final Board board = gameState.getCurrentBoard();
 
-      // First palyer
-      final Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);
-      final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
-      final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
-      final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
-      final Unit firstPlayerKnight3= new Knight(PlayerType.FIRST_PLAYER);
-      final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
-      firstPlayerArcher.setNowHp(0);
+    // First palyer
+    final Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
+    firstPlayerArcher.setNowHp(0);
 
-      PlaceUnitEvent place1 = new PlaceUnitEvent(0,1,firstPlayerKnight1,gameState.getCurrentPlayer(),true,false);
-      PlaceUnitEvent place2 = new PlaceUnitEvent(1,1,firstPlayerKnight2,gameState.getCurrentPlayer(),true,false);
-      PlaceUnitEvent place3 = new PlaceUnitEvent(2,1,firstPlayerKnight3,gameState.getCurrentPlayer(),true,false);
-      PlaceUnitEvent place4 = new PlaceUnitEvent(0,0,firstPlayerArcher,gameState.getCurrentPlayer(),true,false);
-      PlaceUnitEvent place5 = new PlaceUnitEvent(1,0,firstPlayerMage,gameState.getCurrentPlayer(),true,false);
-      PlaceUnitEvent place6 = new PlaceUnitEvent(2,0,firstPlayerHealer,gameState.getCurrentPlayer(),false,false);
+    PlaceUnitEvent place1 =
+        new PlaceUnitEvent(0, 1, firstPlayerKnight1, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place2 =
+        new PlaceUnitEvent(1, 1, firstPlayerKnight2, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place3 =
+        new PlaceUnitEvent(2, 1, firstPlayerKnight3, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place4 =
+        new PlaceUnitEvent(0, 0, firstPlayerArcher, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place5 =
+        new PlaceUnitEvent(1, 0, firstPlayerMage, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place6 =
+        new PlaceUnitEvent(2, 0, firstPlayerHealer, gameState.getCurrentPlayer(), false, false);
 
-      gameState.makePlacement(place1);
-      gameState.makePlacement(place2);
-      gameState.makePlacement(place3);
-      gameState.makePlacement(place4);
-      gameState.makePlacement(place5);
+    gameState.makePlacement(place1);
+    gameState.makePlacement(place2);
+    gameState.makePlacement(place3);
+    gameState.makePlacement(place4);
+    gameState.makePlacement(place5);
 
-    GameException gameException = assertThrows(GameException.class,()->gameState.makePlacement(place6));
-    assertEquals(ErrorCode.GENERAL_IS_MISSING,gameException.getErrorCode());
-    }
-
+    GameException gameException =
+        assertThrows(GameException.class, () -> gameState.makePlacement(place6));
+    assertEquals(ErrorCode.GENERAL_IS_MISSING, gameException.getErrorCode());
+  }
 
   @Test
   void testFullBoard_IsNotValide() throws GameException {
@@ -167,7 +182,8 @@ public class GameLogicPlacementTest {
     Unit archer = new Archer(gameState.getCurrentPlayer());
     // inProcess false это значит что пользовател решил что он закочил расстановку
     // Написал например end в конце строки или нажал на кнопку что закончил UI
-    PlaceUnitEvent event = new PlaceUnitEvent(0, 0, archer, gameState.getCurrentPlayer(), false,false);
+    PlaceUnitEvent event =
+        new PlaceUnitEvent(0, 0, archer, gameState.getCurrentPlayer(), false, false);
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.BOARD_IS_NOT_FULL, gameException.getErrorCode());
@@ -182,16 +198,22 @@ public class GameLogicPlacementTest {
     final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
-    final Unit firstPlayerKnight3= new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
     firstPlayerArcher.setNowHp(0);
 
-    PlaceUnitEvent place1 = new PlaceUnitEvent(0,1,firstPlayerKnight1,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place2 = new PlaceUnitEvent(1,1,firstPlayerKnight2,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place3 = new PlaceUnitEvent(2,1,firstPlayerKnight3,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place4 = new PlaceUnitEvent(0,0,firstPlayerArcher,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place5 = new PlaceUnitEvent(1,0,firstPlayerMage,gameState.getCurrentPlayer(),true,true);
-    PlaceUnitEvent place6 = new PlaceUnitEvent(2,0,firstPlayerHealer,gameState.getCurrentPlayer(),false,true);
+    PlaceUnitEvent place1 =
+        new PlaceUnitEvent(0, 1, firstPlayerKnight1, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place2 =
+        new PlaceUnitEvent(1, 1, firstPlayerKnight2, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place3 =
+        new PlaceUnitEvent(2, 1, firstPlayerKnight3, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place4 =
+        new PlaceUnitEvent(0, 0, firstPlayerArcher, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place5 =
+        new PlaceUnitEvent(1, 0, firstPlayerMage, gameState.getCurrentPlayer(), true, true);
+    PlaceUnitEvent place6 =
+        new PlaceUnitEvent(2, 0, firstPlayerHealer, gameState.getCurrentPlayer(), false, true);
 
     gameState.makePlacement(place1);
     gameState.makePlacement(place2);
@@ -199,12 +221,10 @@ public class GameLogicPlacementTest {
     gameState.makePlacement(place4);
     gameState.makePlacement(place5);
 
-
     GameException gameException =
-            assertThrows(GameException.class, () -> gameState.makePlacement(place6));
-    assertEquals(ErrorCode.TO_MANY_GENERAL, gameException.getErrorCode());
+        assertThrows(GameException.class, () -> gameState.makePlacement(place6));
+    assertEquals(ErrorCode.TOO_MANY_GENERAL, gameException.getErrorCode());
   }
-
 
   private void makeFullBoard() {
     Unit reng = new Archer(gameState.getCurrentPlayer());
