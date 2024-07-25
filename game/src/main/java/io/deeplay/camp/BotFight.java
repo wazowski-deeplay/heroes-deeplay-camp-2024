@@ -1,6 +1,7 @@
 package io.deeplay.camp;
 
 import io.deeplay.camp.entities.*;
+import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
@@ -52,12 +53,12 @@ public class BotFight {
         game.gameState.getArmyFirst().isAliveGeneral();
         game.gameState.getArmySecond().isAliveGeneral();
         executeMove(PlayerType.FIRST_PLAYER, gameCount);
-        game.gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
+        game.changePlayer(new ChangePlayerEvent(game.gameState.getCurrentPlayer()));
         executeMove(PlayerType.SECOND_PLAYER, gameCount);
         if (escapeGame()) {
           break;
         }
-        game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
+        game.changePlayer(new ChangePlayerEvent(game.gameState.getCurrentPlayer()));
       }
 
       calcResult(gameCount);
@@ -319,6 +320,7 @@ public class BotFight {
       System.out.format("%-13s", "0");
       System.out.format("%-13s", "1");
       System.out.format("%-13s", "2");
+      System.out.println();
     }
   }
 

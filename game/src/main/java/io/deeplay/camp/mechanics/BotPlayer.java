@@ -44,6 +44,7 @@ public class BotPlayer implements GamePlayer {
       for (Position from : unitsCurrentPlayer) {
         // Хилер проходиться не по юнитам противника, а по своим
         if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {
+          if(!board.getUnit(from.x(), from.y()).getMoved()){
           for (Position to : unitsCurrentPlayer) {
             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
             if (canAct(gameState, move)) {
@@ -57,15 +58,18 @@ public class BotPlayer implements GamePlayer {
                   to.y());
             }
           }
+          }
           // Возможные атаки для юнитов выбранного игрока по живым юнитам соперника
         } else {
-          for (Position to : unitsOpponentPlayer) {
-            MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
-            if (canAct(gameState, move)) {
-              map.put(from, to);
-            } else {
-              logger.atInfo().log(
-                  "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());
+          if(!board.getUnit(from.x(), from.y()).getMoved()){
+            for (Position to : unitsOpponentPlayer) {
+              MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
+              if (canAct(gameState, move)) {
+                map.put(from, to);
+              } else {
+                logger.atInfo().log(
+                        "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());
+              }
             }
           }
         }
