@@ -188,10 +188,7 @@ public class GameState {
       }
     }
 
-    // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность
-    // правил
-      board.setUnit(x, y, placement.getUnit());
-
+    board.setUnit(x, y, placement.getUnit());
 
     // Проверка стартующая когда расстановка по мнению игрока окончена
     if (!placement.isInProcess()) {
@@ -232,30 +229,44 @@ public class GameState {
     this.currentPlayer = playerType;
   }
 
-  private boolean currentPlayerHaveGeneral(Board board,PlayerType playerType) {
+  private boolean currentPlayerHaveGeneral(Board board,PlayerType playerType) throws GameException {
     boolean result = false;
     if (playerType == PlayerType.FIRST_PLAYER) {
+      int countGeneralFirstPlayer = 0;
       for (int i = 0; i < Board.ROWS / 2; i++) {
         for (int j = 0; j < Board.COLUMNS; j++) {
           if (board.getUnit(j, i) == null) {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
+            countGeneralFirstPlayer++;
           }
         }
       }
+      if (countGeneralFirstPlayer>1){
+        throw new GameException(ErrorCode.TO_MANY_GENERAL);
+      }
+      else if (countGeneralFirstPlayer == 1){
+        result = true;
+      }
       return result;
     } else {
+      int countGeneralSecondPlayer = 0;
       for (int i = 2; i < Board.ROWS; i++) {
         for (int j = 0; j < Board.COLUMNS; j++) {
           if (board.getUnit(j, i) == null) {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
-          }
+            countGeneralSecondPlayer++;
+            }
         }
+      }
+      if (countGeneralSecondPlayer>1){
+        throw new GameException(ErrorCode.TO_MANY_GENERAL);
+      }
+      else if (countGeneralSecondPlayer == 1){
+        result =true;
       }
       return result;
     }
