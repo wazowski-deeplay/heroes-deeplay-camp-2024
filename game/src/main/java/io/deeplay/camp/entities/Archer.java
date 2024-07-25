@@ -15,5 +15,6 @@ public class Archer extends Unit {
     if (diceRoll + accuracy > targetUnit.getArmor()) {
       targetUnit.setNowHp(targetUnit.getNowHp() - damage);
     }
+    isMoved = true;
   }
 }

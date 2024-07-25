@@ -12,6 +12,7 @@ public abstract class Unit implements GeneralBuff {
   protected UnitType unitType;
   protected PlayerType playerType;
   protected AttackType attackType;
+  protected boolean isMoved = false;
 
   public Unit(
       UnitType unitType,
@@ -89,6 +90,12 @@ public abstract class Unit implements GeneralBuff {
   public PlayerType getPlayerType() {
     return playerType;
   }
+  public void setMoved(boolean isMoved){
+    this.isMoved = isMoved;
+  }
+  public boolean getMoved(){
+    return isMoved;
+  }
 
   public void setPlayerType(PlayerType playerType) {
     this.playerType = playerType;
@@ -112,4 +119,5 @@ public abstract class Unit implements GeneralBuff {
 
   // Методы для реализации в дочерних классах
   public abstract void playMove(Unit targetUnit);
+
 }
