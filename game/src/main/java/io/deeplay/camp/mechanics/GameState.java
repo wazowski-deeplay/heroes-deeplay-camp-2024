@@ -38,8 +38,10 @@ public class GameState {
 
   public void changeCurrentPlayer() {
     if (currentPlayer == PlayerType.FIRST_PLAYER) {
+      armyFirst.updateArmyMoves();
       currentPlayer = PlayerType.SECOND_PLAYER;
     } else {
+      armySecond.updateArmyMoves();
       currentPlayer = PlayerType.FIRST_PLAYER;
     }
   }
@@ -74,6 +76,27 @@ public class GameState {
     Position from = move.getFrom();
     Position to = move.getTo();
     Unit attacker = move.getAttacker();
+
+    if (outOfBorder(from.x(), from.y()) || outOfBorder(to.x(), to.y())) {
+      logger.atInfo().log(
+          "These coordinates({}) or ({}) are outside board border",
+          from.x() + "," + from.y(),
+          to.x() + "," + to.y());
+      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+    }
+
+    if (attacker.getPlayerType() != currentPlayer) {
+      logger.atInfo().log("Enemy units({}) cannot be called to move", from.x() + "," + from.y());
+      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+    }
+
+    if (attacker.getMoved()) {
+      logger.atInfo().log(
+          "This units {}({}) already moved this round",
+          move.getAttacker().getUnitType(),
+          from.x() + "," + from.y());
+      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
+    }
 
     boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
     boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
@@ -228,18 +251,15 @@ public class GameState {
    */
   public boolean isValidChangePlayer(ChangePlayerEvent changePlayerEvent) {
     if (getCurrentPlayer() == changePlayerEvent.getRequester()
-            && getGameStage() != GameStage.PLACEMENT_STAGE) {
+        && getGameStage() != GameStage.PLACEMENT_STAGE) {
       logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
       return true;
     } else {
       logger.atInfo().log(
-              "{} passes the move out of his turn", changePlayerEvent.getRequester().name());
+          "{} passes the move out of his turn", changePlayerEvent.getRequester().name());
       return false;
     }
   }
-
-
-
 
   public Board getCurrentBoard() {
     return board;
@@ -325,5 +345,9 @@ public class GameState {
             && getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 2) == 0);
+  }
+
+  private boolean outOfBorder(int x, int y) {
+    return x < 0 || x > board.ROWS - 1 || y < 0 || y > board.COLUMNS - 1;
   }
 }

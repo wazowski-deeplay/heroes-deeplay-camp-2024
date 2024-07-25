@@ -38,6 +38,12 @@ public class Army {
     }
   }
 
+  public void updateArmyMoves(){
+    for(Unit unit : units){
+      unit.setMoved(false);
+    }
+  }
+
   public boolean isAliveGeneral() {
     isAliveGeneral = false;
     for (Unit unit : units) {
