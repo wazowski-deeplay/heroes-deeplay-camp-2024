@@ -59,8 +59,7 @@ public class GameLogicPlacementTest {
 
     Unit first = gameState.getCurrentBoard().getUnit(1, 1);
 
-    PlaceUnitEvent event2 =
-        new PlaceUnitEvent(1, 1, mage, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent event2 = new PlaceUnitEvent(1, 1, mage, gameState.getCurrentPlayer(), true,false);
     assertDoesNotThrow(() -> gameState.makePlacement(event2));
     gameState.getCurrentBoard().setUnit(1, 1, mage);
 
@@ -148,6 +147,7 @@ public class GameLogicPlacementTest {
         assertThrows(GameException.class, () -> gameState.makePlacement(event));
     assertEquals(ErrorCode.GENERAL_IS_MISSING, gameException.getErrorCode());
   }
+
 
   @Test
   void testFullBoard_IsNotValide() {

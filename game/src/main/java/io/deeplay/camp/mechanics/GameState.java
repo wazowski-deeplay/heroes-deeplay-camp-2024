@@ -195,7 +195,7 @@ public class GameState {
           logger.atError().log("First player board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-        if (!currentPlayerHaveGeneral(board, PlayerType.FIRST_PLAYER)) {
+        if (!checkCurrentPlayerGeneral(board, PlayerType.FIRST_PLAYER)) {
           logger.atError().log("First player general is missing.");
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
@@ -204,7 +204,7 @@ public class GameState {
           logger.atError().log("Second player's board is not full.");
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-        if (!currentPlayerHaveGeneral(board, PlayerType.SECOND_PLAYER)) {
+        if (!checkCurrentPlayerGeneral(board, PlayerType.SECOND_PLAYER)) {
           logger.atError().log("Second player general is missing.");
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
@@ -226,30 +226,43 @@ public class GameState {
     this.currentPlayer = playerType;
   }
 
-  private boolean currentPlayerHaveGeneral(Board board, PlayerType playerType) {
+  private boolean checkCurrentPlayerGeneral(Board board, PlayerType playerType)
+      throws GameException {
     boolean result = false;
     if (playerType == PlayerType.FIRST_PLAYER) {
+      int countGeneralFirstPlayer = 0;
       for (int i = 0; i < Board.ROWS / 2; i++) {
         for (int j = 0; j < Board.COLUMNS; j++) {
           if (board.getUnit(j, i) == null) {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
+            countGeneralFirstPlayer++;
           }
         }
       }
+      if (countGeneralFirstPlayer > 1) {
+        throw new GameException(ErrorCode.TOO_MANY_GENERAL);
+      } else if (countGeneralFirstPlayer == 1) {
+        result = true;
+      }
       return result;
     } else {
+      int countGeneralSecondPlayer = 0;
       for (int i = 2; i < Board.ROWS; i++) {
         for (int j = 0; j < Board.COLUMNS; j++) {
           if (board.getUnit(j, i) == null) {
             continue;
           }
           if (board.getUnit(j, i).isAlive() && board.getUnit(j, i).isGeneral()) {
-            return result = true;
+            countGeneralSecondPlayer++;
           }
         }
+      }
+      if (countGeneralSecondPlayer > 1) {
+        throw new GameException(ErrorCode.TOO_MANY_GENERAL);
+      } else if (countGeneralSecondPlayer == 1) {
+        result = true;
       }
       return result;
     }
