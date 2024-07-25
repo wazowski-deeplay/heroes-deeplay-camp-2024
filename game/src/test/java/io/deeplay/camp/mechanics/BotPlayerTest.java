@@ -2,6 +2,7 @@ package io.deeplay.camp.mechanics;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.deeplay.camp.entities.Archer;
@@ -12,6 +13,7 @@ import io.deeplay.camp.entities.Mage;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.events.PlaceUnitEvent;
+import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
 import java.util.ArrayList;
 import java.util.List;
