@@ -33,8 +33,8 @@ public class BotPlayer implements GamePlayer {
   public PossibleActions<Position, Position> unitsPossibleActions(GameState gameState) {
     Board board = gameState.getCurrentBoard();
     PossibleActions<Position, Position> map = new PossibleActions<>();
-    List<Position> unitsCurrentPlayer = new ArrayList<>();
-    List<Position> unitsOpponentPlayer = new ArrayList<>();
+    List<Position> unitsCurrentPlayer;
+    List<Position> unitsOpponentPlayer;
     // Ключ - это атакующий юнит, значение - это все возможные атаки данного юнита
     // Для первого игрока
     if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
@@ -109,9 +109,9 @@ public class BotPlayer implements GamePlayer {
   }
 
   private boolean canAct(GameState gameState, MakeMoveEvent move) {
-    boolean result = false;
+    boolean result;
     try {
-      gameState.makeMove(move);
+      gameState.isValidMove(move);
       result = true;
     } catch (GameException e) {
       logger.atError().log("Move is invalid: {}", e.getMessage());
@@ -124,11 +124,11 @@ public class BotPlayer implements GamePlayer {
   public void startGame(StartGameEvent event) {}
 
   @Override
-  public void placeUnit(PlaceUnitEvent event) throws GameException {}
+  public void placeUnit(PlaceUnitEvent event) {}
 
   @Override
-  public void changePlayer(ChangePlayerEvent event) throws GameException {}
+  public void changePlayer(ChangePlayerEvent event) {}
 
   @Override
-  public void makeMove(MakeMoveEvent event) throws GameException {}
+  public void makeMove(MakeMoveEvent event) {}
 }

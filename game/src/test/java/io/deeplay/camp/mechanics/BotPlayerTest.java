@@ -84,7 +84,8 @@ public class BotPlayerTest {
     board.setUnit(1, 2, secondPlayerKnight2);
     board.setUnit(2, 2, secondPlayerKnight3);
 
-    final List<Position> unitPositions = botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+    final List<Position> unitPositions =
+        botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
 
     final List<Position> expectrdPositions =
         List.of(new Position(0, 1), new Position(1, 1), new Position(2, 1));
@@ -173,7 +174,8 @@ public class BotPlayerTest {
     board.setUnit(1, 2, secondPlayerKnight2);
     board.setUnit(2, 2, secondPlayerKnight3);
 
-    final List<Position> unitPositions = botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
+    final List<Position> unitPositions =
+        botPlayer.enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
 
     final List<Position> expectrdPositions = List.of(new Position(1, 1), new Position(2, 1));
 
@@ -297,16 +299,22 @@ public class BotPlayerTest {
     final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
-    final Unit firstPlayerKnight3= new Knight(PlayerType.FIRST_PLAYER);
+    final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
     firstPlayerArcher.setNowHp(0);
 
-    PlaceUnitEvent place1 = new PlaceUnitEvent(0,1,firstPlayerKnight1,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place2 = new PlaceUnitEvent(1,1,firstPlayerKnight2,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place3 = new PlaceUnitEvent(2,1,firstPlayerKnight3,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place4 = new PlaceUnitEvent(0,0,firstPlayerArcher,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place5 = new PlaceUnitEvent(1,0,firstPlayerMage,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place6 = new PlaceUnitEvent(2,0,firstPlayerHealer,gameState.getCurrentPlayer(),false,true);
+    PlaceUnitEvent place1 =
+        new PlaceUnitEvent(0, 1, firstPlayerKnight1, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place2 =
+        new PlaceUnitEvent(1, 1, firstPlayerKnight2, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place3 =
+        new PlaceUnitEvent(2, 1, firstPlayerKnight3, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place4 =
+        new PlaceUnitEvent(0, 0, firstPlayerArcher, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place5 =
+        new PlaceUnitEvent(1, 0, firstPlayerMage, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place6 =
+        new PlaceUnitEvent(2, 0, firstPlayerHealer, gameState.getCurrentPlayer(), false, true);
 
     gameState.makePlacement(place1);
     gameState.makePlacement(place2);
@@ -325,12 +333,18 @@ public class BotPlayerTest {
     final Unit secondPlayerHealer = new Healer(PlayerType.SECOND_PLAYER);
     secondPlayerMage.setNowHp(0);
 
-    PlaceUnitEvent place7 = new PlaceUnitEvent(0,2,secondPlayerKnight1,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place8 = new PlaceUnitEvent(1,2,secondPlayerKnight2,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place9 = new PlaceUnitEvent(2,2,secondPlayerKnight3,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place10 = new PlaceUnitEvent(0,3,secondPlayerArcher,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place11 = new PlaceUnitEvent(1,3,secondPlayerMage,gameState.getCurrentPlayer(),true,false);
-    PlaceUnitEvent place12 = new PlaceUnitEvent(2,3,secondPlayerHealer,gameState.getCurrentPlayer(),false,true);
+    PlaceUnitEvent place7 =
+        new PlaceUnitEvent(0, 2, secondPlayerKnight1, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place8 =
+        new PlaceUnitEvent(1, 2, secondPlayerKnight2, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place9 =
+        new PlaceUnitEvent(2, 2, secondPlayerKnight3, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place10 =
+        new PlaceUnitEvent(0, 3, secondPlayerArcher, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place11 =
+        new PlaceUnitEvent(1, 3, secondPlayerMage, gameState.getCurrentPlayer(), true, false);
+    PlaceUnitEvent place12 =
+        new PlaceUnitEvent(2, 3, secondPlayerHealer, gameState.getCurrentPlayer(), false, true);
 
     gameState.makePlacement(place7);
     gameState.makePlacement(place8);
@@ -355,7 +369,7 @@ public class BotPlayerTest {
     final Position position6 = new Position(1, 1);
     final Position position7 = new Position(2, 1);
     // Возможные атаки мага 1 0 Первого игрока
-    final Position mage = new Position(1,0 );
+    final Position mage = new Position(1, 0);
     final Position position8 = new Position(0, 2);
     final Position position9 = new Position(1, 2);
     final Position position10 = new Position(2, 2);

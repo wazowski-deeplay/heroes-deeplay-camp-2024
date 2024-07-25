@@ -21,7 +21,7 @@ public class Game implements GameListener {
 
   @Override
   public void placeUnit(PlaceUnitEvent placeUnitEvent) throws GameException {
-      gameState.makePlacement(placeUnitEvent);
+    gameState.makePlacement(placeUnitEvent);
   }
 
   @Override
@@ -32,6 +32,6 @@ public class Game implements GameListener {
 
   @Override
   public void makeMove(MakeMoveEvent makeMoveEvent) throws GameException {
-      gameState.makeMove(makeMoveEvent);
+    gameState.makeMove(makeMoveEvent);
   }
 }

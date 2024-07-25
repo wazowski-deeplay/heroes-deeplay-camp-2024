@@ -1,12 +1,6 @@
 package io.deeplay.camp.mechanics;
 
-import io.deeplay.camp.entities.Board;
-import io.deeplay.camp.entities.Position;
-import io.deeplay.camp.entities.Unit;
-import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.ChangePlayerEvent;
-import io.deeplay.camp.events.MakeMoveEvent;
-import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
 import org.slf4j.Logger;
@@ -33,13 +27,4 @@ public class GameLogic {
       throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
     }
   }
-
-  /**
-   * Метод проверяет событие совершение хода одним юнитом по отношению к другому.
-   *
-   * @param gameState Актуальное игровое состояние.
-   * @param move Событие совершения хода юнитом.
-   * @throws GameException Если атакующий юнит атакует своего союзника, либо бьёт по мёртвому.
-   */
-
 }
