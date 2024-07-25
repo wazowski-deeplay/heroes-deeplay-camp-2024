@@ -46,6 +46,7 @@ public class Army {
 
   public boolean isAliveGeneral() {
     isAliveGeneral = false;
+    updateArmyMoves();
     for (Unit unit : units) {
       if (unit == null) {
         continue;

@@ -38,10 +38,8 @@ public class GameState {
 
   public void changeCurrentPlayer() {
     if (currentPlayer == PlayerType.FIRST_PLAYER) {
-      armyFirst.updateArmyMoves();
       currentPlayer = PlayerType.SECOND_PLAYER;
     } else {
-      armySecond.updateArmyMoves();
       currentPlayer = PlayerType.FIRST_PLAYER;
     }
   }
@@ -68,6 +66,11 @@ public class GameState {
             .getUnit(move.getFrom().x(), move.getFrom().y())
             .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
       }
+      logger.atInfo().log(
+              "This {}({}) attack enemy or heal ({})",
+              move.getAttacker().getUnitType(),
+              move.getFrom().x() + "," + move.getFrom().y(),
+              move.getTo().x() + "," + move.getTo().y());
     }
   }
 
@@ -76,6 +79,13 @@ public class GameState {
     Position from = move.getFrom();
     Position to = move.getTo();
     Unit attacker = move.getAttacker();
+
+    if (!attacker.isAlive()) {
+      logger.atInfo().log(
+              "This units {}({}) already dead, he wont move",
+              move.getAttacker().getUnitType(),
+              from.x() + "," + from.y());
+    }
 
     if (outOfBorder(from.x(), from.y()) || outOfBorder(to.x(), to.y())) {
       logger.atInfo().log(
@@ -348,6 +358,6 @@ public class GameState {
   }
 
   private boolean outOfBorder(int x, int y) {
-    return x < 0 || x > board.ROWS - 1 || y < 0 || y > board.COLUMNS - 1;
+    return x < 0 || x > board.COLUMNS - 1 || y < 0 || y > board.ROWS - 1;
   }
 }

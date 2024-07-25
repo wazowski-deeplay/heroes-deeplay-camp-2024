@@ -25,7 +25,7 @@ class GameTest {
   void testGame() {
     BotPlayer bot1 = new BotPlayer();
     BotPlayer bot2 = new BotPlayer();
-    BotFight fight = new BotFight(bot1, bot2, 10, true);
+    BotFight fight = new BotFight(bot1, bot2, 500, false);
     try {
       fight.playGames();
     } catch (GameException e) {
