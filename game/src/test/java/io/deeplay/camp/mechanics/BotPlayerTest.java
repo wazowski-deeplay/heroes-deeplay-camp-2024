@@ -253,7 +253,7 @@ public class BotPlayerTest {
 
   @Test
   public void testStructurePossibleActions() {
-    final PossibleActions<Position, Position> map = new PossibleActions<Position, Position>();
+    final PossibleActions<Position, Position> map = new PossibleActions<>();
     final Position attackPositionUnits1 = new Position(1, 1);
     final Position attackPositionUnits2 = new Position(1, 2);
 
@@ -292,7 +292,6 @@ public class BotPlayerTest {
 
   @Test
   public void testUnitsPossibleActions() throws GameException {
-    final Board board = gameState.getCurrentBoard();
 
     // First palyer
     final Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);

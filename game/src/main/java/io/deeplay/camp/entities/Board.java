@@ -3,9 +3,11 @@ package io.deeplay.camp.entities;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Getter
 @AllArgsConstructor
 public class Board {
   public static final int ROWS = 4;
@@ -81,7 +83,4 @@ public class Board {
     return units[x][y] == null;
   }
 
-  public Unit[][] getUnits() {
-    return units;
-  }
 }

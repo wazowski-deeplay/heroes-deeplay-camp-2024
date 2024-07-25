@@ -6,6 +6,7 @@ import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.entities.UnitType;
+import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
@@ -19,11 +20,11 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class GameState {
 
-  private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
+  private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
   private Board board;
   private GameStage gameStage;
-  private PlayerType currentPlayer;
+  @Getter @Setter private PlayerType currentPlayer;
   private Army armyFirst;
   private Army armySecond;
 
@@ -76,8 +77,8 @@ public class GameState {
 
     boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
     boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInRow = nullUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, to, attacker);
+    boolean nullUnitInRow = nullUnitMeleeRow(from, attacker);
+    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, attacker);
     boolean attackEnemyUnit =
         getCurrentBoard().getUnit(to.x(), to.y()).getPlayerType() != attacker.getPlayerType();
     boolean isAliveDefender = getCurrentBoard().getUnit(to.x(), to.y()).isAlive();
@@ -152,7 +153,6 @@ public class GameState {
   private boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    boolean result = false;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
 
     if (x > Board.COLUMNS) {
@@ -163,10 +163,10 @@ public class GameState {
       logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
       throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
     }
+
     // Проверка на сторону юнита
     if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       if (y < (Board.ROWS / 2)) {
-        result = true;
         logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
       } else {
         logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
@@ -175,13 +175,14 @@ public class GameState {
     } else {
       if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
         logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
-        result = true;
       } else {
         logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
     }
 
+    // Если ход игрока корректен с точки зрения кординатов применяем ход и проверяем на корректность
+    // правил
     board.setUnit(x, y, placement.getUnit());
 
     // Проверка стартующая когда расстановка по мнению игрока окончена
@@ -207,9 +208,33 @@ public class GameState {
           throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       }
-      result = true;
     }
-    return result;
+    return true;
+  }
+
+  public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
+    if (isValidChangePlayer(changePlayerEvent)) {
+      changeCurrentPlayer();
+    } else {
+      throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
+    }
+  }
+
+  /**
+   * Метод проверяет событие перехода хода другому игроку.
+   *
+   * @param changePlayerEvent Событие передачи хода.
+   */
+  public boolean isValidChangePlayer(ChangePlayerEvent changePlayerEvent) {
+    if (getCurrentPlayer() == changePlayerEvent.getRequester()
+        && getGameStage() != GameStage.PLACEMENT_STAGE) {
+      logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
+      return true;
+    } else {
+      logger.atInfo().log(
+          "{} passes the move out of his turn", changePlayerEvent.getRequester().name());
+      return false;
+    }
   }
 
   public Board getCurrentBoard() {
@@ -284,14 +309,14 @@ public class GameState {
             && to.y() == from.y() - 1);
   }
 
-  private boolean nullUnitMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 1) == 0);
   }
 
-  private boolean nullUnitNextMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitNextMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
