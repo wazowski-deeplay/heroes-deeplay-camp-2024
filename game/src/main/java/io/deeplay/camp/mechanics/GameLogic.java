@@ -33,12 +33,4 @@ public class GameLogic {
       throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
     }
   }
-
-  /**
-   * Метод проверяет событие совершение хода одним юнитом по отношению к другому.
-   *
-   * @param gameState Актуальное игровое состояние.
-   * @param move Событие совершения хода юнитом.
-   * @throws GameException Если атакующий юнит атакует своего союзника, либо бьёт по мёртвому.
-   */
 }
