@@ -26,8 +26,7 @@ public class Game implements GameListener {
 
   @Override
   public void changePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
-    GameLogic.isValidChangePlayer(gameState, changePlayerEvent);
-    gameState.changeCurrentPlayer();
+    gameState.makeChangePlayer(changePlayerEvent);
   }
 
   @Override
