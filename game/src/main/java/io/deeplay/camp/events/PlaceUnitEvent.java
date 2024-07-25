@@ -13,7 +13,7 @@ public class PlaceUnitEvent extends Event {
   private int columns;
   private int rows;
   private Unit unit;
-  private boolean inProcess;
+  private boolean inProcess = true;
 
   // Мы должны знать куда ставят, какого юнита, и кто ставит
   // playerType мы получаем из gameState, пример в тесте

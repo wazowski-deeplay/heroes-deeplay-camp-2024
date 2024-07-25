@@ -14,7 +14,6 @@ public enum ErrorCode {
   PLACEMENT_INCORRECT("Введены не корректные координаты"),
   GENERAL_IS_MISSING("Отсутствует генерал");
 
-
   private final String message;
 
   ErrorCode(String message) {
