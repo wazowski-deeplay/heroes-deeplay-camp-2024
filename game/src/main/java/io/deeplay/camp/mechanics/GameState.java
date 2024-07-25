@@ -6,6 +6,7 @@ import io.deeplay.camp.entities.Board;
 import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
 import io.deeplay.camp.entities.UnitType;
+import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
@@ -19,8 +20,7 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class GameState {
 
-  private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
-
+  private static final Logger logger = LoggerFactory.getLogger(GameState.class);
   private Board board;
   private GameStage gameStage;
   private PlayerType currentPlayer;
@@ -213,6 +213,33 @@ public class GameState {
     }
     return result;
   }
+
+  public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
+    if (isValidChangePlayer(changePlayerEvent)) {
+      changeCurrentPlayer();
+    } else {
+      throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
+    }
+  }
+
+  /**
+   * Метод проверяет событие перехода хода другому игроку.
+   *
+   * @param changePlayerEvent Событие передачи хода.
+   */
+  public boolean isValidChangePlayer(ChangePlayerEvent changePlayerEvent) {
+    if (getCurrentPlayer() == changePlayerEvent.getRequester()
+            && getGameStage() != GameStage.PLACEMENT_STAGE) {
+      logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
+      return true;
+    } else {
+      logger.atInfo().log(
+              "{} passes the move out of his turn", changePlayerEvent.getRequester().name());
+      return false;
+    }
+  }
+
+
 
   public Board getCurrentBoard() {
     return board;
