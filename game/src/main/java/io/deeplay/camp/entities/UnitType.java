@@ -5,4 +5,8 @@ public enum UnitType {
   ARCHER,
   MAGE,
   HEALER;
+
+  public static UnitType getRandom() {
+    return values()[(int) (Math.random() * values().length)];
+  }
 }

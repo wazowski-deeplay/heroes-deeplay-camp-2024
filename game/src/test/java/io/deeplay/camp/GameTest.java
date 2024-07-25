@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
+import io.deeplay.camp.mechanics.BotPlayer;
 import io.deeplay.camp.mechanics.GameStage;
 import io.deeplay.camp.mechanics.PlayerType;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,19 @@ class GameTest {
   public void setUp() {
     game = new Game();
   }
+
+  @Test
+  void testGame() {
+    BotPlayer bot1 = new BotPlayer();
+    BotPlayer bot2 = new BotPlayer();
+    BotFight fight = new BotFight(bot1, bot2, 10, true);
+    try {
+      fight.playGames();
+    } catch (GameException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 
   @Test
   void testChangePlayerRequestFromNotCurrentPlayer() {

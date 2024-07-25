@@ -2,7 +2,8 @@ package io.deeplay.camp.mechanics;
 
 public enum PlayerType {
   FIRST_PLAYER,
-  SECOND_PLAYER;
+  SECOND_PLAYER,
+  DRAW;
 
   public PlayerType switchPlayer() {
     if (this == FIRST_PLAYER) {
