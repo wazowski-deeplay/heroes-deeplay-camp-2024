@@ -4,11 +4,11 @@ import io.deeplay.camp.mechanics.PlayerType;
 
 public abstract class Unit implements GeneralBuff {
   protected int maxHp;
-  protected int nowHp;
+  protected int currentHp;
   protected int damage;
   protected int accuracy;
   protected int armor;
-  protected boolean isGeneral = false;
+  protected boolean isGeneral;
   protected UnitType unitType;
   protected PlayerType playerType;
   protected AttackType attackType;
@@ -17,14 +17,14 @@ public abstract class Unit implements GeneralBuff {
   public Unit(
       UnitType unitType,
       int maxHp,
-      int nowHp,
+      int currentHp,
       int damage,
       int accuracy,
       int armor,
       boolean isGeneral) {
     this.unitType = unitType;
     this.maxHp = maxHp;
-    this.nowHp = nowHp;
+    this.currentHp = currentHp;
     this.damage = damage;
     this.accuracy = accuracy;
     this.armor = armor;
@@ -45,17 +45,17 @@ public abstract class Unit implements GeneralBuff {
     this.maxHp = health;
   }
 
-  public int getNowHp() {
-    return nowHp;
+  public int getCurrentHp() {
+    return currentHp;
   }
 
-  public void setNowHp(int health) {
-    this.nowHp = health;
-    if (this.nowHp < 0) {
-      this.nowHp = 0;
+  public void setCurrentHp(int health) {
+    this.currentHp = health;
+    if (this.currentHp < 0) {
+      this.currentHp = 0;
     }
-    if (this.nowHp > maxHp) {
-      this.nowHp = maxHp;
+    if (this.currentHp > maxHp) {
+      this.currentHp = maxHp;
     }
   }
 
@@ -90,10 +90,12 @@ public abstract class Unit implements GeneralBuff {
   public PlayerType getPlayerType() {
     return playerType;
   }
-  public void setMoved(boolean isMoved){
+
+  public void setMoved(boolean isMoved) {
     this.isMoved = isMoved;
   }
-  public boolean getMoved(){
+
+  public boolean getMoved() {
     return isMoved;
   }
 
@@ -106,7 +108,7 @@ public abstract class Unit implements GeneralBuff {
   }
 
   public boolean isAlive() {
-    return nowHp > 0;
+    return currentHp > 0;
   }
 
   public boolean isGeneral() {
@@ -119,5 +121,4 @@ public abstract class Unit implements GeneralBuff {
 
   // Методы для реализации в дочерних классах
   public abstract void playMove(Unit targetUnit);
-
 }

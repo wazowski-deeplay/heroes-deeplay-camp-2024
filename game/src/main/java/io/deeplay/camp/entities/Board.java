@@ -64,6 +64,21 @@ public class Board {
     return unitPositions;
   }
 
+  public List<Position> enumerateEmptyCells(int startRow, int endRow) {
+    List<Position> unitPositions = new ArrayList<>();
+    for (int i = startRow; i < endRow; i++) {
+      for (int j = 0; j < Board.COLUMNS; j++) {
+        if (isEmptyCell(j, i)) {
+          unitPositions.add(new Position(j, i));
+          logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);
+        } else if (getUnit(j, i).isAlive()) {
+          logger.atInfo().log("Cell (X-{},Y-{}) Already have unit", j, i);
+        }
+      }
+    }
+    return unitPositions;
+  }
+
   public int countUnitsRow(int row) {
     int count = 0;
     for (int i = 0; i < COLUMNS; i++) {

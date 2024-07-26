@@ -108,14 +108,6 @@ public class GameState {
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
-    if (from.x() == to.x() && from.y() == to.y()) {
-      logger.atInfo().log(
-          "This units {}({}) cant attack yourself",
-          move.getAttacker().getUnitType(),
-          from.x() + "," + from.y());
-      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
-    }
-
     boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
     boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
     boolean nullUnitInRow = nullUnitMeleeRow(from, to, attacker);
@@ -191,17 +183,17 @@ public class GameState {
     }
   }
 
-  private boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
+  public boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    boolean result = false;
+    boolean result;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
 
-    if (x > Board.COLUMNS) {
+    if (x > Board.COLUMNS || x < 0) {
       logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
       throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
     }
-    if (y > Board.ROWS) {
+    if (y > Board.ROWS || y < 0) {
       logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
       throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
     }
@@ -251,6 +243,7 @@ public class GameState {
       }
       result = true;
     }
+    board.setUnit(x, y, null);
     return result;
   }
 

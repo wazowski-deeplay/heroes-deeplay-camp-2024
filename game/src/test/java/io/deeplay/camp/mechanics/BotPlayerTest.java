@@ -127,7 +127,7 @@ public class BotPlayerTest {
     final Unit firstPlayerKnight1 = new Knight(playerType);
     final Unit firstPlayerKnight2 = new Knight(playerType);
     final Unit firstPlayerKnight3 = new Knight(playerType);
-    firstPlayerKnight2.setNowHp(0);
+    firstPlayerKnight2.setCurrentHp(0);
     board.setUnit(0, 1, firstPlayerKnight1);
     board.setUnit(1, 1, firstPlayerKnight2);
     board.setUnit(2, 1, firstPlayerKnight3);
@@ -145,7 +145,7 @@ public class BotPlayerTest {
     final Unit secondPlayerKnight1 = new Knight(playerType);
     final Unit secondPlayerKnight2 = new Knight(playerType);
     final Unit secondPlayerKnight3 = new Knight(playerType);
-    secondPlayerKnight2.setNowHp(0);
+    secondPlayerKnight2.setCurrentHp(0);
     board.setUnit(0, 2, secondPlayerKnight1);
     board.setUnit(1, 2, secondPlayerKnight2);
     board.setUnit(2, 2, secondPlayerKnight3);
@@ -162,11 +162,11 @@ public class BotPlayerTest {
     final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
-    firstPlayerKnight1.setNowHp(0);
+    firstPlayerKnight1.setCurrentHp(0);
     final Unit secondPlayerKnight2 = new Knight(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerKnight3 = new Knight(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerKnight1 = new Knight(PlayerType.SECOND_PLAYER);
-    secondPlayerKnight3.setNowHp(0);
+    secondPlayerKnight3.setCurrentHp(0);
     board.setUnit(0, 1, firstPlayerKnight1);
     board.setUnit(1, 1, firstPlayerKnight2);
     board.setUnit(2, 1, firstPlayerKnight3);
@@ -189,11 +189,11 @@ public class BotPlayerTest {
     final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight1 = new Knight(PlayerType.FIRST_PLAYER);
-    firstPlayerKnight1.setNowHp(0);
+    firstPlayerKnight1.setCurrentHp(0);
     final Unit secondPlayerKnight2 = new Knight(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerKnight3 = new Knight(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerKnight1 = new Knight(PlayerType.SECOND_PLAYER);
-    secondPlayerKnight3.setNowHp(0);
+    secondPlayerKnight3.setCurrentHp(0);
     board.setUnit(0, 1, firstPlayerKnight1);
     board.setUnit(1, 1, firstPlayerKnight2);
     board.setUnit(2, 1, firstPlayerKnight3);
@@ -217,7 +217,7 @@ public class BotPlayerTest {
     final Unit firstPlayerMage = new Mage(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
-    firstPlayerArcher.setNowHp(0);
+    firstPlayerArcher.setCurrentHp(0);
     board.setUnit(0, 0, firstPlayerArcher);
     board.setUnit(2, 0, firstPlayerMage);
     board.setUnit(2, 1, firstPlayerHealer);
@@ -228,7 +228,7 @@ public class BotPlayerTest {
     final Unit secondPlayerMage1 = new Mage(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerMage2 = new Mage(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerHealer = new Healer(PlayerType.SECOND_PLAYER);
-    secondPlayerHealer.setNowHp(0);
+    secondPlayerHealer.setCurrentHp(0);
     board.setUnit(1, 2, secondPlayerKnight);
     board.setUnit(2, 3, secondPlayerMage1);
     board.setUnit(0, 3, secondPlayerMage2);
@@ -292,7 +292,6 @@ public class BotPlayerTest {
 
   @Test
   public void testUnitsPossibleActions() throws GameException {
-    final Board board = gameState.getCurrentBoard();
 
     // First palyer
     final Unit firstPlayerArcher = new Archer(PlayerType.FIRST_PLAYER);
@@ -301,7 +300,7 @@ public class BotPlayerTest {
     final Unit firstPlayerKnight2 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerKnight3 = new Knight(PlayerType.FIRST_PLAYER);
     final Unit firstPlayerHealer = new Healer(PlayerType.FIRST_PLAYER);
-    firstPlayerArcher.setNowHp(0);
+    firstPlayerArcher.setCurrentHp(0);
 
     PlaceUnitEvent place1 =
         new PlaceUnitEvent(0, 1, firstPlayerKnight1, gameState.getCurrentPlayer(), true, false);
@@ -331,7 +330,7 @@ public class BotPlayerTest {
     final Unit secondPlayerArcher = new Archer(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerMage = new Mage(PlayerType.SECOND_PLAYER);
     final Unit secondPlayerHealer = new Healer(PlayerType.SECOND_PLAYER);
-    secondPlayerMage.setNowHp(0);
+    secondPlayerMage.setCurrentHp(0);
 
     PlaceUnitEvent place7 =
         new PlaceUnitEvent(0, 2, secondPlayerKnight1, gameState.getCurrentPlayer(), true, false);

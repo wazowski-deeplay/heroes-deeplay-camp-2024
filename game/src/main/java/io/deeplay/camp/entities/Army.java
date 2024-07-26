@@ -38,8 +38,8 @@ public class Army {
     }
   }
 
-  public void updateArmyMoves(){
-    for(Unit unit : units){
+  public void updateArmyMoves() {
+    for (Unit unit : units) {
       unit.setMoved(false);
     }
   }

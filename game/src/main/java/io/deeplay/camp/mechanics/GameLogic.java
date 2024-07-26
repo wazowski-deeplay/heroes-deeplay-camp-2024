@@ -1,12 +1,6 @@
 package io.deeplay.camp.mechanics;
 
-import io.deeplay.camp.entities.Board;
-import io.deeplay.camp.entities.Position;
-import io.deeplay.camp.entities.Unit;
-import io.deeplay.camp.entities.UnitType;
 import io.deeplay.camp.events.ChangePlayerEvent;
-import io.deeplay.camp.events.MakeMoveEvent;
-import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ErrorCode;
 import io.deeplay.camp.exceptions.GameException;
 import org.slf4j.Logger;
