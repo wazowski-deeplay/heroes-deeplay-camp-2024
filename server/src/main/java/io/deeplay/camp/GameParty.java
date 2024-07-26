@@ -8,13 +8,17 @@ import io.deeplay.camp.events.StartGameEvent;
 import io.deeplay.camp.exceptions.GameException;
 import lombok.Getter;
 
+import java.util.UUID;
+
 /** Класс, отвечающий за конкретную игровую партию. Все запроы транслирует в Game. */
 @Getter
 public class GameParty {
   private Game game;
-  private long gamePartyId;
+  private UUID gamePartyId;
 
-  public GameParty(long gamePartyId) {
+  // нужно добавить игроков
+
+  public GameParty(UUID gamePartyId) {
     this.gamePartyId = gamePartyId;
     game = new Game();
   }

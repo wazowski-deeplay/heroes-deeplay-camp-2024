@@ -1,5 +1,6 @@
 package io.deeplay.camp.dto.client;
 
+import ch.qos.logback.core.net.server.Client;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.dto.client.game.ChangePlayerRequest;
@@ -10,6 +11,9 @@ import io.deeplay.camp.dto.client.party.CreatePartyRequest;
 import io.deeplay.camp.dto.client.party.JoinPartyRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
@@ -24,7 +28,8 @@ import lombok.NoArgsConstructor;
 })
 public abstract class Request {
   private RequestType requestType;
-
+  @Setter
+  private UUID clientId;
   public Request(RequestType requestType) {
     this.requestType = requestType;
   }
