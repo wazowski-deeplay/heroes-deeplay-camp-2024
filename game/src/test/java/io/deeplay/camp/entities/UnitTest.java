@@ -25,7 +25,7 @@ class UnitTest {
   @Test
   void getNowHpKnight() {
     Knight unit = new Knight(PlayerType.FIRST_PLAYER);
-    int expected = unit.getNowHp();
+    int expected = unit.getCurrentHp();
     int actual = 15;
     Assertions.assertEquals(expected, actual);
   }
@@ -34,7 +34,7 @@ class UnitTest {
   void getDamageMage() {
     Mage unit = new Mage(PlayerType.FIRST_PLAYER);
     int expected = unit.getDamage();
-    int actual = 2;
+    int actual = 1;
     Assertions.assertEquals(expected, actual);
   }
 

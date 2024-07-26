@@ -35,7 +35,7 @@ class ArmyTest {
   @Test
   void isAliveGeneralTestDebuff() {
     army.isAliveGeneral();
-    army.getUnits()[1].setNowHp(-5);
+    army.getUnits()[1].setCurrentHp(-5);
     army.isAliveGeneral();
     Assertions.assertEquals(army.getUnits()[2].getArmor(), 15);
   }

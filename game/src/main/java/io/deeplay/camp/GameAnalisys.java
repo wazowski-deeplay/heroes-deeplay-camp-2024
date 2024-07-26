@@ -48,7 +48,7 @@ public class GameAnalisys {
         favorMageFirst[countGame][2]++;
         for (int i = 0; i < board.getUnits().length; i++) {
           for (int j = board.getUnits()[i].length / 2; j < board.getUnits()[i].length; j++) {
-            if (currentBoard.getUnit(i, j).getNowHp() != board.getUnit(i, j).getNowHp()) {
+            if (currentBoard.getUnit(i, j).getCurrentHp() != board.getUnit(i, j).getCurrentHp()) {
               favorMageFirst[countGame][1]++;
             }
           }
@@ -57,7 +57,7 @@ public class GameAnalisys {
         favorMageSecond[countGame][2]++;
         for (int i = 0; i < board.getUnits().length; i++) {
           for (int j = 0; j < board.getUnits()[i].length / 2; j++) {
-            if (currentBoard.getUnit(i, j).getNowHp() != board.getUnit(i, j).getNowHp()) {
+            if (currentBoard.getUnit(i, j).getCurrentHp() != board.getUnit(i, j).getCurrentHp()) {
               favorMageSecond[countGame][1]++;
             }
           }
@@ -67,19 +67,22 @@ public class GameAnalisys {
     if (attacker.getPlayerType() == PlayerType.FIRST_PLAYER) {
       if (attacker.getUnitType() == UnitType.KNIGHT) {
         favorKnightFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorKnightFirst[countGame][1]++;
         }
       }
       if (attacker.getUnitType() == UnitType.ARCHER) {
         favorArcherFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorArcherFirst[countGame][1]++;
         }
       }
       if (attacker.getUnitType() == UnitType.HEALER) {
         favorHealerFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorHealerFirst[countGame][1]++;
         }
       }
@@ -87,19 +90,22 @@ public class GameAnalisys {
     if (attacker.getPlayerType() == PlayerType.SECOND_PLAYER) {
       if (attacker.getUnitType() == UnitType.KNIGHT) {
         favorKnightSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorKnightSecond[countGame][1]++;
         }
       }
       if (attacker.getUnitType() == UnitType.ARCHER) {
         favorArcherSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorArcherSecond[countGame][1]++;
         }
       }
       if (attacker.getUnitType() == UnitType.HEALER) {
         favorHealerSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getNowHp() != board.getUnit(xto, yto).getNowHp()) {
+        if (currentBoard.getUnit(xto, yto).getCurrentHp()
+            != board.getUnit(xto, yto).getCurrentHp()) {
           favorHealerSecond[countGame][1]++;
         }
       }

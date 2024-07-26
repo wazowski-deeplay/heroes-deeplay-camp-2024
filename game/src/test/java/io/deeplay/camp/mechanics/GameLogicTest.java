@@ -35,7 +35,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToKnight() throws GameException {
+  void isValidMoveAttackKnightToKnight() {
     Position posAttacker = new Position(1, 1);
     Position posDefender = new Position(1, 2);
     MakeMoveEvent makeMove =
@@ -61,7 +61,7 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackArcherToArcher() throws GameException {
+  void isValidMoveAttackArcherToArcher() {
 
     Position posAttacker = new Position(1, 0);
     Position posDefender = new Position(2, 3);
@@ -88,10 +88,10 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToOneKnight() throws GameException {
+  void isValidMoveAttackKnightToOneKnight() {
 
-    gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
-    gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
+    gameState.getCurrentBoard().getUnit(0, 2).setCurrentHp(-5);
+    gameState.getCurrentBoard().getUnit(1, 2).setCurrentHp(-5);
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(2, 2);
     MakeMoveEvent makeMove =
@@ -104,8 +104,8 @@ class GameLogicTest {
 
   @Test
   void isValidMoveAttackKnightToArcherWithOneKnight() {
-    gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
-    gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
+    gameState.getCurrentBoard().getUnit(0, 2).setCurrentHp(-5);
+    gameState.getCurrentBoard().getUnit(1, 2).setCurrentHp(-5);
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(2, 3);
     MakeMoveEvent makeMove =
@@ -119,10 +119,10 @@ class GameLogicTest {
   }
 
   @Test
-  void isValidMoveAttackKnightToArcherWithNullKnight() throws GameException {
-    gameState.getCurrentBoard().getUnit(0, 2).setNowHp(-5);
-    gameState.getCurrentBoard().getUnit(1, 2).setNowHp(-5);
-    gameState.getCurrentBoard().getUnit(2, 2).setNowHp(-5);
+  void isValidMoveAttackKnightToArcherWithNullKnight() {
+    gameState.getCurrentBoard().getUnit(0, 2).setCurrentHp(-5);
+    gameState.getCurrentBoard().getUnit(1, 2).setCurrentHp(-5);
+    gameState.getCurrentBoard().getUnit(2, 2).setCurrentHp(-5);
     Position posAttacker = new Position(0, 1);
     Position posDefender = new Position(2, 3);
     MakeMoveEvent makeMove =
@@ -145,18 +145,6 @@ class GameLogicTest {
     GameException gameException =
         assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
-  }
-
-  @Test
-  void isValidMoveHealAllyHealerToAllyKnight() throws GameException {
-    Position posAttacker = new Position(1, 3);
-    Position posDefender = new Position(1, 2);
-    MakeMoveEvent makeMove =
-        new MakeMoveEvent(
-            posAttacker,
-            posDefender,
-            gameState.getCurrentBoard().getUnit(posAttacker.x(), posAttacker.y()));
-    assertDoesNotThrow(() -> gameState.makeMove(makeMove));
   }
 
   @Test

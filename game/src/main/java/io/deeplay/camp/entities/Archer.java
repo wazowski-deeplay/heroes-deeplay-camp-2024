@@ -13,7 +13,7 @@ public class Archer extends Unit {
   public void playMove(Unit targetUnit) {
     int diceRoll = (int) (Math.random() * 20);
     if (diceRoll + accuracy > targetUnit.getArmor()) {
-      targetUnit.setNowHp(targetUnit.getNowHp() - damage);
+      targetUnit.setCurrentHp(targetUnit.getCurrentHp() - damage);
     }
     isMoved = true;
   }

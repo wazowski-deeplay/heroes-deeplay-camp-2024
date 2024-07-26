@@ -5,7 +5,6 @@ import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.events.StartGameEvent;
 import io.deeplay.camp.exceptions.GameException;
-import io.deeplay.camp.mechanics.GameLogic;
 import io.deeplay.camp.mechanics.GameState;
 
 public class Game implements GameListener {

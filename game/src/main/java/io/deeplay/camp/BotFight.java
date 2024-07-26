@@ -18,7 +18,7 @@ public class BotFight {
   private static int countDraw = 0;
   private final int countGame;
 
-  private final int timeSkeep = 250;
+  private final int timeSkeep = 50;
   Game game;
   GameAnalisys gameAnalisys;
   BotPlayer botFirst;
@@ -26,8 +26,6 @@ public class BotFight {
   boolean consoleOut = true;
   boolean outInfoGame;
   String separator = System.getProperty("line.separator");
-  PlaceUnitEvent[] placementEvents = new PlaceUnitEvent[12];
-
   JFrame frame;
   JTextArea area1;
   JPanel contents;
@@ -37,6 +35,7 @@ public class BotFight {
     this.botSecond = botSecond;
     this.countGame = countGame;
     game = new Game();
+    game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
     gameAnalisys = new GameAnalisys(countGame);
     this.outInfoGame = infoGame;
     frame = new JFrame();
@@ -55,27 +54,23 @@ public class BotFight {
     for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
       game = new Game();
-      placementEvents = new PlaceUnitEvent[12];
-      fillPlace(game.gameState.getCurrentBoard());
+
       game.gameState.setGameStage(GameStage.PLACEMENT_STAGE);
-      fillBoard(PlayerType.FIRST_PLAYER);
-
-      game.gameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
-      fillBoard(PlayerType.SECOND_PLAYER);
-
+      executePlace(game.gameState.getCurrentPlayer(), gameCount);
+      game.gameState.changeCurrentPlayer();
+      executePlace(game.gameState.getCurrentPlayer(), gameCount);
+      game.gameState.changeCurrentPlayer();
       gameAnalisys.setCurrentBoard(game.gameState.getCurrentBoard().getUnits());
 
-      game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
       game.gameState.getArmyFirst().fillArmy(game.gameState.getCurrentBoard());
       game.gameState.getArmySecond().fillArmy(game.gameState.getCurrentBoard());
       game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
-      consoleView(null);
       for (int z = 0; z < 10; z++) {
         game.gameState.getArmyFirst().isAliveGeneral();
         game.gameState.getArmySecond().isAliveGeneral();
-        executeMove(PlayerType.FIRST_PLAYER, gameCount);
+        executeMove(game.gameState.getCurrentPlayer(), gameCount);
         game.changePlayer(new ChangePlayerEvent(game.gameState.getCurrentPlayer()));
-        executeMove(PlayerType.SECOND_PLAYER, gameCount);
+        executeMove(game.gameState.getCurrentPlayer(), gameCount);
         if (escapeGame()) {
           break;
         }
@@ -138,7 +133,7 @@ public class BotFight {
   }
 
   @SneakyThrows
-  public void executeMove(PlayerType playerType, int countGame) throws GameException {
+  public void executeMove(PlayerType playerType, int countGame) {
     if (playerType == PlayerType.FIRST_PLAYER) {
       for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
         for (int j = 0; j < game.gameState.getCurrentBoard().getUnits()[i].length / 2; j++) {
@@ -185,91 +180,85 @@ public class BotFight {
     }
   }
 
-  public void fillBoard(PlayerType playerType) throws GameException {
-    int index;
+  @SneakyThrows
+  public void executePlace(PlayerType playerType, int countGame) {
     if (playerType == PlayerType.FIRST_PLAYER) {
-      index = 0;
       for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
         for (int j = 0; j < game.gameState.getCurrentBoard().getUnits()[i].length / 2; j++) {
-          game.placeUnit(placementEvents[index++]);
+          PossibleActions<Position, Unit> positionPossiblePlacementFirst =
+              botFirst.unitsPossiblePlacement(game.gameState);
+
+          Position pos1 = new Position(i, j);
+          int rand = (int) (Math.random() * positionPossiblePlacementFirst.get(pos1).size());
+          if (positionPossiblePlacementFirst.get(pos1).size() == 0) {
+            continue;
+          }
+          boolean inProcess = true;
+          boolean general = false;
+          if (botFirst
+                      .enumerationPlayerUnits(
+                          PlayerType.FIRST_PLAYER, game.gameState.getCurrentBoard())
+                      .size()
+                  + 1
+              == 6) {
+            inProcess = false;
+            general = true;
+          }
+          PlaceUnitEvent place =
+              new PlaceUnitEvent(
+                  pos1.x(),
+                  pos1.y(),
+                  positionPossiblePlacementFirst.get(pos1).get(rand),
+                  PlayerType.FIRST_PLAYER,
+                  inProcess,
+                  general);
+
+          game.placeUnit(place);
+          Thread.sleep(timeSkeep);
+          consoleView(null);
         }
       }
-    }
-    if (playerType == PlayerType.SECOND_PLAYER) {
-      index = 6;
+    } else if (playerType == PlayerType.SECOND_PLAYER) {
       for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
         for (int j = game.gameState.getCurrentBoard().getUnits()[i].length / 2;
             j < game.gameState.getCurrentBoard().getUnits()[i].length;
             j++) {
-          game.placeUnit(placementEvents[index++]);
+          PossibleActions<Position, Unit> positionPossiblePlacementSecond =
+              botSecond.unitsPossiblePlacement(game.gameState);
+          Position pos1 = new Position(i, j);
+          int rand = (int) (Math.random() * positionPossiblePlacementSecond.get(pos1).size());
+          if (positionPossiblePlacementSecond.get(pos1).size() == 0) {
+            continue;
+          }
+          boolean inProcess = true;
+          boolean general = false;
+          if (botFirst
+                      .enumerationPlayerUnits(
+                          PlayerType.SECOND_PLAYER, game.gameState.getCurrentBoard())
+                      .size()
+                  + 1
+              == 6) {
+            inProcess = false;
+            general = true;
+          }
+          PlaceUnitEvent place =
+              new PlaceUnitEvent(
+                  pos1.x(),
+                  pos1.y(),
+                  positionPossiblePlacementSecond.get(pos1).get(rand),
+                  PlayerType.SECOND_PLAYER,
+                  inProcess,
+                  general);
+
+          game.placeUnit(place);
+          Thread.sleep(timeSkeep);
+          consoleView(null);
         }
       }
     }
   }
 
-  public void fillPlace(Board board) {
-    placementEvents[0] =
-        new PlaceUnitEvent(
-            0, 0, randomUnit(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false);
-    placementEvents[1] =
-        new PlaceUnitEvent(
-            0, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false);
-    placementEvents[2] =
-        new PlaceUnitEvent(
-            1, 0, randomUnit(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false);
-    placementEvents[3] =
-        new PlaceUnitEvent(
-            1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false);
-    placementEvents[4] =
-        new PlaceUnitEvent(
-            2, 0, randomUnit(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false);
-    placementEvents[5] =
-        new PlaceUnitEvent(
-            2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false);
-    placementEvents[6] =
-        new PlaceUnitEvent(
-            0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false);
-    placementEvents[7] =
-        new PlaceUnitEvent(
-            0, 3, randomUnit(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false);
-    placementEvents[8] =
-        new PlaceUnitEvent(
-            1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false);
-    placementEvents[9] =
-        new PlaceUnitEvent(
-            1, 3, randomUnit(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false);
-    placementEvents[10] =
-        new PlaceUnitEvent(
-            2, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false);
-    placementEvents[11] =
-        new PlaceUnitEvent(
-            2, 3, randomUnit(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false);
-
-    int randUnitFirst = rnd(0, 5);
-    while (placementEvents[randUnitFirst].getUnit().getUnitType() == UnitType.HEALER) {
-      randUnitFirst = rnd(0, 5);
-    }
-    int randUnitSecond = rnd(6, 11);
-    while (placementEvents[randUnitSecond].getUnit().getUnitType() == UnitType.HEALER) {
-      randUnitSecond = rnd(6, 11);
-    }
-    placementEvents[randUnitFirst].getUnit().setGeneral(true);
-    placementEvents[randUnitSecond].getUnit().setGeneral(true);
-  }
-
-  public static Unit randomUnit(PlayerType playerType) {
-    Unit unit;
-    switch (UnitType.getRandom()) {
-      case MAGE -> unit = new Mage(playerType);
-      case ARCHER -> unit = new Archer(playerType);
-      case HEALER -> unit = new Healer(playerType);
-      case KNIGHT -> unit = new Healer(playerType);
-      default -> unit = new Archer(playerType);
-    }
-    return unit;
-  }
-
-  public void consoleView(MakeMoveEvent move) throws IOException {
+  public void consoleView(MakeMoveEvent move) {
     if (consoleOut) {
       area1.setText(null);
       if (move == null) {
@@ -282,96 +271,72 @@ public class BotFight {
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 3).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(0, 3).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(0, 3).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 3))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(0, 3))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 3).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(1, 3).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(1, 3).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 3))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(1, 3))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 3).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(2, 3).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(2, 3).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 3))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(2, 3))));
       area1.append(separator);
       area1.append(separator);
       area1.append(String.format("%-" + s + "s", "2"));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 2).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(0, 2).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(0, 2).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 2))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(0, 2))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 2).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(1, 2).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(1, 2).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 2))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(1, 2))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 2).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(2, 2).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(2, 2).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 2))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(2, 2))));
       area1.append(separator);
       area1.append(separator);
       area1.append(String.format("%-" + s + "s", "1"));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 1).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(0, 1).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(0, 1).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 1))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(0, 1))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 1).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(1, 1).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(1, 1).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 1))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(1, 1))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 1).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(2, 1).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(2, 1).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 1))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(2, 1))));
       area1.append(separator);
       area1.append(separator);
       area1.append(String.format("%-" + s + "s", "0"));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 0).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(0, 0).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(0, 0).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(0, 0))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(0, 0))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 0).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(1, 0).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(1, 0).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(1, 0))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(1, 0))));
       area1.append(
           String.format(
               "%-" + s + "s",
-              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 0).getMoved())
-                  + game.gameState.getCurrentBoard().getUnit(2, 0).getUnitType().name()
-                  + ""
-                  + game.gameState.getCurrentBoard().getUnit(2, 0).getNowHp()));
+              markIsMoved(game.gameState.getCurrentBoard().getUnit(2, 0))
+                  + markIsName(game.gameState.getCurrentBoard().getUnit(2, 0))));
       area1.append(separator);
       area1.append(separator);
       area1.append(String.format("%-25s", "#"));
@@ -426,15 +391,28 @@ public class BotFight {
     }
   }
 
-  public static int rnd(int min, int max) {
-    max -= min;
-    return (int) (Math.random() * ++max) + min;
+  private String markIsMoved(Unit unit) {
+    String result = "?";
+    if (unit == null) {
+      return "";
+    }
+    if (unit.getMoved()) {
+      result = "!";
+    }
+    return result;
   }
 
-  private String markIsMoved(boolean isMoved) {
+  private String markIsName(Unit unit) {
     String result = "?";
-    if (isMoved) {
-      result = "!";
+    if (unit == null) {
+      return result = "------";
+    }
+    switch (unit.getUnitType()) {
+      case KNIGHT -> result = "Knight" + unit.getCurrentHp();
+      case ARCHER -> result = "Archer" + unit.getCurrentHp();
+      case MAGE -> result = "Wizard" + unit.getCurrentHp();
+      case HEALER -> result = "Healer" + unit.getCurrentHp();
+      default -> result = "------";
     }
     return result;
   }
