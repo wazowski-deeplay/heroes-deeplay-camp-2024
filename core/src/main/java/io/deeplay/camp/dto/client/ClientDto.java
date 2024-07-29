@@ -14,13 +14,13 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "requestType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "clientDtoType")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = MakeMoveDto.class, name = "MAKE_MOVE"),
-  @JsonSubTypes.Type(value = PlaceUnitDto.class, name = "PLACE_UNIT"),
-  @JsonSubTypes.Type(value = ChangePlayerDto.class, name = "CHANGE_PLAYER"),
-  @JsonSubTypes.Type(value = CreateGamePartyDto.class, name = "CREATE_PARTY"),
-  @JsonSubTypes.Type(value = JoinGamePartyDto.class, name = "JOIN_PARTY"),
+  @JsonSubTypes.Type(value = MakeMoveDto.class),
+  @JsonSubTypes.Type(value = PlaceUnitDto.class),
+  @JsonSubTypes.Type(value = ChangePlayerDto.class),
+  @JsonSubTypes.Type(value = CreateGamePartyDto.class),
+  @JsonSubTypes.Type(value = JoinGamePartyDto.class),
 })
 public abstract class ClientDto {
   private ClientDtoType clientDtoType;

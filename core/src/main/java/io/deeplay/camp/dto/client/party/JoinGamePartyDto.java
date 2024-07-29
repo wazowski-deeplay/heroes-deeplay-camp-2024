@@ -4,6 +4,7 @@ import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.ClientDtoType;
 import lombok.Getter;
 
+
 @Getter
 public class JoinGamePartyDto extends ClientDto {
   public JoinGamePartyDto() {

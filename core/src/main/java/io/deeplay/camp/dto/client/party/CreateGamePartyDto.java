@@ -4,7 +4,9 @@ import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.ClientDtoType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class CreateGamePartyDto extends ClientDto {
   private GameType gameType;
