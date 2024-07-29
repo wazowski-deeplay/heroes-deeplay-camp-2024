@@ -1,9 +1,12 @@
 package io.deeplay.camp;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.UUID;
-
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,16 @@ public class ClientHandler {
     }
   }
 
+  public void sendMessage(String message) {
+    try {
+      writer.write(message);
+      writer.newLine();
+      writer.flush();
+    } catch (IOException e) {
+      logger.error("Error sending response", e);
+    }
+  }
+
   public String readRequest() {
     try {
       return reader.readLine();
@@ -39,21 +52,17 @@ public class ClientHandler {
 
   public void closeResources() {
     try {
-      if (reader != null) reader.close();
-      if (writer != null) writer.close();
-      if (clientSocket != null) clientSocket.close();
+      if (reader != null) {
+        reader.close();
+      }
+      if (writer != null) {
+        writer.close();
+      }
+      if (clientSocket != null) {
+        clientSocket.close();
+      }
     } catch (IOException e) {
       logger.error("Error closing resources", e);
-    }
-  }
-
-  public void sendMessage(String message) {
-    try {
-      writer.write(message);
-      writer.newLine();
-      writer.flush();
-    } catch (IOException e) {
-      logger.error("Error sending response", e);
     }
   }
 }
