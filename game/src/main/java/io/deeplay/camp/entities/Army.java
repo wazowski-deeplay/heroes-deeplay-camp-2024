@@ -38,6 +38,7 @@ public class Army {
     }
   }
 
+  // Обновление возможности ходить для юнитов данной армии
   public void updateArmyMoves() {
     for (Unit unit : units) {
       unit.setMoved(false);
@@ -46,7 +47,6 @@ public class Army {
 
   public boolean isAliveGeneral() {
     isAliveGeneral = false;
-    updateArmyMoves();
     for (Unit unit : units) {
       if (unit == null) {
         continue;
