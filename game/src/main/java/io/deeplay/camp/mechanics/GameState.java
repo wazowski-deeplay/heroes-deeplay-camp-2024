@@ -76,10 +76,12 @@ public class GameState {
             .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
       }
       logger.atInfo().log(
-          "This {}({}) attack enemy or heal ({})",
+          "This {}({},{}) attack enemy or heal ({},{})",
           move.getAttacker().getUnitType(),
-          move.getFrom().x() + "," + move.getFrom().y(),
-          move.getTo().x() + "," + move.getTo().y());
+          move.getFrom().x(),
+          move.getFrom().y(),
+          move.getTo().x(),
+          move.getTo().y());
       allUnitsDeadByPlayer();
       armyFirst.isAliveGeneral();
       armySecond.isAliveGeneral();
@@ -94,29 +96,34 @@ public class GameState {
 
     if (!attacker.isAlive()) {
       logger.atInfo().log(
-          "This units {}({}) already dead, he wont move",
+          "This units {}({},{}) already dead, he wont move",
           move.getAttacker().getUnitType(),
-          from.x() + "," + from.y());
+          from.x(),
+          from.y());
+      throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (outOfBorder(from.x(), from.y()) || outOfBorder(to.x(), to.y())) {
       logger.atInfo().log(
-          "These coordinates({}) or ({}) are outside board border",
-          from.x() + "," + from.y(),
-          to.x() + "," + to.y());
+          "These coordinates({},{}) or ({},{}) are outside board border",
+          from.x(),
+          from.x(),
+          to.x(),
+          to.y());
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (attacker.getPlayerType() != currentPlayer) {
-      logger.atInfo().log("Enemy units({}) cannot be called to move", from.x() + "," + from.y());
+      logger.atInfo().log("Enemy units({},{}) cannot be called to move", from.x(), from.y());
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (attacker.getMoved()) {
       logger.atInfo().log(
-          "This units {}({}) already moved this round",
+          "This units {}({},{}) already moved this round",
           move.getAttacker().getUnitType(),
-          from.x() + "," + from.y());
+          from.x(),
+          from.y());
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
@@ -143,9 +150,11 @@ public class GameState {
           }
         } else {
           logger.atInfo().log(
-              "This Knight({}) try attack ({}), who outside his radius",
-              from.x() + "," + from.y(),
-              to.x() + "," + to.y());
+              "This Knight({},{}) try attack ({},{}), who outside his radius",
+              from.x(),
+              from.y(),
+              to.x(),
+              to.y());
           throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
         }
       } else {

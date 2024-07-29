@@ -12,6 +12,7 @@ public abstract class Unit implements GeneralBuff {
   protected UnitType unitType;
   protected PlayerType playerType;
   protected AttackType attackType;
+  // Поле для проверки, походил ли данный юнит в этом ходу или нет
   protected boolean isMoved = false;
 
   public Unit(
