@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 public class BotPlayer implements GamePlayer {
   private static final Logger logger = LoggerFactory.getLogger(BotPlayer.class);
 
+  // Список всех возможных Юнитов для добавления на клетку
   public List<Unit> enumerationUnit(PlayerType playerType) {
     List<Unit> tmp = new ArrayList<>();
     tmp.add(new Knight(playerType));
@@ -34,6 +35,7 @@ public class BotPlayer implements GamePlayer {
     return unitPositions;
   }
 
+  // Подсчёт количества пустых клеток у выбранного игрока
   public List<Position> enumerationEmptyCells(PlayerType playerType, Board board) {
     List<Position> unitPositions = new ArrayList<>();
     if (playerType == PlayerType.FIRST_PLAYER) {
@@ -129,19 +131,22 @@ public class BotPlayer implements GamePlayer {
     return map;
   }
 
+  // Возможные варианты расстановки юнитов
+  // Ключ - какая клетка рассматривается для размещения
+  // Значение - возможные юниты для расстановки
   public PossibleActions<Position, Unit> unitsPossiblePlacement(GameState gameState) {
     Board board = gameState.getCurrentBoard();
     PossibleActions<Position, Unit> map = new PossibleActions<>();
     List<Position> cellsCurrentPlayer;
     List<Unit> unitList;
-    // Ключ - это атакующий юнит, значение - это все возможные атаки данного юнита
+    // Ключ - какая клетка рассматривается для размещения, значение - возможные юниты для
+    // расстановки
     // Для первого игрока
     if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
       logger.atInfo().log("Calculating possible placement for First Player");
       cellsCurrentPlayer = enumerationEmptyCells(PlayerType.FIRST_PLAYER, board);
       unitList = enumerationUnit(PlayerType.FIRST_PLAYER);
       for (Position to : cellsCurrentPlayer) {
-        // Хилер проходиться не по юнитам противника, а по своим
         if (board.isEmptyCell(to.x(), to.y())) {
           boolean inProcess = true;
           boolean general = false;
@@ -171,7 +176,6 @@ public class BotPlayer implements GamePlayer {
       cellsCurrentPlayer = enumerationEmptyCells(PlayerType.SECOND_PLAYER, board);
       unitList = enumerationUnit(PlayerType.SECOND_PLAYER);
       for (Position to : cellsCurrentPlayer) {
-        // Хилер проходиться не по юнитам противника, а по своим
         if (board.isEmptyCell(to.x(), to.y())) {
           boolean inProcess = true;
           boolean general = false;
@@ -199,6 +203,7 @@ public class BotPlayer implements GamePlayer {
     return map;
   }
 
+  // Метод обёртка для отлавливания ошибок для действий юнитов
   private boolean canActMove(GameState gameState, MakeMoveEvent move) {
     boolean result;
     try {
@@ -211,6 +216,7 @@ public class BotPlayer implements GamePlayer {
     return result;
   }
 
+  // Метод обёртка для отлавливания ошибок для расстановки юнитов
   private boolean canActPlace(GameState gameState, PlaceUnitEvent placeUnitEvent) {
     boolean result;
     try {

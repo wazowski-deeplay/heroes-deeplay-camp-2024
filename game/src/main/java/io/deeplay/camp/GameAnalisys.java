@@ -1,7 +1,6 @@
 package io.deeplay.camp;
 
 import io.deeplay.camp.entities.*;
-import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.mechanics.PlayerType;
 import lombok.Getter;
@@ -36,82 +35,7 @@ public class GameAnalisys {
     winners = new PlayerType[countGame];
   }
 
-  public void reviewMove(MakeMoveEvent move, GameState gameState, int countGame) {
-    int xfrom = move.getFrom().x();
-    int yfrom = move.getFrom().y();
-    int xto = move.getTo().x();
-    int yto = move.getTo().y();
-    Board board = gameState.getCurrentBoard();
-    Unit attacker = board.getUnit(xfrom, yfrom);
-    if (attacker.getUnitType() == UnitType.MAGE) {
-      if (attacker.getPlayerType() == PlayerType.FIRST_PLAYER) {
-        favorMageFirst[countGame][2]++;
-        for (int i = 0; i < board.getUnits().length; i++) {
-          for (int j = board.getUnits()[i].length / 2; j < board.getUnits()[i].length; j++) {
-            if (currentBoard.getUnit(i, j).getCurrentHp() != board.getUnit(i, j).getCurrentHp()) {
-              favorMageFirst[countGame][1]++;
-            }
-          }
-        }
-      } else {
-        favorMageSecond[countGame][2]++;
-        for (int i = 0; i < board.getUnits().length; i++) {
-          for (int j = 0; j < board.getUnits()[i].length / 2; j++) {
-            if (currentBoard.getUnit(i, j).getCurrentHp() != board.getUnit(i, j).getCurrentHp()) {
-              favorMageSecond[countGame][1]++;
-            }
-          }
-        }
-      }
-    }
-    if (attacker.getPlayerType() == PlayerType.FIRST_PLAYER) {
-      if (attacker.getUnitType() == UnitType.KNIGHT) {
-        favorKnightFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorKnightFirst[countGame][1]++;
-        }
-      }
-      if (attacker.getUnitType() == UnitType.ARCHER) {
-        favorArcherFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorArcherFirst[countGame][1]++;
-        }
-      }
-      if (attacker.getUnitType() == UnitType.HEALER) {
-        favorHealerFirst[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorHealerFirst[countGame][1]++;
-        }
-      }
-    }
-    if (attacker.getPlayerType() == PlayerType.SECOND_PLAYER) {
-      if (attacker.getUnitType() == UnitType.KNIGHT) {
-        favorKnightSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorKnightSecond[countGame][1]++;
-        }
-      }
-      if (attacker.getUnitType() == UnitType.ARCHER) {
-        favorArcherSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorArcherSecond[countGame][1]++;
-        }
-      }
-      if (attacker.getUnitType() == UnitType.HEALER) {
-        favorHealerSecond[countGame][2]++;
-        if (currentBoard.getUnit(xto, yto).getCurrentHp()
-            != board.getUnit(xto, yto).getCurrentHp()) {
-          favorHealerSecond[countGame][1]++;
-        }
-      }
-    }
-  }
-
+  // Подсчитывает результаты одной игры
   public void reviewGame(PlayerType playerWinner, GameState gameState, int countGame) {
     int[] knightCount = new int[2];
     int[] archerCount = new int[2];
@@ -148,6 +72,7 @@ public class GameAnalisys {
     favorMageSecond[countGame][0] = mageCount[1];
   }
 
+  // Выводит информацию о всех прошедших играх
   public void outputInfo() {
     int tab = 30;
     int tab2 = 30;

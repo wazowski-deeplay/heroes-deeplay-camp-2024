@@ -27,6 +27,7 @@ public class GameState {
   private PlayerType currentPlayer;
   private Army armyFirst;
   private Army armySecond;
+  private int countRound = 10;
 
   public GameState() {
     board = new Board();
@@ -41,6 +42,14 @@ public class GameState {
       currentPlayer = PlayerType.SECOND_PLAYER;
     } else {
       currentPlayer = PlayerType.FIRST_PLAYER;
+      if (gameStage == GameStage.MOVEMENT_STAGE) {
+        armyFirst.updateArmyMoves();
+        armySecond.updateArmyMoves();
+        countRound--;
+      }
+    }
+    if (countRound == 0) {
+      gameStage = GameStage.ENDED;
     }
   }
 
@@ -71,6 +80,9 @@ public class GameState {
           move.getAttacker().getUnitType(),
           move.getFrom().x() + "," + move.getFrom().y(),
           move.getTo().x() + "," + move.getTo().y());
+      allUnitsDeadByPlayer();
+      armyFirst.isAliveGeneral();
+      armySecond.isAliveGeneral();
     }
   }
 
@@ -360,5 +372,12 @@ public class GameState {
 
   private boolean outOfBorder(int x, int y) {
     return x < 0 || x > board.COLUMNS - 1 || y < 0 || y > board.ROWS - 1;
+  }
+
+  private void allUnitsDeadByPlayer() {
+    if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).size() == 0
+        || getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).size() == 0) {
+      gameStage = GameStage.ENDED;
+    }
   }
 }
