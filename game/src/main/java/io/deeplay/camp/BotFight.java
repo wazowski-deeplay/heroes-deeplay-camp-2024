@@ -16,7 +16,7 @@ public class BotFight {
   private static int countDraw = 0;
   private final int countGame;
 
-  private final int timeSkeep = 50;
+  private final int timeSkeep = 500;
   Game game;
   GameAnalisys gameAnalisys;
   BotPlayer botFirst;
@@ -268,47 +268,13 @@ public class BotFight {
       area1.append(separator);
 
       if (move != null) {
-        if (move.getAttacker().getUnitType() == UnitType.MAGE) {
-          area1.append(
-              "Unit "
-                  + move.getAttacker().getUnitType().name()
-                  + "("
-                  + move.getFrom().x()
-                  + ","
-                  + move.getFrom().y()
-                  + ") attack all enemys units");
-        } else if (move.getAttacker().getUnitType() == UnitType.HEALER) {
-          area1.append(
-              "Unit "
-                  + move.getAttacker().getUnitType().name()
-                  + "("
-                  + move.getFrom().x()
-                  + ","
-                  + move.getFrom().y()
-                  + ") heal "
-                  + move.getAttacker().getUnitType().name()
-                  + "("
-                  + move.getTo().x()
-                  + ","
-                  + move.getTo().y()
-                  + ")");
-        } else {
-          area1.append(
-              "Unit "
-                  + move.getAttacker().getUnitType().name()
-                  + "("
-                  + move.getFrom().x()
-                  + ","
-                  + move.getFrom().y()
-                  + ") attack "
-                  + move.getAttacker().getUnitType().name()
-                  + "("
-                  + move.getTo().x()
-                  + ","
-                  + move.getTo().y()
-                  + ")");
-        }
-        area1.append(separator);
+        area1.append(
+            outUnitMove(
+                move.getAttacker().getUnitType(),
+                move.getFrom().x(),
+                move.getFrom().y(),
+                move.getTo().x(),
+                move.getTo().y()));
       }
     }
   }
@@ -338,5 +304,32 @@ public class BotFight {
       default -> result = "------";
     }
     return result;
+  }
+
+  private String outUnitMove(UnitType unitType, int fromX, int fromY, int toX, int toY) {
+    if (unitType == UnitType.MAGE) {
+      return "Unit Mage" + "(" + fromX + "," + fromY + ") attack all enemys units";
+    } else {
+      String action;
+      if (unitType != UnitType.HEALER) {
+        action = " attack ";
+      } else {
+        action = " heal ";
+      }
+      return "Unit "
+          + unitType.name()
+          + "("
+          + fromX
+          + ","
+          + fromY
+          + ")"
+          + action
+          + game.gameState.getCurrentBoard().getUnit(toX, toY).getUnitType().name()
+          + "("
+          + toX
+          + ","
+          + toY
+          + ")";
+    }
   }
 }
