@@ -1,7 +1,9 @@
 package io.deeplay.camp;
 
 import io.deeplay.camp.dto.client.ClientDto;
+import io.deeplay.camp.exceptions.ConnectionErrorCode;
 import io.deeplay.camp.exceptions.GameException;
+import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.manager.ClientManager;
 import io.deeplay.camp.manager.GamePartyManager;
 import java.net.Socket;
@@ -57,9 +59,23 @@ public class Session implements Runnable {
           closeResources();
           return;
         default:
+          throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
       }
-    } catch (GameException e) {
-      // формируем ответ об ошибке и отправляем
+    } catch (Exception e) {
+      handleException(e);
+    }
+  }
+
+  private void handleException(Exception e) {
+    if (e instanceof GameManagerException gameManagerException) {
+      logger.error(
+          "{} {}",
+          gameManagerException.getConnectionErrorCode(),
+          gameManagerException.getMessage());
+    } else if (e instanceof GameException gameException) {
+      logger.error("{} {}", gameException.getErrorCode(), gameException.getMessage());
+    } else {
+      logger.error("{}", e.getMessage());
     }
   }
 

@@ -11,7 +11,9 @@ import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
+import io.deeplay.camp.exceptions.ConnectionErrorCode;
 import io.deeplay.camp.exceptions.GameException;
+import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.mechanics.PlayerType;
 import io.deeplay.camp.player.AiPlayer;
 import io.deeplay.camp.player.HumanPlayer;
@@ -34,7 +36,7 @@ public class GamePartyManager {
    *
    * @param clientDto Запрос клиента.
    */
-  public void processCreateOrJoinGameParty(ClientDto clientDto) {
+  public void processCreateOrJoinGameParty(ClientDto clientDto) throws GameManagerException {
     switch (clientDto.getClientDtoType()) {
       case CREATE_PARTY -> {
         CreateGamePartyDto partyDto = (CreateGamePartyDto) clientDto;
@@ -48,7 +50,10 @@ public class GamePartyManager {
         UUID gamePartyId = joinGamePartyDto.getGamePartyId();
         processJoinParty(gamePartyId, clientId);
       }
-      default -> {}
+      default -> {
+        logger.error("Ошибка создания или присоединения к игре");
+        throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+      }
     }
   }
 
@@ -58,11 +63,14 @@ public class GamePartyManager {
    * @param clientId Id клиента, сделавшего запрос.
    * @param gameType Тип игры.
    */
-  public void processCreateGameParty(UUID clientId, GameType gameType) {
+  public void processCreateGameParty(UUID clientId, GameType gameType) throws GameManagerException {
     switch (gameType) {
       case HUMAN_VS_BOT -> createHumanVsBotParty(clientId);
       case HUMAN_VS_HUMAN -> createHumanVsHumanParty(clientId);
-      default -> {}
+      default -> {
+        logger.error("Ошибка выбора типа игры");
+        throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+      }
     }
   }
 
@@ -72,13 +80,21 @@ public class GamePartyManager {
    *
    * @param firstHumanPlayerId Id клиента, запросившего создание.
    */
-  private void createHumanVsHumanParty(UUID firstHumanPlayerId) {
-    GameParty gameParty = new GameParty(UUID.randomUUID());
-    gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
-    gameParties.put(gameParty.getGamePartyId(), gameParty);
+  private void createHumanVsHumanParty(UUID firstHumanPlayerId) throws GameManagerException {
+    try {
+      GameParty gameParty = new GameParty(UUID.randomUUID());
+      gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
+      gameParties.put(gameParty.getGamePartyId(), gameParty);
 
-    GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
-    sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
+      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+      sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
+    } catch (GameManagerException e) {
+      logger.error("Ошибка в создании игры между игроком и игроком{}", e.getConnectionErrorCode());
+      throw e;
+    } catch (Exception e) {
+      logger.error("Не известная ошибка в создании игры между игроком и игроком{}", e.getMessage());
+      throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+    }
   }
 
   /**
@@ -87,15 +103,24 @@ public class GamePartyManager {
    *
    * @param humanPlayerId Id клиента, запросившего создание.
    */
-  private void createHumanVsBotParty(UUID humanPlayerId) {
-    GameParty gameParty = new GameParty(UUID.randomUUID());
-    gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
-    gameParties.put(gameParty.getGamePartyId(), gameParty);
+  private void createHumanVsBotParty(UUID humanPlayerId) throws GameManagerException {
+    try {
+      GameParty gameParty = new GameParty(UUID.randomUUID());
+      gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
+      gameParties.put(gameParty.getGamePartyId(), gameParty);
 
-    GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
-    sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
+      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+      sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
 
-    gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
+      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
+    } catch (GameManagerException e) {
+      logger.error(
+          "Ошибка при создании игры между игроком и ботом {} ", e.getConnectionErrorCode());
+      throw e;
+    } catch (Exception e) {
+      logger.error("Неизвестная ошибка при создании игры между игроком и ботом {}", e.getMessage());
+      throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+    }
   }
 
   /**
@@ -104,14 +129,28 @@ public class GamePartyManager {
    * @param gamePartyId Id пати.
    * @param clientId Id подключающегося клиента.
    */
-  public void processJoinParty(UUID gamePartyId, UUID clientId) {
-    GameParty gameParty = gameParties.get(gamePartyId);
-    if (!gameParty.getPlayers().isFull()) {
-      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
-      sendGamePartyInfo(clientId, gamePartyInfoDto);
+  public void processJoinParty(UUID gamePartyId, UUID clientId) throws GameManagerException {
+    try {
+      if (!gameParties.containsKey(gamePartyId)) {
+        logger.error("Ошибка соединения. Не существующая гей пати");
+        throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+      }
+      GameParty gameParty = gameParties.get(gamePartyId);
+      if (!gameParty.getPlayers().isFull()) {
+        GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+        sendGamePartyInfo(clientId, gamePartyInfoDto);
 
-      gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
-      gameParties.put(gameParty.getGamePartyId(), gameParty);
+        gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
+        gameParties.put(gameParty.getGamePartyId(), gameParty);
+      } else {
+        logger.error("Ошибка подключения.При присоединении к игровой сеccии");
+        throw new GameManagerException(ConnectionErrorCode.FULL_PARTY);
+      }
+    } catch (GameManagerException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("{}", e.getMessage());
+      throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
     }
   }
 
@@ -121,7 +160,7 @@ public class GamePartyManager {
    * @param clientDto Запрос с действием.
    * @throws GameException Если действие некорректно.
    */
-  public void processGameAction(ClientDto clientDto) throws GameException {
+  public void processGameAction(ClientDto clientDto) throws GameException, GameManagerException {
     switch (clientDto.getClientDtoType()) {
       case MAKE_MOVE -> {
         MakeMoveDto makeMoveDto = (MakeMoveDto) clientDto;
@@ -138,7 +177,10 @@ public class GamePartyManager {
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
         gameParty.processChangePlayer(changePlayerDto);
       }
-      default -> {}
+      default -> {
+        logger.error("Не возможное действие");
+        throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+      }
     }
   }
 
@@ -148,14 +190,15 @@ public class GamePartyManager {
    * @param clientId Id клиента, которому отправляется инф.
    * @param gamePartyInfoDto Информация о пати.
    */
-  public void sendGamePartyInfo(UUID clientId, GamePartyInfoDto gamePartyInfoDto) {
+  public void sendGamePartyInfo(UUID clientId, GamePartyInfoDto gamePartyInfoDto)
+      throws GameManagerException {
     String gamePartyInfo;
     try {
       gamePartyInfo = JsonConverter.serialize(gamePartyInfoDto);
       ClientManager.getInstance().sendMessage(clientId, gamePartyInfo);
 
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
     }
   }
 }
