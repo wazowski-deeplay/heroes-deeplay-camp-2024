@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class ClientHandler {
   @Getter private UUID clientId;
   private Socket clientSocket;
-  private BufferedReader reader;
+  @Getter private BufferedReader reader;
   private BufferedWriter writer;
 
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
@@ -31,6 +31,11 @@ public class ClientHandler {
     }
   }
 
+  /**
+   * Метод отправки сообщений для клиента.
+   *
+   * @param message Сообщение.
+   */
   public void sendMessage(String message) {
     try {
       writer.write(message);
@@ -41,15 +46,21 @@ public class ClientHandler {
     }
   }
 
+  /**
+   * Метод чтения сообщений от клиента.
+   *
+   * @return Сообщение от клиента.
+   */
   public String readRequest() {
     try {
       return reader.readLine();
     } catch (IOException e) {
-      logger.error("Error reading request", e);
+      System.out.println("Error reading request" + e.getMessage());
       return null;
     }
   }
 
+  /** Метод закрытия ресурсов. */
   public void closeResources() {
     try {
       if (reader != null) {
@@ -64,5 +75,14 @@ public class ClientHandler {
     } catch (IOException e) {
       logger.error("Error closing resources", e);
     }
+  }
+
+  /**
+   * Метод, проверяющий подключение клиента.
+   *
+   * @return true/false.
+   */
+  public boolean isConnected() {
+    return clientSocket.isConnected();
   }
 }

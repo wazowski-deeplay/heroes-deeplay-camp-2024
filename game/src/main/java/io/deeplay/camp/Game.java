@@ -8,10 +8,12 @@ import io.deeplay.camp.events.StartGameEvent;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.GameLogic;
 import io.deeplay.camp.mechanics.GameState;
+import lombok.Getter;
 
+@Getter
 public class Game implements GameListener {
 
-  GameState gameState;
+  private final GameState gameState;
 
   public Game() {
     gameState = new GameState();

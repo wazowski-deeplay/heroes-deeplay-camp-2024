@@ -42,7 +42,8 @@ public class ClientManager {
    */
   public void sendMessage(UUID clientId, String message) {
     try {
-      clients.get(clientId).sendMessage(message);
+      ClientHandler handler = clients.get(clientId);
+      handler.sendMessage(message);
     } catch (Exception e) {
       logger.info("Невозможно отправить сообщение клиенту: {}", clientId);
     }

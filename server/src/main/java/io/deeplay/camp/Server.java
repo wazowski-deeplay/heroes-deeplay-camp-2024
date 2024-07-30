@@ -23,7 +23,7 @@ public class Server {
   public void start() {
     try {
       serverSocket = new ServerSocket(port);
-      logger.info("Server started on port " + port);
+      logger.info("Server started on port {}", port);
 
       while (true) {
         Socket clientSocket = serverSocket.accept();

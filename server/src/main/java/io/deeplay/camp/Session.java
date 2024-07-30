@@ -2,6 +2,7 @@ package io.deeplay.camp;
 
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.exceptions.GameException;
+import io.deeplay.camp.manager.ClientManager;
 import io.deeplay.camp.manager.GamePartyManager;
 import java.net.Socket;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ public class Session implements Runnable {
 
   public Session(Socket clientSocket, GamePartyManager gamePartyManager) {
     this.clientHandler = new ClientHandler(clientSocket);
+    ClientManager.getInstance().addClient(clientHandler.getClientId(), clientHandler);
     this.gamePartyManager = gamePartyManager;
   }
 
@@ -32,6 +34,7 @@ public class Session implements Runnable {
     } catch (Exception e) {
       logger.error("Session error", e);
     } finally {
+      logger.info("Session closed");
       closeResources();
     }
   }

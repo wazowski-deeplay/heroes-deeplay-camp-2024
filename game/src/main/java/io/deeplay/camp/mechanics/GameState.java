@@ -1,5 +1,6 @@
 package io.deeplay.camp.mechanics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.deeplay.camp.entities.Army;
 import io.deeplay.camp.entities.AttackType;
 import io.deeplay.camp.entities.Board;
@@ -16,8 +17,8 @@ public class GameState {
 
   private PlayerType currentPlayer;
 
-  private Army armyFirst;
-  private Army armySecond;
+  @JsonIgnore private Army armyFirst;
+  @JsonIgnore private Army armySecond;
   private GameStage gameStage;
 
   public GameState() {

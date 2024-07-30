@@ -1,6 +1,8 @@
 package io.deeplay.camp.manager;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.deeplay.camp.GameParty;
+import io.deeplay.camp.JsonConverter;
 import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
@@ -8,6 +10,7 @@ import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
+import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.PlayerType;
 import io.deeplay.camp.player.AiPlayer;
@@ -18,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Класс, отвечающий за менеджмент игровых партий. */
 public class GamePartyManager {
   private final Map<UUID, GameParty> gameParties;
   private static final Logger logger = LoggerFactory.getLogger(GamePartyManager.class);
@@ -28,9 +30,9 @@ public class GamePartyManager {
   }
 
   /**
-   * Метод, распределяющий запросы на создание игры/подключение к ней.
+   * Метод, распределяющий запросы на создание/подключение к пати.
    *
-   * @param clientDto Запрос от клиента.
+   * @param clientDto Запрос клиента.
    */
   public void processCreateOrJoinGameParty(ClientDto clientDto) {
     switch (clientDto.getClientDtoType()) {
@@ -43,75 +45,81 @@ public class GamePartyManager {
       case JOIN_PARTY -> {
         JoinGamePartyDto joinGamePartyDto = (JoinGamePartyDto) clientDto;
         UUID clientId = joinGamePartyDto.getClientId();
-        UUID gamePartyId = joinGamePartyDto.getClientId();
+        UUID gamePartyId = joinGamePartyDto.getGamePartyId();
         processJoinParty(gamePartyId, clientId);
       }
-      default -> { }
+      default -> {}
     }
   }
 
   /**
-   * Метод, создающий игру по запросу.
+   * Метод обаботки создания игры.
    *
-   * @param clientId Id клиента.
-   * @param gameType Режим игры.
+   * @param clientId Id клиента, сделавшего запрос.
+   * @param gameType Тип игры.
    */
   public void processCreateGameParty(UUID clientId, GameType gameType) {
     switch (gameType) {
       case HUMAN_VS_BOT -> createHumanVsBotParty(clientId);
       case HUMAN_VS_HUMAN -> createHumanVsHumanParty(clientId);
-      default -> { }
+      default -> {}
     }
   }
 
   /**
-   * Метод, создающий онлайн игру.
+   * Метод создания онлайн игры. Создаёт пати и сразу добавляет клиента как игрока. Затем отправляет
+   * ему информацию о пати.
    *
-   * @param firstHumanPlayerId Id клиента, сделавшего запрос на создание игры.
+   * @param firstHumanPlayerId Id клиента, запросившего создание.
    */
   private void createHumanVsHumanParty(UUID firstHumanPlayerId) {
     GameParty gameParty = new GameParty(UUID.randomUUID());
     gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
     gameParties.put(gameParty.getGamePartyId(), gameParty);
+
+    GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+    sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
   }
 
   /**
-   * Метод, создающий игру против бота.
+   * Метод создания игры с ботом. Создаёт пати и сразу добавляет клиента и бота как игроков. Затем
+   * отправляется инф. о пати клиенту.
    *
-   * @param humanPlayerId Id клиента, сделавшего запрос на создание игры.
+   * @param humanPlayerId Id клиента, запросившего создание.
    */
   private void createHumanVsBotParty(UUID humanPlayerId) {
-    try {
-      GameParty gameParty = new GameParty(UUID.randomUUID());
-      gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
-      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
-      gameParties.put(gameParty.getGamePartyId(), gameParty);
-      gameParty.startGame();
-    } catch (Exception e) {
-      logger.error("Не удалось создать игру против бота для клиента: {}", humanPlayerId);
-    }
+    GameParty gameParty = new GameParty(UUID.randomUUID());
+    gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
+    gameParties.put(gameParty.getGamePartyId(), gameParty);
+
+    GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+    sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
+
+    gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
   }
 
   /**
-   * Метод обрабатывающий подключение к игре.
+   * Метод обработки подключения к пати. Добавляет игрока в пати, если она не полная.
    *
-   * @param gamePartyId Id игры для подключения.
-   * @param clientId Подключающийся клиент.
+   * @param gamePartyId Id пати.
+   * @param clientId Id подключающегося клиента.
    */
   public void processJoinParty(UUID gamePartyId, UUID clientId) {
-    try {
-      GameParty gameParty = gameParties.get(gamePartyId);
+    GameParty gameParty = gameParties.get(gamePartyId);
+    if (!gameParty.getPlayers().isFull()) {
+      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+      sendGamePartyInfo(clientId, gamePartyInfoDto);
+
       gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
-      gameParty.startGame();
-    } catch (Exception e) {
-      logger.error("Клиенту {} не удалось подключиться к игре {}", clientId, gamePartyId);
+      gameParties.put(gameParty.getGamePartyId(), gameParty);
     }
   }
 
   /**
-   * Метод, распределяющий запросы между игровыми партиями.
+   * Метод обработки игровых действий со стороны клиентов.
    *
-   * @param clientDto Запрос игровой логики.
+   * @param clientDto Запрос с действием.
+   * @throws GameException Если действие некорректно.
    */
   public void processGameAction(ClientDto clientDto) throws GameException {
     switch (clientDto.getClientDtoType()) {
@@ -130,7 +138,24 @@ public class GamePartyManager {
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
         gameParty.processChangePlayer(changePlayerDto);
       }
-      default -> { }
+      default -> {}
+    }
+  }
+
+  /**
+   * Метод отправки информации о пати для клиентов.
+   *
+   * @param clientId Id клиента, которому отправляется инф.
+   * @param gamePartyInfoDto Информация о пати.
+   */
+  public void sendGamePartyInfo(UUID clientId, GamePartyInfoDto gamePartyInfoDto) {
+    String gamePartyInfo;
+    try {
+      gamePartyInfo = JsonConverter.serialize(gamePartyInfoDto);
+      ClientManager.getInstance().sendMessage(clientId, gamePartyInfo);
+
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
     }
   }
 }

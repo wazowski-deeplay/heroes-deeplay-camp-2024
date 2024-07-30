@@ -1,5 +1,6 @@
 package io.deeplay.camp.player;
 
+import io.deeplay.camp.dto.server.GameStateDto;
 import io.deeplay.camp.mechanics.PlayerType;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,9 @@ public class Players {
     return hashMap.size() == 2;
   }
 
-  public void notifyPlayers(String message) {
-    for (Player player : hashMap.values()) {}
+  public void updateGameState(GameStateDto gameStateDto) {
+    for (Player player : hashMap.values()) {
+      player.updateGameState(gameStateDto);
+    }
   }
 }

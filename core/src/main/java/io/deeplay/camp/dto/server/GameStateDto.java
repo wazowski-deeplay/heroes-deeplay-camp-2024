@@ -1,11 +1,9 @@
 package io.deeplay.camp.dto.server;
 
-
 import io.deeplay.camp.mechanics.GameState;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor

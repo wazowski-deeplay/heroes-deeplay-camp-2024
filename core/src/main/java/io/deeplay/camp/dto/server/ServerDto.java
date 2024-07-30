@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "serverDtoType")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = GamePartyInfoDto.class, name = "GAME_PARTY_INFO"),
-        @JsonSubTypes.Type(value = GameStateDto.class, name = "GAME_STATE"),
+  @JsonSubTypes.Type(value = GamePartyInfoDto.class, name = "GAME_PARTY_INFO"),
+  @JsonSubTypes.Type(value = GameStateDto.class, name = "GAME_STATE"),
 })
 public abstract class ServerDto {
-    ServerDtoType serverDtoType;
-    public ServerDto(ServerDtoType serverDtoType) {
-        this.serverDtoType = serverDtoType;
-    }
+  ServerDtoType serverDtoType;
+
+  public ServerDto(ServerDtoType serverDtoType) {
+    this.serverDtoType = serverDtoType;
+  }
 }
