@@ -50,21 +50,21 @@ public class BotFight {
 
       game = new Game();
 
-      game.gameState.setGameStage(GameStage.PLACEMENT_STAGE);
-      executePlace(game.gameState.getCurrentPlayer(), gameCount);
-      game.gameState.changeCurrentPlayer();
-      executePlace(game.gameState.getCurrentPlayer(), gameCount);
-      game.gameState.changeCurrentPlayer();
-      gameAnalisys.setCurrentBoard(game.gameState.getCurrentBoard().getUnits());
+      game.getGameState().setGameStage(GameStage.PLACEMENT_STAGE);
+      executePlace(game.getGameState().getCurrentPlayer(), gameCount);
+      game.getGameState().changeCurrentPlayer();
+      executePlace(game.getGameState().getCurrentPlayer(), gameCount);
+      game.getGameState().changeCurrentPlayer();
+      gameAnalisys.setCurrentBoard(game.getGameState().getCurrentBoard().getUnits());
 
-      game.gameState.getArmyFirst().fillArmy(game.gameState.getCurrentBoard());
-      game.gameState.getArmySecond().fillArmy(game.gameState.getCurrentBoard());
-      game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
-      while (game.gameState.getGameStage() != GameStage.ENDED) {
-        executeMove(game.gameState.getCurrentPlayer(), gameCount);
-        game.changePlayer(new ChangePlayerEvent(game.gameState.getCurrentPlayer()));
-        executeMove(game.gameState.getCurrentPlayer(), gameCount);
-        game.changePlayer(new ChangePlayerEvent(game.gameState.getCurrentPlayer()));
+      game.getGameState().getArmyFirst().fillArmy(game.getGameState().getCurrentBoard());
+      game.getGameState().getArmySecond().fillArmy(game.getGameState().getCurrentBoard());
+      game.getGameState().setGameStage(GameStage.MOVEMENT_STAGE);
+      while (game.getGameState().getGameStage() != GameStage.ENDED) {
+        executeMove(game.getGameState().getCurrentPlayer(), gameCount);
+        game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
+        executeMove(game.getGameState().getCurrentPlayer(), gameCount);
+        game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
       }
 
       calcResult(gameCount);
@@ -83,41 +83,41 @@ public class BotFight {
 
   public void calcResult(int countGame) {
     if (botFirst
-            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
             .size()
         > botSecond
-            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
             .size()) {
       winsFirstPlayer++;
-      gameAnalisys.reviewGame(PlayerType.FIRST_PLAYER, game.gameState, countGame);
+      gameAnalisys.reviewGame(PlayerType.FIRST_PLAYER, game.getGameState(), countGame);
 
     } else if (botFirst
-            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
             .size()
         < botSecond
-            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
             .size()) {
       winsSecondPlayer++;
-      gameAnalisys.reviewGame(PlayerType.SECOND_PLAYER, game.gameState, countGame);
+      gameAnalisys.reviewGame(PlayerType.SECOND_PLAYER, game.getGameState(), countGame);
 
     } else if (botFirst
-            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
             .size()
         == botSecond
-            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.gameState.getCurrentBoard())
+            .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
             .size()) {
       countDraw++;
-      gameAnalisys.reviewGame(PlayerType.DRAW, game.gameState, countGame);
+      gameAnalisys.reviewGame(PlayerType.DRAW, game.getGameState(), countGame);
     }
   }
 
   public void executeMove(PlayerType playerType, int countGame)
       throws GameException, InterruptedException {
     if (playerType == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
-        for (int j = 0; j < game.gameState.getCurrentBoard().getUnits()[i].length / 2; j++) {
+      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
+        for (int j = 0; j < game.getGameState().getCurrentBoard().getUnits()[i].length / 2; j++) {
           PossibleActions<Position, Position> positionPossibleActionsFirst =
-              botFirst.unitsPossibleActions(game.gameState);
+              botFirst.unitsPossibleActions(game.getGameState());
           int rand =
               (int) (Math.random() * positionPossibleActionsFirst.get(new Position(i, j)).size());
           Position pos1 = new Position(i, j);
@@ -127,7 +127,7 @@ public class BotFight {
           Position pos2 = positionPossibleActionsFirst.get(pos1).get(rand);
           MakeMoveEvent move =
               new MakeMoveEvent(
-                  pos1, pos2, game.gameState.getCurrentBoard().getUnit(pos1.x(), pos1.y()));
+                  pos1, pos2, game.getGameState().getCurrentBoard().getUnit(pos1.x(), pos1.y()));
 
           game.makeMove(move);
           Thread.sleep(timeSkeep);
@@ -135,12 +135,12 @@ public class BotFight {
         }
       }
     } else if (playerType == PlayerType.SECOND_PLAYER) {
-      for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
-        for (int j = game.gameState.getCurrentBoard().getUnits()[i].length / 2;
-            j < game.gameState.getCurrentBoard().getUnits()[i].length;
+      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
+        for (int j = game.getGameState().getCurrentBoard().getUnits()[i].length / 2;
+            j < game.getGameState().getCurrentBoard().getUnits()[i].length;
             j++) {
           PossibleActions<Position, Position> positionPossibleActionsSecond =
-              botSecond.unitsPossibleActions(game.gameState);
+              botSecond.unitsPossibleActions(game.getGameState());
           int rand =
               (int) (Math.random() * positionPossibleActionsSecond.get(new Position(i, j)).size());
           Position pos1 = new Position(i, j);
@@ -150,7 +150,7 @@ public class BotFight {
           Position pos2 = positionPossibleActionsSecond.get(pos1).get(rand);
           MakeMoveEvent move =
               new MakeMoveEvent(
-                  pos1, pos2, game.gameState.getCurrentBoard().getUnit(pos1.x(), pos1.y()));
+                  pos1, pos2, game.getGameState().getCurrentBoard().getUnit(pos1.x(), pos1.y()));
           game.makeMove(move);
           Thread.sleep(timeSkeep);
           outInFrame(move);
@@ -162,10 +162,10 @@ public class BotFight {
   public void executePlace(PlayerType playerType, int countGame)
       throws GameException, InterruptedException {
     if (playerType == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
-        for (int j = 0; j < game.gameState.getCurrentBoard().getUnits()[i].length / 2; j++) {
+      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
+        for (int j = 0; j < game.getGameState().getCurrentBoard().getUnits()[i].length / 2; j++) {
           PossibleActions<Position, Unit> positionPossiblePlacementFirst =
-              botFirst.unitsPossiblePlacement(game.gameState);
+              botFirst.unitsPossiblePlacement(game.getGameState());
 
           Position pos1 = new Position(i, j);
           int rand = (int) (Math.random() * positionPossiblePlacementFirst.get(pos1).size());
@@ -176,7 +176,7 @@ public class BotFight {
           boolean general = false;
           if (botFirst
                       .enumerationPlayerUnits(
-                          PlayerType.FIRST_PLAYER, game.gameState.getCurrentBoard())
+                          PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
                       .size()
                   + 1
               == 6) {
@@ -198,12 +198,12 @@ public class BotFight {
         }
       }
     } else if (playerType == PlayerType.SECOND_PLAYER) {
-      for (int i = 0; i < game.gameState.getCurrentBoard().getUnits().length; i++) {
-        for (int j = game.gameState.getCurrentBoard().getUnits()[i].length / 2;
-            j < game.gameState.getCurrentBoard().getUnits()[i].length;
+      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
+        for (int j = game.getGameState().getCurrentBoard().getUnits()[i].length / 2;
+            j < game.getGameState().getCurrentBoard().getUnits()[i].length;
             j++) {
           PossibleActions<Position, Unit> positionPossiblePlacementSecond =
-              botSecond.unitsPossiblePlacement(game.gameState);
+              botSecond.unitsPossiblePlacement(game.getGameState());
           Position pos1 = new Position(i, j);
           int rand = (int) (Math.random() * positionPossiblePlacementSecond.get(pos1).size());
           if (positionPossiblePlacementSecond.get(pos1).size() == 0) {
@@ -213,7 +213,7 @@ public class BotFight {
           boolean general = false;
           if (botFirst
                       .enumerationPlayerUnits(
-                          PlayerType.SECOND_PLAYER, game.gameState.getCurrentBoard())
+                          PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
                       .size()
                   + 1
               == 6) {
@@ -253,8 +253,8 @@ public class BotFight {
           area1.append(
               String.format(
                   "%-" + s + "s",
-                  outUnitIsMoved(game.gameState.getCurrentBoard().getUnit(column, row))
-                      + outUnitInfo(game.gameState.getCurrentBoard().getUnit(column, row))));
+                  outUnitIsMoved(game.getGameState().getCurrentBoard().getUnit(column, row))
+                      + outUnitInfo(game.getGameState().getCurrentBoard().getUnit(column, row))));
         }
         area1.append(separator);
         area1.append(separator);
@@ -324,7 +324,7 @@ public class BotFight {
           + fromY
           + ")"
           + action
-          + game.gameState.getCurrentBoard().getUnit(toX, toY).getUnitType().name()
+          + game.getGameState().getCurrentBoard().getUnit(toX, toY).getUnitType().name()
           + "("
           + toX
           + ","
