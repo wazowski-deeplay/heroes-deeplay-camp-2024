@@ -23,12 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GamePartyManager {
+public class GamePartyManager implements Runnable {
   private final Map<UUID, GameParty> gameParties;
   private static final Logger logger = LoggerFactory.getLogger(GamePartyManager.class);
+  Thread checkEndedThread;
 
   public GamePartyManager() {
     this.gameParties = new ConcurrentHashMap<>();
+    checkEndedThread = new Thread(this);
+    checkEndedThread.setDaemon(true);
+    checkEndedThread.start();
   }
 
   /**
@@ -199,6 +203,22 @@ public class GamePartyManager {
 
     } catch (JsonProcessingException e) {
       throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+    }
+  }
+
+  @Override
+  public void run() {
+    while (!Thread.currentThread().isInterrupted()) {
+      try {
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      for (GameParty games : gameParties.values()) {
+        if (games.isGameEnded()) {
+          gameParties.remove(games.getGamePartyId());
+        }
+      }
     }
   }
 }
