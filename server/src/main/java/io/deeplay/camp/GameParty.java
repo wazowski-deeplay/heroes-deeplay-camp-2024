@@ -10,6 +10,7 @@ import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.ConnectionErrorCode;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
+import io.deeplay.camp.mechanics.GameStage;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.player.Player;
 import io.deeplay.camp.player.Players;
@@ -68,6 +69,10 @@ public class GameParty {
     GameState gameState = game.getGameState();
     GameStateDto gameStateDto = new GameStateDto(gamePartyId, gameState);
     players.updateGameState(gameStateDto);
+  }
+
+  public boolean isGameEnded() {
+    return game.getGameState().getGameStage() == GameStage.ENDED;
   }
 
   public void close() {}
