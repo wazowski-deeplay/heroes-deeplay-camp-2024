@@ -1,5 +1,6 @@
 package io.deeplay.camp.mechanics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.deeplay.camp.entities.Army;
 import io.deeplay.camp.entities.AttackType;
 import io.deeplay.camp.entities.Board;
@@ -20,13 +21,13 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class GameState {
 
-  private static final Logger logger = LoggerFactory.getLogger(GameLogic.class);
+  private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
   private Board board;
   private GameStage gameStage;
   private PlayerType currentPlayer;
-  private Army armyFirst;
-  private Army armySecond;
+  @JsonIgnore private Army armyFirst;
+  @JsonIgnore private Army armySecond;
   private int countRound = 10;
 
   public GameState() {
