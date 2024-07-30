@@ -7,12 +7,16 @@ import io.deeplay.camp.dto.server.GameStateDto;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
+import io.deeplay.camp.exceptions.ConnectionErrorCode;
 import io.deeplay.camp.exceptions.GameException;
+import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.player.Player;
 import io.deeplay.camp.player.Players;
 import java.util.UUID;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Класс, отвечающий за конкретную игровую партию. Все запроы транслирует в Game. */
 @Getter
@@ -20,6 +24,8 @@ public class GameParty {
   private final Game game;
   private final UUID gamePartyId;
   private final Players players;
+
+  private static final Logger logger = LoggerFactory.getLogger(Session.class);
 
   public GameParty(UUID gamePartyId) {
     players = new Players();
@@ -47,7 +53,11 @@ public class GameParty {
     updateGameStateForPlayers();
   }
 
-  public void addPlayer(Player player) {
+  public void addPlayer(Player player) throws GameManagerException {
+    if (players.isFull()) {
+      logger.error("Ошибка добавления игрока, пати переполненна");
+      throw new GameManagerException(ConnectionErrorCode.FULL_PARTY);
+    }
     players.addPlayer(player.getPlayerType(), player);
     if (players.isFull()) {
       updateGameStateForPlayers();
