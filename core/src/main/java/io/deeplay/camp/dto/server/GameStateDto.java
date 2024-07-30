@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class GameStateDto extends ServerDto {
-    private UUID gamePartyId;
-    private GameState gameState;
-    public GameStateDto(UUID gamePartyId, GameState gameState) {
-        super(ServerDtoType.GAME_STATE);
-        this.gamePartyId = gamePartyId;
-        this.gameState = gameState;
-    }
+  private UUID gamePartyId;
+  private GameState gameState;
+
+  public GameStateDto(UUID gamePartyId, GameState gameState) {
+    super(ServerDtoType.GAME_STATE);
+    this.gamePartyId = gamePartyId;
+    this.gameState = gameState;
+  }
 }

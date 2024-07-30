@@ -48,7 +48,7 @@ public class GamePartyManager {
         UUID gamePartyId = joinGamePartyDto.getGamePartyId();
         processJoinParty(gamePartyId, clientId);
       }
-      default -> {}
+      default -> { }
     }
   }
 
@@ -62,7 +62,7 @@ public class GamePartyManager {
     switch (gameType) {
       case HUMAN_VS_BOT -> createHumanVsBotParty(clientId);
       case HUMAN_VS_HUMAN -> createHumanVsHumanParty(clientId);
-      default -> {}
+      default -> { }
     }
   }
 
@@ -138,7 +138,7 @@ public class GamePartyManager {
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
         gameParty.processChangePlayer(changePlayerDto);
       }
-      default -> {}
+      default -> { }
     }
   }
 
