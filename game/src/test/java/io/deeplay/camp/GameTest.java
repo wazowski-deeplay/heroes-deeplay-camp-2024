@@ -37,36 +37,36 @@ class GameTest {
 
   @Test
   void testChangePlayerRequestFromNotCurrentPlayer() {
-    game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
-    game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
+    game.getGameState().setCurrentPlayer(PlayerType.FIRST_PLAYER);
+    game.getGameState().setGameStage(GameStage.MOVEMENT_STAGE);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
 
     GameException gameException =
         assertThrows(GameException.class, () -> game.changePlayer(changePlayerEvent));
     assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
-    assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
+    assertEquals(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentPlayer());
   }
 
   @Test
   void testChangePlayerFromCurrentPlayer() {
-    game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
+    game.getGameState().setCurrentPlayer(PlayerType.FIRST_PLAYER);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.FIRST_PLAYER);
-    game.gameState.setGameStage(GameStage.MOVEMENT_STAGE);
+    game.getGameState().setGameStage(GameStage.MOVEMENT_STAGE);
 
     assertDoesNotThrow(() -> game.changePlayer(changePlayerEvent));
     // Если запрос сделал первый игрок, текущий игрок остается первым
-    assertEquals(PlayerType.SECOND_PLAYER, game.gameState.getCurrentPlayer());
+    assertEquals(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentPlayer());
   }
 
   @Test
   void testChangePlayerAtPlacementStage() {
-    game.gameState.setCurrentPlayer(PlayerType.FIRST_PLAYER);
-    game.gameState.setGameStage(GameStage.PLACEMENT_STAGE);
+    game.getGameState().setCurrentPlayer(PlayerType.FIRST_PLAYER);
+    game.getGameState().setGameStage(GameStage.PLACEMENT_STAGE);
     ChangePlayerEvent changePlayerEvent = new ChangePlayerEvent(PlayerType.SECOND_PLAYER);
 
     GameException gameException =
         assertThrows(GameException.class, () -> game.changePlayer(changePlayerEvent));
     assertEquals(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE, gameException.getErrorCode());
-    assertEquals(PlayerType.FIRST_PLAYER, game.gameState.getCurrentPlayer());
+    assertEquals(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentPlayer());
   }
 }

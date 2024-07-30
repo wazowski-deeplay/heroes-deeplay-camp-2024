@@ -36,6 +36,10 @@ allprojects {
         // кодогенерация
         compileOnly("org.projectlombok:lombok:1.18.32")
         annotationProcessor("org.projectlombok:lombok:1.18.32")
+        // json
+        implementation("com.fasterxml.jackson.core:jackson-core:2.13.0")
+        implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+        implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.0")
     }
 
     tasks.test {
