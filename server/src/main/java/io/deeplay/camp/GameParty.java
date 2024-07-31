@@ -35,7 +35,8 @@ public class GameParty {
   }
 
   public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
-    PlaceUnitEvent placeUnitEvent = DtoToEventConverter.convert(placeUnitDto);
+    PlaceUnitEvent placeUnitEvent =
+        DtoToEventConverter.convert(placeUnitDto, game.getGameState().getCurrentPlayer());
     game.placeUnit(placeUnitEvent);
     updateGameStateForPlayers();
   }
@@ -49,7 +50,8 @@ public class GameParty {
   public void startGame() {}
 
   public void processChangePlayer(ChangePlayerDto changePlayerRequest) throws GameException {
-    ChangePlayerEvent changePlayerEvent = DtoToEventConverter.convert(changePlayerRequest);
+    ChangePlayerEvent changePlayerEvent =
+        DtoToEventConverter.convert(changePlayerRequest, game.getGameState().getCurrentPlayer());
     game.changePlayer(changePlayerEvent);
     updateGameStateForPlayers();
   }
