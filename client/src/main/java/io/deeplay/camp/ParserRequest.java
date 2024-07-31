@@ -1,9 +1,12 @@
 package io.deeplay.camp;
 
+import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
+import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.entities.UnitType;
 import java.util.UUID;
 
@@ -75,9 +78,27 @@ public class ParserRequest {
               general);
     }
     if (userCommand[0].equals("endturn")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
       clientDto = new ChangePlayerDto(gamePartyId);
     }
+    if (userCommand[0].equals("creategame")) {
+      if (userCommand[1].equals("vs_human")) {
+        clientDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
+      } else if (userCommand[1].equals("vs_bot")) {
+        clientDto = new CreateGamePartyDto(GameType.HUMAN_VS_BOT);
+      } else {
+        return null;
+      }
+    }
+    if (userCommand[0].equals("joingame")) {
+      if (userCommand.length != 2) {
+        return null;
+      }
 
+      clientDto = new JoinGamePartyDto(UUID.fromString(userCommand[1]));
+    }
     return clientDto;
   }
 

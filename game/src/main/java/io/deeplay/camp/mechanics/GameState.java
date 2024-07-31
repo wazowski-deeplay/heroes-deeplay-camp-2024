@@ -286,8 +286,7 @@ public class GameState {
    * @param changePlayerEvent Событие передачи хода.
    */
   public boolean isValidChangePlayer(ChangePlayerEvent changePlayerEvent) {
-    if (getCurrentPlayer() == changePlayerEvent.getRequester()
-        && getGameStage() != GameStage.PLACEMENT_STAGE) {
+    if (getCurrentPlayer() == changePlayerEvent.getRequester()) {
       logger.atInfo().log("{} has completed his turn", changePlayerEvent.getRequester().name());
       return true;
     } else {
