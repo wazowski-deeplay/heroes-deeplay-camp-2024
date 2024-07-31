@@ -28,11 +28,11 @@ public class DtoToEventConverter {
         placeUnitDto.isGeneral());
   }
 
-  public static MakeMoveEvent convert(MakeMoveDto makeMoveDto) {
+  public static MakeMoveEvent convert(MakeMoveDto makeMoveDto, Board board) {
     return new MakeMoveEvent(
         new Position(makeMoveDto.getFromX(), makeMoveDto.getFromY()),
         new Position(makeMoveDto.getToX(), makeMoveDto.getToY()),
-        makeMoveDto.getAttacker());
+            board.getUnit(makeMoveDto.getFromX(), makeMoveDto.getFromY()));
   }
 
   public static ChangePlayerEvent convert(ChangePlayerDto changePlayerDto, PlayerType playerType) {

@@ -4,7 +4,6 @@ import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.ClientDtoType;
 import java.util.UUID;
 
-import io.deeplay.camp.entities.Unit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,15 +15,14 @@ public class MakeMoveDto extends ClientDto {
   private int fromY;
   private int toX;
   private int toY;
-  private Unit attacker;
 
-  public MakeMoveDto(UUID gamePartyId, int fromX, int fromY, int toX, int toY, Unit attacker) {
+
+  public MakeMoveDto(UUID gamePartyId, int fromX, int fromY, int toX, int toY) {
     super(ClientDtoType.MAKE_MOVE);
     this.gamePartyId = gamePartyId;
     this.fromX = fromX;
     this.fromY = fromY;
     this.toX = toX;
     this.toY = toY;
-    this.attacker = attacker;
   }
 }
