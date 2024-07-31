@@ -1,7 +1,9 @@
 package io.deeplay.camp.entities;
 
 import io.deeplay.camp.mechanics.PlayerType;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class Healer extends Unit {
   public Healer(PlayerType playerType) {
     super(UnitType.HEALER, 10, 10, 5, 15, 12, false);

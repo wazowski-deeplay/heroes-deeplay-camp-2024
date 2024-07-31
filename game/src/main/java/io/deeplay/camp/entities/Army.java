@@ -2,7 +2,9 @@ package io.deeplay.camp.entities;
 
 import io.deeplay.camp.mechanics.PlayerType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class Army {
   public PlayerType owner;
