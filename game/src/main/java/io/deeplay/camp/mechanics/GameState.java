@@ -48,6 +48,9 @@ public class GameState {
         armySecond.updateArmyMoves();
         countRound--;
       }
+      if (gameStage == GameStage.PLACEMENT_STAGE) {
+        gameStage = GameStage.MOVEMENT_STAGE;
+      }
     }
     if (countRound == 0) {
       gameStage = GameStage.ENDED;

@@ -16,7 +16,7 @@ public class BotFight {
   private static int countDraw = 0;
   private final int countGame;
 
-  private final int timeSkeep = 500;
+  private final int timeSkeep = 50;
   Game game;
   GameAnalisys gameAnalisys;
   BotPlayer botFirst;
@@ -49,17 +49,12 @@ public class BotFight {
     for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
       game = new Game();
-
-      game.getGameState().setGameStage(GameStage.PLACEMENT_STAGE);
       executePlace(game.getGameState().getCurrentPlayer(), gameCount);
       game.getGameState().changeCurrentPlayer();
       executePlace(game.getGameState().getCurrentPlayer(), gameCount);
       game.getGameState().changeCurrentPlayer();
       gameAnalisys.setCurrentBoard(game.getGameState().getCurrentBoard().getUnits());
 
-      game.getGameState().getArmyFirst().fillArmy(game.getGameState().getCurrentBoard());
-      game.getGameState().getArmySecond().fillArmy(game.getGameState().getCurrentBoard());
-      game.getGameState().setGameStage(GameStage.MOVEMENT_STAGE);
       while (game.getGameState().getGameStage() != GameStage.ENDED) {
         executeMove(game.getGameState().getCurrentPlayer(), gameCount);
         game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
