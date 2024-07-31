@@ -72,10 +72,10 @@ class ServerTest {
             clientSocket3 = new Socket("localhost", 8080);
             clientIn3 =
                     new BufferedReader(
-                            new InputStreamReader(clientSocket2.getInputStream(), StandardCharsets.UTF_8));
+                            new InputStreamReader(clientSocket3.getInputStream(), StandardCharsets.UTF_8));
             clientOut3 =
                     new BufferedWriter(
-                            new OutputStreamWriter(clientSocket2.getOutputStream(), StandardCharsets.UTF_8));
+                            new OutputStreamWriter(clientSocket3.getOutputStream(), StandardCharsets.UTF_8));
 
 
 
@@ -199,11 +199,6 @@ class ServerTest {
         JoinGamePartyDto joinGamePartyDto2 = new JoinGamePartyDto(gamePartyId);
         String joinRequest2 = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto2));
         Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut3, joinRequest2));
-
-        // Присоединяем 3 игрока
-        String joinResponse2 = Assertions.assertDoesNotThrow(() -> clientIn3.readLine());
-        ServerDto joinResponseDto2 = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(joinResponse2, ServerDto.class));
-        Assertions.assertInstanceOf(JoinGamePartyDto.class, joinGamePartyDto2);
 
         String errorResponse = Assertions.assertDoesNotThrow(() -> clientIn3.readLine());
         ServerDto errorDto = Assertions.assertDoesNotThrow(()-> JsonConverter.deserialize(errorResponse, ServerDto.class));
