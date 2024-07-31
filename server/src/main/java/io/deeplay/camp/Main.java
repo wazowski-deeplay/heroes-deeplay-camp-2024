@@ -11,7 +11,7 @@ public class Main {
 
   public static void main(String[] args) {
     LOGGER.info("server");
-    server = new Server(8080);
+    server = new Server(9090);
     serverThread = new Thread(server::start);
     serverThread.start();
   }

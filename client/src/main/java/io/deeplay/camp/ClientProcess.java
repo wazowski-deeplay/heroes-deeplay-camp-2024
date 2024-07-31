@@ -23,7 +23,7 @@ public class ClientProcess {
   private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
   public ClientProcess(String addr, int port) {
-    this.addr = addr;
+    //this.addr = addr;
     this.port = port;
     try {
       this.socket = new Socket(addr, port);

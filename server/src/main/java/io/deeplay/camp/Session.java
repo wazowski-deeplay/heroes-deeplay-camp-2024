@@ -1,7 +1,9 @@
 package io.deeplay.camp;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.deeplay.camp.dto.client.ClientDto;
-import io.deeplay.camp.exceptions.ConnectionErrorCode;
+import io.deeplay.camp.dto.server.ConnectionErrorCode;
+import io.deeplay.camp.dto.server.ErrorResponseDto;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.manager.ClientManager;
@@ -33,11 +35,22 @@ public class Session implements Runnable {
         clientDto.setClientId(clientHandler.getClientId());
         handleRequest(clientDto);
       }
+    } catch (JsonProcessingException e) {
+
     } catch (Exception e) {
       logger.error("Session error", e);
     } finally {
       logger.info("Session closed");
       closeResources();
+    }
+  }
+
+  private void sendErrorToClient(ErrorResponseDto errorResponseDto) {
+    try {
+      String errorResponse = JsonConverter.serialize(errorResponseDto);
+      clientHandler.sendMessage(errorResponse);
+    } catch (JsonProcessingException e) {
+      logger.error("Failed to serialize error response", e);
     }
   }
 
@@ -72,6 +85,9 @@ public class Session implements Runnable {
           "{} {}",
           gameManagerException.getConnectionErrorCode(),
           gameManagerException.getMessage());
+      sendErrorToClient(
+          new ErrorResponseDto(
+              gameManagerException.getConnectionErrorCode(), gameManagerException.getMessage()));
     } else if (e instanceof GameException gameException) {
       logger.error("{} {}", gameException.getErrorCode(), gameException.getMessage());
     } else {
