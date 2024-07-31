@@ -1,8 +1,11 @@
 package io.deeplay.camp;
 
+import io.deeplay.camp.dto.client.ClientDto;
+import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.dto.server.ServerDto;
 import java.io.*;
 import java.net.Socket;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +14,12 @@ public class ClientProcess {
   private Socket socket;
   private String addr;
   private int port;
-  GameStatePlayer gameStatePlayer;
+
+  private UUID gamePartyId;
+  private GameStatePlayer gameStatePlayer;
   private BufferedReader inputUser;
   private ServerHandler serverHandler;
+  private ParserRequest parserRequest;
   private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
   public ClientProcess(String addr, int port) {
@@ -56,8 +62,15 @@ public class ClientProcess {
         String userWord;
         try {
           userWord = inputUser.readLine();
-          // Парсер
-          serverHandler.sendRequest(userWord);
+          ClientDto clientDto = null;
+          if (parserRequest.convert(userWord, gamePartyId) != null) {
+            clientDto = parserRequest.convert(userWord, gamePartyId);
+          } else {
+            System.out.println("Некорректный ввод данных, попробуйте снова");
+            continue;
+          }
+          String sendDto = JsonConverter.serialize(clientDto);
+          serverHandler.sendRequest(sendDto);
         } catch (IOException e) {
           serverHandler.downService();
         }
@@ -73,8 +86,9 @@ public class ClientProcess {
           // Обновление доски
           return;
         case GAME_PARTY_INFO:
-          gameStatePlayer.updateInfo(serverDto);
-          // Обновление инфы
+          GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
+          gamePartyId = gamePartyInfoDto.getGamePartyId();
+          // Обновление инфы о текущей пати
           return;
         default:
           return;
