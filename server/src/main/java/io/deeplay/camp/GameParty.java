@@ -42,7 +42,8 @@ public class GameParty {
   }
 
   public void processMakeMove(MakeMoveDto makeMoveRequest) throws GameException {
-    MakeMoveEvent makeMoveEvent = DtoToEventConverter.convert(makeMoveRequest);
+    MakeMoveEvent makeMoveEvent =
+            DtoToEventConverter.convert(makeMoveRequest, game.getGameState().getCurrentBoard());
     game.makeMove(makeMoveEvent);
     updateGameStateForPlayers();
   }

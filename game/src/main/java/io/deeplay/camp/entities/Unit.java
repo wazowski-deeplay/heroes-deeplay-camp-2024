@@ -1,7 +1,18 @@
 package io.deeplay.camp.entities;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.mechanics.PlayerType;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "unitType")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Knight.class, name = "KNIGHT"),
+        @JsonSubTypes.Type(value = Mage.class, name = "MAGE"),
+        @JsonSubTypes.Type(value = Healer.class, name = "HEALER"),
+        @JsonSubTypes.Type(value = Archer.class, name = "ARCHER"),
+})
 public abstract class Unit implements GeneralBuff {
   protected int maxHp;
   protected int currentHp;

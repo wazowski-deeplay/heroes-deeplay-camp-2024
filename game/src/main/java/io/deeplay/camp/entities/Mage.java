@@ -1,7 +1,9 @@
 package io.deeplay.camp.entities;
 
 import io.deeplay.camp.mechanics.PlayerType;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class Mage extends Unit {
   public Mage(PlayerType playerType) {
     super(UnitType.MAGE, 10, 10, 1, 5, 12, false);
