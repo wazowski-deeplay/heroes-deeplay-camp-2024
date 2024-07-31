@@ -29,6 +29,7 @@ public class ClientProcess {
       this.socket = new Socket(addr, port);
       this.serverHandler = new ServerHandler(socket);
       this.gameStatePlayer = new GameStatePlayer();
+      this.parserRequest = new ParserRequest();
       this.inputUser = new BufferedReader(new InputStreamReader(System.in));
     } catch (IOException e) {
       System.err.println("Socket failed");
@@ -88,6 +89,7 @@ public class ClientProcess {
         case GAME_PARTY_INFO:
           GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
           gamePartyId = gamePartyInfoDto.getGamePartyId();
+          System.out.println(gamePartyId);
           // Обновление инфы о текущей пати
           return;
         default:

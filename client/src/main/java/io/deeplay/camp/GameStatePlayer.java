@@ -11,6 +11,10 @@ public class GameStatePlayer {
   UUID gamePartyId;
   Cui cui;
 
+  public GameStatePlayer() {
+    cui = new Cui();
+  }
+
   public void updateBoard(ServerDto serverDto) {
     GameStateDto gameStateDto = (GameStateDto) serverDto;
     gameState = gameStateDto.getGameState();
