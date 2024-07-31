@@ -1,8 +1,11 @@
 package io.deeplay.camp;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.dto.GameType;
+import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
+import io.deeplay.camp.dto.server.ErrorResponseDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.dto.server.GameStateDto;
 import io.deeplay.camp.dto.server.ServerDto;
@@ -11,9 +14,12 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+
+import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +35,10 @@ class ServerTest {
     private static Socket clientSocket2;
     private static BufferedReader clientIn2;
     private static BufferedWriter clientOut2;
+
+    private static Socket clientSocket3;
+    private static BufferedReader clientIn3;
+    private static BufferedWriter clientOut3;
 
     @BeforeEach
     public void setUpServerAndClients() {
@@ -59,6 +69,18 @@ class ServerTest {
             clientOut2 =
                     new BufferedWriter(
                             new OutputStreamWriter(clientSocket2.getOutputStream(), StandardCharsets.UTF_8));
+            clientSocket3 = new Socket("localhost", 8080);
+            clientIn3 =
+                    new BufferedReader(
+                            new InputStreamReader(clientSocket2.getInputStream(), StandardCharsets.UTF_8));
+            clientOut3 =
+                    new BufferedWriter(
+                            new OutputStreamWriter(clientSocket2.getOutputStream(), StandardCharsets.UTF_8));
+
+
+
+
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -85,6 +107,19 @@ class ServerTest {
         ServerDto gameStateDto =
                 Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(gameState, ServerDto.class));
         Assertions.assertInstanceOf(GameStateDto.class, gameStateDto);
+    }
+
+    @Test
+    void createGamePartyWithInvalidGameTypeTest(){
+        CreateGamePartyDto invalidDto = new CreateGamePartyDto(null);
+        String request = Assertions.assertDoesNotThrow(()->JsonConverter.serialize(invalidDto));
+
+        Assertions.assertDoesNotThrow(()->writeRequestToServer(clientOut1,request));
+
+        String errorResponse = Assertions.assertDoesNotThrow(()-> clientIn1.readLine());
+        ServerDto errorDto = Assertions.assertDoesNotThrow(()-> JsonConverter.deserialize(errorResponse, ServerDto.class));
+        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.UNIDENTIFIED_ERROR, ((ErrorResponseDto)errorDto).getErrorCode());
     }
 
     @Test
@@ -120,6 +155,62 @@ class ServerTest {
         ServerDto gameStateDto =
                 Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(gameState, ServerDto.class));
         Assertions.assertInstanceOf(GameStateDto.class, gameStateDto);
+    }
+
+    @Test
+    void joinNonExistentGamePartyTest() {
+        UUID nonExistentGamePartyId = UUID.randomUUID();
+        JoinGamePartyDto joinGamePartyDto = new JoinGamePartyDto(nonExistentGamePartyId);
+        String request = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
+
+        // Ожидаем, что сервер вернет сообщение об ошибке
+        String errorResponse = Assertions.assertDoesNotThrow(() -> clientIn1.readLine());
+        ServerDto errorDto = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(errorResponse, ServerDto.class));
+
+        // Проверяем, что сервер вернул объект ErrorResponseDto с соответствующим кодом ошибки
+        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.NON_EXISTENT_CONNECTION, ((ErrorResponseDto) errorDto).getErrorCode());
+    }
+
+    @Test
+    void joinGamePartyTest_IsNotValid() {
+        // Попытка присоединиться к полной игре
+        CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
+        String request = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
+
+        // Получаем ответ с информацией о пати (без gameState, т.к. второго игрока пока нет)
+        String gamePartyInfo = Assertions.assertDoesNotThrow(() -> clientIn1.readLine());
+        ServerDto gamePartyInfoDto = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(gamePartyInfo, ServerDto.class));
+        UUID gamePartyId = ((GamePartyInfoDto) gamePartyInfoDto).getGamePartyId();
+
+        // Присоединяем второго игрока, чтобы сделать игру полной
+        JoinGamePartyDto joinGamePartyDto1 = new JoinGamePartyDto(gamePartyId);
+        String joinRequest1 = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto1));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut2, joinRequest1));
+
+        // Получаем подтверждение о присоединении второго игрока
+        String joinResponse = Assertions.assertDoesNotThrow(() -> clientIn2.readLine());
+        ServerDto joinResponseDto = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(joinResponse, ServerDto.class));
+        Assertions.assertInstanceOf(GamePartyInfoDto.class, joinResponseDto);
+
+
+        JoinGamePartyDto joinGamePartyDto2 = new JoinGamePartyDto(gamePartyId);
+        String joinRequest2 = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto2));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut3, joinRequest2));
+
+        // Присоединяем 3 игрока
+        String joinResponse2 = Assertions.assertDoesNotThrow(() -> clientIn3.readLine());
+        ServerDto joinResponseDto2 = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(joinResponse2, ServerDto.class));
+        Assertions.assertInstanceOf(JoinGamePartyDto.class, joinGamePartyDto2);
+
+        String errorResponse = Assertions.assertDoesNotThrow(() -> clientIn3.readLine());
+        ServerDto errorDto = Assertions.assertDoesNotThrow(()-> JsonConverter.deserialize(errorResponse, ServerDto.class));
+
+        // Проверяем, что сервер вернул объект ErrorResponseDto с соответствующим кодом ошибки
+        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.FULL_PARTY, ((ErrorResponseDto) errorDto).getErrorCode());
     }
 
     UUID createHumanVsHumanParty() {

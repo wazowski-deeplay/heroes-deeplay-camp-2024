@@ -10,8 +10,8 @@ import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
+import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
-import io.deeplay.camp.exceptions.ConnectionErrorCode;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.mechanics.PlayerType;
@@ -68,6 +68,9 @@ public class GamePartyManager implements Runnable {
    * @param gameType Тип игры.
    */
   public void processCreateGameParty(UUID clientId, GameType gameType) throws GameManagerException {
+    if (gameType == null) {
+      throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+    }
     switch (gameType) {
       case HUMAN_VS_BOT -> createHumanVsBotParty(clientId);
       case HUMAN_VS_HUMAN -> createHumanVsHumanParty(clientId);
