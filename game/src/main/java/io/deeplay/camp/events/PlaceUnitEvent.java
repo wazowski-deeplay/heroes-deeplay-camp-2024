@@ -14,6 +14,7 @@ public class PlaceUnitEvent extends Event {
   private int rows;
   private Unit unit;
   private boolean inProcess = true;
+  private boolean general = false;
 
   // Мы должны знать куда ставят, какого юнита, и кто ставит
   // playerType мы получаем из gameState, пример в тесте
@@ -22,6 +23,7 @@ public class PlaceUnitEvent extends Event {
     this.columns = x;
     this.rows = y;
     this.unit = unit;
+    this.general = general;
     unit.setPlayerType(playerType);
     unit.setGeneral(general);
     this.inProcess = inProcess;

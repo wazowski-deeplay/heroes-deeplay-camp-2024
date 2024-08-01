@@ -10,6 +10,7 @@ import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
+import io.deeplay.camp.manager.GamePartyManager;
 import io.deeplay.camp.mechanics.GameStage;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.player.Player;

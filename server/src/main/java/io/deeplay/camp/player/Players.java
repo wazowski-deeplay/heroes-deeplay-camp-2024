@@ -33,6 +33,10 @@ public class Players {
         if (((HumanPlayer) player).getClientId().equals(clientId)) {
           return player.getPlayerType();
         }
+      } else if(player instanceof AiPlayer){
+        if (((AiPlayer) player).getGameParty().getGame().getGameState().getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
+          return player.getPlayerType();
+        }
       }
     }
     return null;

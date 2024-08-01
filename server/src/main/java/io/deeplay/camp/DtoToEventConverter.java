@@ -18,6 +18,7 @@ public class DtoToEventConverter {
       case ARCHER -> unit = new Archer(playerType);
       case HEALER -> unit = new Healer(playerType);
       case MAGE -> unit = new Mage(playerType);
+      default -> unit = null;
     }
     return new PlaceUnitEvent(
         placeUnitDto.getColumns(),
@@ -32,7 +33,7 @@ public class DtoToEventConverter {
     return new MakeMoveEvent(
         new Position(makeMoveDto.getFromX(), makeMoveDto.getFromY()),
         new Position(makeMoveDto.getToX(), makeMoveDto.getToY()),
-            board.getUnit(makeMoveDto.getFromX(), makeMoveDto.getFromY()));
+        board.getUnit(makeMoveDto.getFromX(), makeMoveDto.getFromY()));
   }
 
   public static ChangePlayerEvent convert(ChangePlayerDto changePlayerDto, PlayerType playerType) {
