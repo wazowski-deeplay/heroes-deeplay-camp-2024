@@ -119,7 +119,7 @@ public class GamePartyManager implements Runnable {
       GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
       sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
 
-      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
+      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER, gameParty));
     } catch (GameManagerException e) {
       logger.error(
           "Ошибка при создании игры между игроком и ботом {} ", e.getConnectionErrorCode());
