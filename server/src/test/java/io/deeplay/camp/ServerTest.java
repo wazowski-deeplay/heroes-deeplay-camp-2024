@@ -1,11 +1,9 @@
 package io.deeplay.camp;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.dto.GameType;
-import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
-import io.deeplay.camp.dto.server.ErrorResponseDto;
+import io.deeplay.camp.dto.server.ErrorConnectionResponseDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.dto.server.GameStateDto;
 import io.deeplay.camp.dto.server.ServerDto;
@@ -14,7 +12,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -118,8 +115,8 @@ class ServerTest {
 
         String errorResponse = Assertions.assertDoesNotThrow(()-> clientIn1.readLine());
         ServerDto errorDto = Assertions.assertDoesNotThrow(()-> JsonConverter.deserialize(errorResponse, ServerDto.class));
-        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
-        Assertions.assertEquals(ConnectionErrorCode.UNIDENTIFIED_ERROR, ((ErrorResponseDto)errorDto).getErrorCode());
+        Assertions.assertInstanceOf(ErrorConnectionResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.UNIDENTIFIED_ERROR, ((ErrorConnectionResponseDto)errorDto).getConnectionErrorCode());
     }
 
     @Test
@@ -169,8 +166,8 @@ class ServerTest {
         ServerDto errorDto = Assertions.assertDoesNotThrow(() -> JsonConverter.deserialize(errorResponse, ServerDto.class));
 
         // Проверяем, что сервер вернул объект ErrorResponseDto с соответствующим кодом ошибки
-        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
-        Assertions.assertEquals(ConnectionErrorCode.NON_EXISTENT_CONNECTION, ((ErrorResponseDto) errorDto).getErrorCode());
+        Assertions.assertInstanceOf(ErrorConnectionResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.NON_EXISTENT_CONNECTION, ((ErrorConnectionResponseDto) errorDto).getConnectionErrorCode());
     }
 
     @Test
@@ -204,8 +201,8 @@ class ServerTest {
         ServerDto errorDto = Assertions.assertDoesNotThrow(()-> JsonConverter.deserialize(errorResponse, ServerDto.class));
 
         // Проверяем, что сервер вернул объект ErrorResponseDto с соответствующим кодом ошибки
-        Assertions.assertInstanceOf(ErrorResponseDto.class, errorDto);
-        Assertions.assertEquals(ConnectionErrorCode.FULL_PARTY, ((ErrorResponseDto) errorDto).getErrorCode());
+        Assertions.assertInstanceOf(ErrorConnectionResponseDto.class, errorDto);
+        Assertions.assertEquals(ConnectionErrorCode.FULL_PARTY, ((ErrorConnectionResponseDto) errorDto).getConnectionErrorCode());
     }
 
     UUID createHumanVsHumanParty() {

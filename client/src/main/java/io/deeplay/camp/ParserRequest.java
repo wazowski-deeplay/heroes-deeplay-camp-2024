@@ -149,7 +149,7 @@ public class ParserRequest {
       case "healer" -> {
         return UnitType.HEALER;
       }
-      default -> System.out.println("gay");
+      default -> System.out.println("gay type");
     }
     return null;
   }
