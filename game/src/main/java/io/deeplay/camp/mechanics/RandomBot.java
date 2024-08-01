@@ -9,10 +9,94 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BotPlayer {
+public class RandomBot extends Bot {
+
   private static final Logger logger = LoggerFactory.getLogger(BotPlayer.class);
 
-  // Список всех возможных Юнитов для добавления на клетку
+  @Override
+  public PlaceUnitEvent generatePlaceUnitEvent(GameState gameState) {
+    int shiftRow = 0;
+    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+      shiftRow = 0;
+    } else if (gameState.getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
+      shiftRow = 2;
+    }
+    for (int i = 0; i < gameState.getCurrentBoard().getUnits().length; i++) {
+      for (int j = shiftRow;
+          j < gameState.getCurrentBoard().getUnits()[i].length / 2 + shiftRow;
+          j++) {
+        if (!gameState.getCurrentBoard().isEmptyCell(i, j)) {
+          continue;
+        }
+        PossibleActions<Position, Unit> positionPossiblePlacement =
+            unitsPossiblePlacement(gameState);
+        Position pos1 = new Position(i, j);
+        if (positionPossiblePlacement.get(pos1).size() == 0) {
+          continue;
+        }
+        boolean inProcess = true;
+        boolean general = false;
+        int randUnit = (int) (Math.random() * positionPossiblePlacement.get(pos1).size());
+        if (enumerationPlayerUnits(gameState.getCurrentPlayer(), gameState.getCurrentBoard()).size()
+                + 1
+            == 6) {
+          int randGeneral = (int) (Math.random() * 6);
+          if (randGeneral != 5) {
+            gameState
+                .getCurrentBoard()
+                .getUnit(intToPos(randGeneral).x(), intToPos(randGeneral).y() + shiftRow)
+                .setGeneral(true);
+          } else {
+            general = true;
+          }
+          inProcess = false;
+        }
+        PlaceUnitEvent place =
+            new PlaceUnitEvent(
+                pos1.x(),
+                pos1.y(),
+                positionPossiblePlacement.get(pos1).get(randUnit),
+                gameState.getCurrentPlayer(),
+                inProcess,
+                general);
+        return place;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public MakeMoveEvent generateMakeMoveEvent(GameState gameState) {
+    int shiftRow = 0;
+    if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+      shiftRow = 0;
+    } else if (gameState.getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
+      shiftRow = 2;
+    }
+    for (int i = 0; i < gameState.getCurrentBoard().getUnits().length; i++) {
+      for (int j = shiftRow;
+          j < gameState.getCurrentBoard().getUnits()[i].length / 2 + shiftRow;
+          j++) {
+        if (gameState.getCurrentBoard().getUnit(i, j).getMoved()) {
+          continue;
+        }
+        PossibleActions<Position, Position> positionPossibleActions =
+            unitsPossibleActions(gameState);
+        int rand = (int) (Math.random() * positionPossibleActions.get(new Position(i, j)).size());
+        Position pos1 = new Position(i, j);
+        if (positionPossibleActions.get(pos1).size() == 0) {
+          continue;
+        }
+        Position pos2 = positionPossibleActions.get(pos1).get(rand);
+        MakeMoveEvent move =
+            new MakeMoveEvent(pos1, pos2, gameState.getCurrentBoard().getUnit(pos1.x(), pos1.y()));
+        return move;
+      }
+    }
+    return null;
+  }
+
+  // Добавление возможных юнитов в один список
   public List<Unit> enumerationUnit(PlayerType playerType) {
     List<Unit> tmp = new ArrayList<>();
     tmp.add(new Knight(playerType));
@@ -33,7 +117,6 @@ public class BotPlayer {
     return unitPositions;
   }
 
-  // Подсчёт количества пустых клеток у выбранного игрока
   public List<Position> enumerationEmptyCells(PlayerType playerType, Board board) {
     List<Position> unitPositions = new ArrayList<>();
     if (playerType == PlayerType.FIRST_PLAYER) {
@@ -44,9 +127,6 @@ public class BotPlayer {
     return unitPositions;
   }
 
-  // Возможные варианты действий юнитов
-  // Ключ это какой юнит атакует
-  // значение возможные валидные атаки этого юнита
   public PossibleActions<Position, Position> unitsPossibleActions(GameState gameState) {
     Board board = gameState.getCurrentBoard();
     PossibleActions<Position, Position> map = new PossibleActions<>();
@@ -129,9 +209,6 @@ public class BotPlayer {
     return map;
   }
 
-  // Возможные варианты расстановки юнитов
-  // Ключ - какая клетка рассматривается для размещения
-  // Значение - возможные юниты для расстановки
   public PossibleActions<Position, Unit> unitsPossiblePlacement(GameState gameState) {
     Board board = gameState.getCurrentBoard();
     PossibleActions<Position, Unit> map = new PossibleActions<>();
@@ -199,6 +276,32 @@ public class BotPlayer {
       }
     }
     return map;
+  }
+
+  private Position intToPos(int n) {
+    switch (n) {
+      case 0 -> {
+        return new Position(0, 0);
+      }
+      case 1 -> {
+        return new Position(0, 1);
+      }
+      case 2 -> {
+        return new Position(1, 0);
+      }
+      case 3 -> {
+        return new Position(1, 1);
+      }
+      case 4 -> {
+        return new Position(2, 0);
+      }
+      case 5 -> {
+        return new Position(2, 1);
+      }
+      default -> {
+        return null;
+      }
+    }
   }
 
   // Метод обёртка для отлавливания ошибок для действий юнитов

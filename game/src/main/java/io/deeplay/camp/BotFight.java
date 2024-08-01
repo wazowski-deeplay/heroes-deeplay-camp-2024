@@ -3,7 +3,6 @@ package io.deeplay.camp;
 import io.deeplay.camp.entities.*;
 import io.deeplay.camp.events.ChangePlayerEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
-import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.*;
 import java.awt.*;
@@ -16,11 +15,11 @@ public class BotFight {
   private static int countDraw = 0;
   private final int countGame;
 
-  private final int timeSkeep = 50;
+  private final int timeSkeep = 250;
   Game game;
   GameAnalisys gameAnalisys;
-  BotPlayer botFirst;
-  BotPlayer botSecond;
+  RandomBot botFirst;
+  RandomBot botSecond;
   boolean consoleOut = true;
   boolean outInfoGame;
   String separator = System.getProperty("line.separator");
@@ -28,7 +27,7 @@ public class BotFight {
   JTextArea area1;
   JPanel contents;
 
-  public BotFight(BotPlayer botFirst, BotPlayer botSecond, int countGame, boolean infoGame) {
+  public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) {
     this.botFirst = botFirst;
     this.botSecond = botSecond;
     this.countGame = countGame;
@@ -49,16 +48,16 @@ public class BotFight {
     for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
       game = new Game();
-      executePlace(game.getGameState().getCurrentPlayer(), gameCount);
+      executePlace(game.getGameState(), gameCount);
       game.getGameState().changeCurrentPlayer();
-      executePlace(game.getGameState().getCurrentPlayer(), gameCount);
+      executePlace(game.getGameState(), gameCount);
       game.getGameState().changeCurrentPlayer();
       gameAnalisys.setCurrentBoard(game.getGameState().getCurrentBoard().getUnits());
 
       while (game.getGameState().getGameStage() != GameStage.ENDED) {
-        executeMove(game.getGameState().getCurrentPlayer(), gameCount);
+        executeMove(game.getGameState(), gameCount);
         game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
-        executeMove(game.getGameState().getCurrentPlayer(), gameCount);
+        executeMove(game.getGameState(), gameCount);
         game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
       }
 
@@ -106,128 +105,40 @@ public class BotFight {
     }
   }
 
-  public void executeMove(PlayerType playerType, int countGame)
+  public void executeMove(GameState gameState, int countGame)
       throws GameException, InterruptedException {
-    if (playerType == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
-        for (int j = 0; j < game.getGameState().getCurrentBoard().getUnits()[i].length / 2; j++) {
-          PossibleActions<Position, Position> positionPossibleActionsFirst =
-              botFirst.unitsPossibleActions(game.getGameState());
-          int rand =
-              (int) (Math.random() * positionPossibleActionsFirst.get(new Position(i, j)).size());
-          Position pos1 = new Position(i, j);
-          if (positionPossibleActionsFirst.get(pos1).size() == 0) {
-            continue;
-          }
-          Position pos2 = positionPossibleActionsFirst.get(pos1).get(rand);
-          MakeMoveEvent move =
-              new MakeMoveEvent(
-                  pos1, pos2, game.getGameState().getCurrentBoard().getUnit(pos1.x(), pos1.y()));
-
-          game.makeMove(move);
-          Thread.sleep(timeSkeep);
-          outInFrame(move);
+    for (int i = 0; i < 6; i++) {
+      if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+        MakeMoveEvent event = botFirst.generateMakeMoveEvent(gameState);
+        if (event == null) {
+          continue;
         }
-      }
-    } else if (playerType == PlayerType.SECOND_PLAYER) {
-      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
-        for (int j = game.getGameState().getCurrentBoard().getUnits()[i].length / 2;
-            j < game.getGameState().getCurrentBoard().getUnits()[i].length;
-            j++) {
-          PossibleActions<Position, Position> positionPossibleActionsSecond =
-              botSecond.unitsPossibleActions(game.getGameState());
-          int rand =
-              (int) (Math.random() * positionPossibleActionsSecond.get(new Position(i, j)).size());
-          Position pos1 = new Position(i, j);
-          if (positionPossibleActionsSecond.get(pos1).size() == 0) {
-            continue;
-          }
-          Position pos2 = positionPossibleActionsSecond.get(pos1).get(rand);
-          MakeMoveEvent move =
-              new MakeMoveEvent(
-                  pos1, pos2, game.getGameState().getCurrentBoard().getUnit(pos1.x(), pos1.y()));
-          game.makeMove(move);
-          Thread.sleep(timeSkeep);
-          outInFrame(move);
+        game.makeMove(event);
+        Thread.sleep(timeSkeep);
+        outInFrame(event);
+      } else {
+        MakeMoveEvent event = botSecond.generateMakeMoveEvent(gameState);
+        if (event == null) {
+          continue;
         }
+        game.makeMove(event);
+        Thread.sleep(timeSkeep);
+        outInFrame(event);
       }
     }
   }
 
-  public void executePlace(PlayerType playerType, int countGame)
+  public void executePlace(GameState gameState, int countGame)
       throws GameException, InterruptedException {
-    if (playerType == PlayerType.FIRST_PLAYER) {
-      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
-        for (int j = 0; j < game.getGameState().getCurrentBoard().getUnits()[i].length / 2; j++) {
-          PossibleActions<Position, Unit> positionPossiblePlacementFirst =
-              botFirst.unitsPossiblePlacement(game.getGameState());
-
-          Position pos1 = new Position(i, j);
-          int rand = (int) (Math.random() * positionPossiblePlacementFirst.get(pos1).size());
-          if (positionPossiblePlacementFirst.get(pos1).size() == 0) {
-            continue;
-          }
-          boolean inProcess = true;
-          boolean general = false;
-          if (botFirst
-                      .enumerationPlayerUnits(
-                          PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
-                      .size()
-                  + 1
-              == 6) {
-            inProcess = false;
-            general = true;
-          }
-          PlaceUnitEvent place =
-              new PlaceUnitEvent(
-                  pos1.x(),
-                  pos1.y(),
-                  positionPossiblePlacementFirst.get(pos1).get(rand),
-                  PlayerType.FIRST_PLAYER,
-                  inProcess,
-                  general);
-
-          game.placeUnit(place);
-          Thread.sleep(timeSkeep);
-          outInFrame(null);
-        }
-      }
-    } else if (playerType == PlayerType.SECOND_PLAYER) {
-      for (int i = 0; i < game.getGameState().getCurrentBoard().getUnits().length; i++) {
-        for (int j = game.getGameState().getCurrentBoard().getUnits()[i].length / 2;
-            j < game.getGameState().getCurrentBoard().getUnits()[i].length;
-            j++) {
-          PossibleActions<Position, Unit> positionPossiblePlacementSecond =
-              botSecond.unitsPossiblePlacement(game.getGameState());
-          Position pos1 = new Position(i, j);
-          int rand = (int) (Math.random() * positionPossiblePlacementSecond.get(pos1).size());
-          if (positionPossiblePlacementSecond.get(pos1).size() == 0) {
-            continue;
-          }
-          boolean inProcess = true;
-          boolean general = false;
-          if (botFirst
-                      .enumerationPlayerUnits(
-                          PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
-                      .size()
-                  + 1
-              == 6) {
-            inProcess = false;
-            general = true;
-          }
-          PlaceUnitEvent place =
-              new PlaceUnitEvent(
-                  pos1.x(),
-                  pos1.y(),
-                  positionPossiblePlacementSecond.get(pos1).get(rand),
-                  PlayerType.SECOND_PLAYER,
-                  inProcess,
-                  general);
-
-          game.placeUnit(place);
-          Thread.sleep(timeSkeep);
-          outInFrame(null);
-        }
+    for (int i = 0; i < 6; i++) {
+      if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+        game.placeUnit(botFirst.generatePlaceUnitEvent(gameState));
+        Thread.sleep(timeSkeep);
+        outInFrame(null);
+      } else {
+        game.placeUnit(botSecond.generatePlaceUnitEvent(gameState));
+        Thread.sleep(timeSkeep);
+        outInFrame(null);
       }
     }
   }
