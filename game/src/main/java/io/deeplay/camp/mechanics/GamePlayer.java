@@ -5,7 +5,7 @@ import io.deeplay.camp.entities.Position;
 import io.deeplay.camp.entities.Unit;
 
 public interface GamePlayer extends GameListener {
-  PossibleActions<Position, Position> unitsPossibleActions(GameState gameState);
+    PossibleActions<Position, Position> unitsPossibleActions(GameState gameState);
 
-  PossibleActions<Position, Unit> unitsPossiblePlacement(GameState gameState);
+    PossibleActions<Position, Unit> unitsPossiblePlacement(GameState gameState);
 }
