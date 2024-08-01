@@ -36,7 +36,7 @@ public class Session implements Runnable {
         handleRequest(clientDto);
       }
     } catch (JsonProcessingException e) {
-
+      logger.error("Session errors", e);
     } catch (Exception e) {
       logger.error("Session error", e);
     } finally {
