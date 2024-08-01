@@ -119,7 +119,7 @@ public class GamePartyManager implements Runnable {
       GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
       sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
 
-      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER));
+      gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER, gameParty));
     } catch (GameManagerException e) {
       logger.error(
           "Ошибка при создании игры между игроком и ботом {} ", e.getConnectionErrorCode());
@@ -195,7 +195,7 @@ public class GamePartyManager implements Runnable {
    * Метод отправки информации о пати для клиентов.
    *
    * @param clientId Id клиента, которому отправляется инф.
-   * @param gamePartyInfoDto Информация о пати.
+   * @param gamePartyInfoDto информация о пати.
    */
   public void sendGamePartyInfo(UUID clientId, GamePartyInfoDto gamePartyInfoDto)
       throws GameManagerException {

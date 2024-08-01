@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "unitType")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Knight.class, name = "KNIGHT"),
-        @JsonSubTypes.Type(value = Mage.class, name = "MAGE"),
-        @JsonSubTypes.Type(value = Healer.class, name = "HEALER"),
-        @JsonSubTypes.Type(value = Archer.class, name = "ARCHER"),
+  @JsonSubTypes.Type(value = Knight.class, name = "KNIGHT"),
+  @JsonSubTypes.Type(value = Mage.class, name = "MAGE"),
+  @JsonSubTypes.Type(value = Healer.class, name = "HEALER"),
+  @JsonSubTypes.Type(value = Archer.class, name = "ARCHER"),
 })
 public abstract class Unit implements GeneralBuff {
   protected int maxHp;
