@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = GamePartyInfoDto.class, name = "GAME_PARTY_INFO"),
   @JsonSubTypes.Type(value = GameStateDto.class, name = "GAME_STATE"),
-  @JsonSubTypes.Type(value = ErrorResponseDto.class, name = "ERROR_INFO"),
+  @JsonSubTypes.Type(value = ErrorConnectionResponseDto.class, name = "ERROR_CONNECTION_INFO"),
+  @JsonSubTypes.Type(value = ErrorGameResponseDto.class, name = "ERROR_GAME_INFO"),
 })
 public abstract class ServerDto {
   ServerDtoType serverDtoType;

@@ -52,7 +52,7 @@ public class ServerHandler {
         writer.close();
       }
     } catch (IOException ignored) {
-      System.out.println("gay");
+      System.out.println("gay server ");
     }
   }
 }

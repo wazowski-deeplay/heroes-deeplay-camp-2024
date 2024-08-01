@@ -1,6 +1,8 @@
 package io.deeplay.camp;
 
 import io.deeplay.camp.dto.client.ClientDto;
+import io.deeplay.camp.dto.server.ErrorConnectionResponseDto;
+import io.deeplay.camp.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.dto.server.ServerDto;
 import java.io.*;
@@ -92,11 +94,20 @@ public class ClientProcess {
           System.out.println(gamePartyId);
           // Обновление инфы о текущей пати
           return;
+        case ERROR_CONNECTION_INFO:
+          ErrorConnectionResponseDto errorConnectionResponseDto =
+              (ErrorConnectionResponseDto) serverDto;
+          System.out.println(errorConnectionResponseDto.getConnectionErrorCode());
+          return;
+        case ERROR_GAME_INFO:
+          ErrorGameResponseDto errorGameResponseDto = (ErrorGameResponseDto) serverDto;
+          System.out.println(errorGameResponseDto.getMessage());
+          return;
         default:
           return;
       }
     } catch (Exception e) {
-      System.out.println("gay");
+      System.out.println("gay exceptions ");
     }
   }
 }
