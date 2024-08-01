@@ -146,7 +146,6 @@ public class GamePartyManager implements Runnable {
       if (!gameParty.getPlayers().isFull()) {
         GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
         sendGamePartyInfo(clientId, gamePartyInfoDto);
-
         gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
         gameParties.put(gameParty.getGamePartyId(), gameParty);
       } else {

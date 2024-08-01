@@ -36,14 +36,14 @@ public class GameParty {
 
   public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
     PlaceUnitEvent placeUnitEvent =
-        DtoToEventConverter.convert(placeUnitDto, game.getGameState().getCurrentPlayer());
+        DtoToEventConverter.convert(placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
     game.placeUnit(placeUnitEvent);
     updateGameStateForPlayers();
   }
 
   public void processMakeMove(MakeMoveDto makeMoveRequest) throws GameException {
     MakeMoveEvent makeMoveEvent =
-            DtoToEventConverter.convert(makeMoveRequest, game.getGameState().getCurrentBoard());
+        DtoToEventConverter.convert(makeMoveRequest, game.getGameState().getCurrentBoard());
     game.makeMove(makeMoveEvent);
     updateGameStateForPlayers();
   }

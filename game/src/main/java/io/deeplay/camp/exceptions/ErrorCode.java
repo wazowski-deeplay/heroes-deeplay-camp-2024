@@ -13,7 +13,8 @@ public enum ErrorCode {
   BOARD_IS_NOT_FULL("Не заполнена"),
   PLACEMENT_INCORRECT("Введены не корректные координаты"),
   GENERAL_IS_MISSING("Отсутствует генерал"),
-  TOO_MANY_GENERAL("Слишком много генералов");
+  TOO_MANY_GENERAL("Слишком много генералов"),
+  NOT_YOUR_TURN("Не твоя очередь");
 
   private final String message;
 

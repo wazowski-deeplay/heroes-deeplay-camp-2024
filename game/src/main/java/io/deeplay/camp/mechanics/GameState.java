@@ -211,63 +211,66 @@ public class GameState {
   public boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    boolean result;
+    boolean result = false;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
-
-    if (x > Board.COLUMNS || x < 0) {
-      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+    if (placement.getUnit().getPlayerType() != getCurrentPlayer()){
+      logger.error("Not your turn");
+      throw new GameException(ErrorCode.NOT_YOUR_TURN);
     }
-    if (y > Board.ROWS || y < 0) {
-      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-    }
-    // Проверка на сторону юнита
-    if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-      if (y < (Board.ROWS / 2)) {
-        result = true;
-        logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
-      } else {
-        logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
+      if (x > Board.COLUMNS || x < 0) {
+        logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
-    } else {
-      if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
-        logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
-        result = true;
-      } else {
-        logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
+      if (y > Board.ROWS || y < 0) {
+        logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
         throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
       }
-    }
-
-    board.setUnit(x, y, placement.getUnit());
-
-    // Проверка стартующая когда расстановка по мнению игрока окончена
-    if (!placement.isInProcess()) {
-      logger.atInfo().log("Placement process finished. Checking board and general presence.");
-      // Проверка на то что на доске есть генерал
-      if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-        if (!board.isFullFirstPlayerPart()) {
-          logger.atError().log("First player board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!checkCurrentPlayerGeneral(board, PlayerType.FIRST_PLAYER)) {
-          logger.atError().log("First player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+      // Проверка на сторону юнита
+      if (placement.getUnit().getPlayerType() == PlayerType.FIRST_PLAYER) {
+        if (y < (Board.ROWS / 2)) {
+          result = true;
+          logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
+        } else {
+          logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
+          throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
         }
       } else {
-        if (!board.isFullSecondPlayerPart()) {
-          logger.atError().log("Second player's board is not full.");
-          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-        }
-        if (!checkCurrentPlayerGeneral(board, PlayerType.SECOND_PLAYER)) {
-          logger.atError().log("Second player general is missing.");
-          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+        if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
+          logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
+          result = true;
+        } else {
+          logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
+          throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
         }
       }
-      result = true;
-    }
+
+      board.setUnit(x, y, placement.getUnit());
+
+      // Проверка стартующая когда расстановка по мнению игрока окончена
+      if (!placement.isInProcess()) {
+        logger.atInfo().log("Placement process finished. Checking board and general presence.");
+        // Проверка на то что на доске есть генерал
+        if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+          if (!board.isFullFirstPlayerPart()) {
+            logger.atError().log("First player board is not full.");
+            throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+          }
+          if (!checkCurrentPlayerGeneral(board, PlayerType.FIRST_PLAYER)) {
+            logger.atError().log("First player general is missing.");
+            throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+          }
+        } else {
+          if (!board.isFullSecondPlayerPart()) {
+            logger.atError().log("Second player's board is not full.");
+            throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+          }
+          if (!checkCurrentPlayerGeneral(board, PlayerType.SECOND_PLAYER)) {
+            logger.atError().log("Second player general is missing.");
+            throw new GameException(ErrorCode.GENERAL_IS_MISSING);
+          }
+        }
+        result = true;
+      }
     board.setUnit(x, y, null);
     return result;
   }
