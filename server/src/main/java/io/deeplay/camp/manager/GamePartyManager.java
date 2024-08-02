@@ -6,6 +6,7 @@ import io.deeplay.camp.JsonConverter;
 import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.dto.client.game.GiveUpDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
@@ -182,6 +183,11 @@ public class GamePartyManager implements Runnable {
         ChangePlayerDto changePlayerDto = (ChangePlayerDto) clientDto;
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
         gameParty.processChangePlayer(changePlayerDto);
+      }
+      case GIVE_UP -> {
+        GiveUpDto giveUpDto = (GiveUpDto) clientDto;
+        GameParty gameParty = gameParties.get(giveUpDto.getGamePartyId());
+        gameParty.processGiveUp(giveUpDto);
       }
       default -> {
         logger.error("Не возможное действие");

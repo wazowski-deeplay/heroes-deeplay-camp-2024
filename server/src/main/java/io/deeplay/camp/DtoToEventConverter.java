@@ -5,6 +5,7 @@ import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.entities.*;
 import io.deeplay.camp.events.ChangePlayerEvent;
+import io.deeplay.camp.events.GiveUpEvent;
 import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.mechanics.PlayerType;
@@ -39,4 +40,9 @@ public class DtoToEventConverter {
   public static ChangePlayerEvent convert(ChangePlayerDto changePlayerDto, PlayerType playerType) {
     return new ChangePlayerEvent(playerType);
   }
+
+  public static GiveUpEvent convert (PlayerType playerType){
+    return new GiveUpEvent(playerType);
+  }
+
 }

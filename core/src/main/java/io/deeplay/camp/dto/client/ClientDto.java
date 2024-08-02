@@ -3,6 +3,7 @@ package io.deeplay.camp.dto.client;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.dto.client.game.GiveUpDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
@@ -21,6 +22,7 @@ import lombok.Setter;
   @JsonSubTypes.Type(value = ChangePlayerDto.class),
   @JsonSubTypes.Type(value = CreateGamePartyDto.class),
   @JsonSubTypes.Type(value = JoinGamePartyDto.class),
+  @JsonSubTypes.Type(value = GiveUpDto.class),
 })
 public abstract class ClientDto {
   private ClientDtoType clientDtoType;

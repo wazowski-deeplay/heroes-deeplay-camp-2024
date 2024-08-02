@@ -1,11 +1,15 @@
 package io.deeplay.camp.dto.client;
 
 public enum ClientDtoType {
-  MAKE_MOVE,
-  PLACE_UNIT,
-  CHANGE_PLAYER,
+  MAKE_MOVE, // Человек сделал ход юнитом на доске
+  PLACE_UNIT, // Человек поставил юнита на доску
+  CHANGE_PLAYER, // Нажал на кнопку или написал команду смены игрока это может сделать только
+                 // текущий игрок для другого нет
   START_GAME,
-  CREATE_PARTY,
-  JOIN_PARTY,
-  DISCONNECT
+  CREATE_PARTY, // Создать игру
+  JOIN_PARTY,  // Присоединиться в уже созданную
+  DISCONNECT,  // запрос на закрытие всех ресурсов игры
+  GIVE_UP,  // сдаться тот игрок который прислал запрос
+  LEAVE_GAME, // выйти из игры автоматически сдаться и тот игрок который прислал запрос
+  OFFER_GIVE_UP // Отослать предложение о сдачи игроком который прислал запрос другому
 }

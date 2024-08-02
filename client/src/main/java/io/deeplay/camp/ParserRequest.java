@@ -3,6 +3,7 @@ package io.deeplay.camp;
 import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.dto.client.game.GiveUpDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
@@ -98,6 +99,13 @@ public class ParserRequest {
       }
 
       clientDto = new JoinGamePartyDto(UUID.fromString(userCommand[1]));
+    }
+    if(userCommand[0].equals("giveup"))
+    {
+      if (userCommand.length != 1){
+        return null;
+      }
+      clientDto = new GiveUpDto(gamePartyId);
     }
     return clientDto;
   }
