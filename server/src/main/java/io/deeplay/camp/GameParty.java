@@ -10,7 +10,6 @@ import io.deeplay.camp.events.MakeMoveEvent;
 import io.deeplay.camp.events.PlaceUnitEvent;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
-import io.deeplay.camp.manager.GamePartyManager;
 import io.deeplay.camp.mechanics.GameStage;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.player.Player;
@@ -37,7 +36,8 @@ public class GameParty {
 
   public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
     PlaceUnitEvent placeUnitEvent =
-        DtoToEventConverter.convert(placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
+        DtoToEventConverter.convert(
+            placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
     game.placeUnit(placeUnitEvent);
     updateGameStateForPlayers();
   }
@@ -48,8 +48,6 @@ public class GameParty {
     game.makeMove(makeMoveEvent);
     updateGameStateForPlayers();
   }
-
-  public void startGame() {}
 
   public void processChangePlayer(ChangePlayerDto changePlayerRequest) throws GameException {
     ChangePlayerEvent changePlayerEvent =
@@ -78,6 +76,4 @@ public class GameParty {
   public boolean isGameEnded() {
     return game.getGameState().getGameStage() == GameStage.ENDED;
   }
-
-  public void close() {}
 }

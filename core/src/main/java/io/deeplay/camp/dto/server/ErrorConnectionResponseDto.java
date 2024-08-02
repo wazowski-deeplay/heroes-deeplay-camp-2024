@@ -1,8 +1,9 @@
 package io.deeplay.camp.dto.server;
 
-import io.deeplay.camp.exceptions.ErrorCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 public class ErrorConnectionResponseDto extends ServerDto {
   private ConnectionErrorCode connectionErrorCode;
@@ -12,14 +13,5 @@ public class ErrorConnectionResponseDto extends ServerDto {
     super(ServerDtoType.ERROR_CONNECTION_INFO);
     this.connectionErrorCode = connectionErrorCode;
     this.message = message;
-  }
-
-  public ConnectionErrorCode getConnectionErrorCode() {
-    return connectionErrorCode;
-  }
-
-
-  public String getMessage() {
-    return message;
   }
 }

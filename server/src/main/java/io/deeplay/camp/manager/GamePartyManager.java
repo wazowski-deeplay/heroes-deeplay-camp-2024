@@ -11,28 +11,35 @@ import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.dto.server.ConnectionErrorCode;
+import io.deeplay.camp.dto.server.GamePartiesDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.mechanics.PlayerType;
 import io.deeplay.camp.player.AiPlayer;
 import io.deeplay.camp.player.HumanPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GamePartyManager implements Runnable {
+public class GamePartyManager {
   private final Map<UUID, GameParty> gameParties;
   private static final Logger logger = LoggerFactory.getLogger(GamePartyManager.class);
-  Thread checkEndedThread;
+  private final ScheduledExecutorService executorService;
 
   public GamePartyManager() {
     this.gameParties = new ConcurrentHashMap<>();
-    checkEndedThread = new Thread(this);
-    checkEndedThread.setDaemon(true);
-    checkEndedThread.start();
+    this.executorService = Executors.newSingleThreadScheduledExecutor();
+    scheduleCheckEndedTask();
   }
 
   /**
@@ -92,7 +99,7 @@ public class GamePartyManager implements Runnable {
       GameParty gameParty = new GameParty(UUID.randomUUID());
       gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
       gameParties.put(gameParty.getGamePartyId(), gameParty);
-
+      logger.info("Партия создалась");
       GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
       sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
     } catch (GameManagerException e) {
@@ -118,7 +125,7 @@ public class GamePartyManager implements Runnable {
 
       GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
       sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
-
+      logger.info("");
       gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER, gameParty));
     } catch (GameManagerException e) {
       logger.error(
@@ -146,6 +153,7 @@ public class GamePartyManager implements Runnable {
       if (!gameParty.getPlayers().isFull()) {
         GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
         sendGamePartyInfo(clientId, gamePartyInfoDto);
+
         gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
         gameParties.put(gameParty.getGamePartyId(), gameParty);
       } else {
@@ -208,19 +216,36 @@ public class GamePartyManager implements Runnable {
     }
   }
 
-  @Override
-  public void run() {
-    while (!Thread.currentThread().isInterrupted()) {
-      try {
-        Thread.sleep(10);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+  public void processGetParties(ClientDto clientDto) throws JsonProcessingException {
+    List<UUID> partiesIds = new ArrayList<>(gameParties.keySet());
+    GamePartiesDto gamePartiesDto = new GamePartiesDto(partiesIds);
+    UUID clientId = clientDto.getClientId();
+    ClientManager.getInstance().sendMessage(clientId, JsonConverter.serialize(gamePartiesDto));
+  }
+
+  private void scheduleCheckEndedTask() {
+    executorService.scheduleAtFixedRate(
+        () -> {
+          System.out.println(gameParties.size());
+          for (GameParty gameParty : gameParties.values()) {
+            if (gameParty.isGameEnded()) {
+              gameParties.remove(gameParty.getGamePartyId());
+            }
+          }
+        },
+        5,
+        5,
+        TimeUnit.SECONDS);
+  }
+
+  public void shutdown() {
+    executorService.shutdown();
+    try {
+      if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+        executorService.shutdownNow();
       }
-      for (GameParty games : gameParties.values()) {
-        if (games.isGameEnded()) {
-          gameParties.remove(games.getGamePartyId());
-        }
-      }
+    } catch (InterruptedException e) {
+      executorService.shutdownNow();
     }
   }
 }
