@@ -1,6 +1,5 @@
 package io.deeplay.camp.player;
 
-import io.deeplay.camp.Game;
 import io.deeplay.camp.GameParty;
 import io.deeplay.camp.bot.Bot;
 import io.deeplay.camp.bot.RandomBot;
@@ -14,10 +13,11 @@ import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.mechanics.GameState;
 import io.deeplay.camp.mechanics.PlayerType;
 import lombok.Getter;
+
 @Getter
 public class AiPlayer extends Player {
-  private Bot bot;
-  private GameParty gameParty;
+  private final Bot bot;
+  private final GameParty gameParty;
 
   public AiPlayer(PlayerType playerType, GameParty gameParty) {
     super(playerType);
@@ -68,7 +68,7 @@ public class AiPlayer extends Player {
           }
         }
         default -> {
-          System.out.println("hui");
+          System.out.println("Неопознанное состояние");
         }
       }
     }

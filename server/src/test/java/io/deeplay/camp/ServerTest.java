@@ -2,8 +2,11 @@ package io.deeplay.camp;
 
 import io.deeplay.camp.dto.GameType;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
+import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.dto.server.ErrorConnectionResponseDto;
+import io.deeplay.camp.dto.server.GamePartiesDto;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.dto.server.GameStateDto;
 import io.deeplay.camp.dto.server.ServerDto;
@@ -15,25 +18,18 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-
-import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ServerTest {
-    private static Server server;
-    private static Thread serverThread;
 
-    private static Socket clientSocket1;
     private static BufferedReader clientIn1;
     private static BufferedWriter clientOut1;
 
-    private static Socket clientSocket2;
     private static BufferedReader clientIn2;
     private static BufferedWriter clientOut2;
 
-    private static Socket clientSocket3;
     private static BufferedReader clientIn3;
     private static BufferedWriter clientOut3;
 
@@ -44,14 +40,14 @@ class ServerTest {
     }
 
     public static void setUpServer() {
-        server = new Server(8080);
-        serverThread = new Thread(server::start);
+        Server server = new Server(8080);
+        Thread serverThread = new Thread(server::start);
         serverThread.start();
     }
 
     public static void setUpClients() {
         try {
-            clientSocket1 = new Socket("localhost", 8080);
+            Socket clientSocket1 = new Socket("localhost", 8080);
             clientIn1 =
                     new BufferedReader(
                             new InputStreamReader(clientSocket1.getInputStream(), StandardCharsets.UTF_8));
@@ -59,25 +55,20 @@ class ServerTest {
                     new BufferedWriter(
                             new OutputStreamWriter(clientSocket1.getOutputStream(), StandardCharsets.UTF_8));
 
-            clientSocket2 = new Socket("localhost", 8080);
+            Socket clientSocket2 = new Socket("localhost", 8080);
             clientIn2 =
                     new BufferedReader(
                             new InputStreamReader(clientSocket2.getInputStream(), StandardCharsets.UTF_8));
             clientOut2 =
                     new BufferedWriter(
                             new OutputStreamWriter(clientSocket2.getOutputStream(), StandardCharsets.UTF_8));
-            clientSocket3 = new Socket("localhost", 8080);
+            Socket clientSocket3 = new Socket("localhost", 8080);
             clientIn3 =
                     new BufferedReader(
                             new InputStreamReader(clientSocket3.getInputStream(), StandardCharsets.UTF_8));
             clientOut3 =
                     new BufferedWriter(
                             new OutputStreamWriter(clientSocket3.getOutputStream(), StandardCharsets.UTF_8));
-
-
-
-
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -227,5 +218,29 @@ class ServerTest {
         clientOut.write(request);
         clientOut.newLine();
         clientOut.flush();
+    }
+
+    @Test
+    void getPartiesTest() throws InterruptedException {
+        CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
+        String request =
+                Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
+
+        CreateGamePartyDto createGamePartyDto2 = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
+        String request2 =
+                Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto2));
+        Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut2, request2));
+
+        Thread.sleep(1000);
+        GetPartiesDto getPartiesDto = new GetPartiesDto();
+        String getPartiesDtoString = Assertions.assertDoesNotThrow(() ->JsonConverter.serialize(getPartiesDto));
+        Assertions.assertDoesNotThrow(() ->writeRequestToServer(clientOut3, getPartiesDtoString));
+
+        String responseString = Assertions.assertDoesNotThrow(()->clientIn3.readLine());
+        ServerDto serverDto = Assertions.assertDoesNotThrow(()->JsonConverter.deserialize(responseString, ServerDto.class));
+        Assertions.assertInstanceOf(GamePartiesDto.class, serverDto);
+        GamePartiesDto gamePartiesDto = (GamePartiesDto) serverDto;
+        Assertions.assertEquals(2,gamePartiesDto.getGamePartiesIds().size());
     }
 }

@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "serverDtoType")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = GamePartyInfoDto.class, name = "GAME_PARTY_INFO"),
-  @JsonSubTypes.Type(value = GameStateDto.class, name = "GAME_STATE"),
-  @JsonSubTypes.Type(value = ErrorConnectionResponseDto.class, name = "ERROR_CONNECTION_INFO"),
-  @JsonSubTypes.Type(value = ErrorGameResponseDto.class, name = "ERROR_GAME_INFO"),
+  @JsonSubTypes.Type(value = GamePartyInfoDto.class),
+  @JsonSubTypes.Type(value = GameStateDto.class),
+  @JsonSubTypes.Type(value = ErrorConnectionResponseDto.class),
+  @JsonSubTypes.Type(value = ErrorGameResponseDto.class),
+  @JsonSubTypes.Type(value = GamePartiesDto.class),
 })
 public abstract class ServerDto {
   ServerDtoType serverDtoType;

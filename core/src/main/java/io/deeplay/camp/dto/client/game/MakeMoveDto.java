@@ -16,7 +16,6 @@ public class MakeMoveDto extends ClientDto {
   private int toX;
   private int toY;
 
-
   public MakeMoveDto(UUID gamePartyId, int fromX, int fromY, int toX, int toY) {
     super(ClientDtoType.MAKE_MOVE);
     this.gamePartyId = gamePartyId;

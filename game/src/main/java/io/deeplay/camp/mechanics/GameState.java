@@ -25,6 +25,8 @@ public class GameState {
 
   private Board board;
   private GameStage gameStage;
+  @Setter
+  @Getter
   private PlayerType currentPlayer;
   @JsonIgnore private Army armyFirst;
   @JsonIgnore private Army armySecond;
@@ -133,8 +135,8 @@ public class GameState {
 
     boolean fullUnitInRow = fullUnitMeleeRow(from, to, attacker);
     boolean oneUnitInRow = oneUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInRow = nullUnitMeleeRow(from, to, attacker);
-    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, to, attacker);
+    boolean nullUnitInRow = nullUnitMeleeRow(from, attacker);
+    boolean nullUnitInNextRow = nullUnitNextMeleeRow(from, attacker);
     boolean attackEnemyUnit =
         getCurrentBoard().getUnit(to.x(), to.y()).getPlayerType() != attacker.getPlayerType();
     boolean isAliveDefender = getCurrentBoard().getUnit(to.x(), to.y()).isAlive();
@@ -211,68 +213,65 @@ public class GameState {
   public boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    boolean result = false;
+    boolean result;
     logger.atInfo().log("Checking placement for unit {} at ({}, {})", placement.getUnit(), x, y);
-    if (placement.getUnit().getPlayerType() != getCurrentPlayer()){
+    if (placement.getUnit().getPlayerType() != getCurrentPlayer()) {
       logger.error("Not your turn");
       throw new GameException(ErrorCode.NOT_YOUR_TURN);
     }
-      if (x > Board.COLUMNS || x < 0) {
-        logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-      }
-      if (y > Board.ROWS || y < 0) {
-        logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
-        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
-      }
-      // Проверка на сторону юнита
-      if (placement.getUnit().getPlayerType() == PlayerType.FIRST_PLAYER) {
-        if (y < (Board.ROWS / 2)) {
-          result = true;
+    if (x > Board.COLUMNS || x < 0) {
+      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
+      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+    }
+    if (y > Board.ROWS || y < 0) {
+      logger.atError().log("Placement coordinates ({}, {}) are out of board bounds.", x, y);
+      throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+    }
+    // Проверка на сторону юнита
+    if (placement.getUnit().getPlayerType() == PlayerType.FIRST_PLAYER) {
+      if (y < (Board.ROWS / 2)) {
           logger.atInfo().log("Placement valid for First Player at ({}, {}).", x, y);
-        } else {
-          logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
-          throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+      } else {
+        logger.atError().log("Placement invalid for First Player at ({}, {}).", x, y);
+        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+      }
+    } else {
+      if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
+        logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
+      } else {
+        logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
+        throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+      }
+    }
+
+    board.setUnit(x, y, placement.getUnit());
+
+    // Проверка стартующая когда расстановка по мнению игрока окончена
+    if (!placement.isInProcess()) {
+      logger.atInfo().log("Placement process finished. Checking board and general presence.");
+      // Проверка на то что на доске есть генерал
+      if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+        if (!board.isFullFirstPlayerPart()) {
+          logger.atError().log("First player board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!checkCurrentPlayerGeneral(board, PlayerType.FIRST_PLAYER)) {
+          logger.atError().log("First player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       } else {
-        if (y > ((Board.ROWS / 2) - 1) && y < Board.ROWS) {
-          logger.atInfo().log("Placement valid for Second Player at ({}, {}).", x, y);
-          result = true;
-        } else {
-          logger.atError().log("Placement invalid for Second Player at ({}, {}).", x, y);
-          throw new GameException(ErrorCode.PLACEMENT_INCORRECT);
+        if (!board.isFullSecondPlayerPart()) {
+          logger.atError().log("Second player's board is not full.");
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+        if (!checkCurrentPlayerGeneral(board, PlayerType.SECOND_PLAYER)) {
+          logger.atError().log("Second player general is missing.");
+          throw new GameException(ErrorCode.GENERAL_IS_MISSING);
         }
       }
-
-      board.setUnit(x, y, placement.getUnit());
-
-      // Проверка стартующая когда расстановка по мнению игрока окончена
-      if (!placement.isInProcess()) {
-        logger.atInfo().log("Placement process finished. Checking board and general presence.");
-        // Проверка на то что на доске есть генерал
-        if (getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-          if (!board.isFullFirstPlayerPart()) {
-            logger.atError().log("First player board is not full.");
-            throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-          }
-          if (!checkCurrentPlayerGeneral(board, PlayerType.FIRST_PLAYER)) {
-            logger.atError().log("First player general is missing.");
-            throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-          }
-        } else {
-          if (!board.isFullSecondPlayerPart()) {
-            logger.atError().log("Second player's board is not full.");
-            throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
-          }
-          if (!checkCurrentPlayerGeneral(board, PlayerType.SECOND_PLAYER)) {
-            logger.atError().log("Second player general is missing.");
-            throw new GameException(ErrorCode.GENERAL_IS_MISSING);
-          }
-        }
-        result = true;
-      }
+    }
     board.setUnit(x, y, null);
-    return result;
+    return true;
   }
 
   public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
@@ -303,15 +302,7 @@ public class GameState {
     return board;
   }
 
-  public PlayerType getCurrentPlayer() {
-    return currentPlayer;
-  }
-
-  public void setCurrentPlayer(PlayerType playerType) {
-    this.currentPlayer = playerType;
-  }
-
-  private boolean checkCurrentPlayerGeneral(Board board, PlayerType playerType)
+    private boolean checkCurrentPlayerGeneral(Board board, PlayerType playerType)
       throws GameException {
     boolean result = false;
     if (playerType == PlayerType.FIRST_PLAYER) {
@@ -371,14 +362,14 @@ public class GameState {
             && to.y() == from.y() - 1);
   }
 
-  private boolean nullUnitMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() - 1) == 0);
   }
 
-  private boolean nullUnitNextMeleeRow(Position from, Position to, Unit attacker) {
+  private boolean nullUnitNextMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 2) == 0)
         || (attacker.getPlayerType() == PlayerType.SECOND_PLAYER
@@ -386,12 +377,12 @@ public class GameState {
   }
 
   private boolean outOfBorder(int x, int y) {
-    return x < 0 || x > board.COLUMNS - 1 || y < 0 || y > board.ROWS - 1;
+    return x < 0 || x > Board.COLUMNS - 1 || y < 0 || y > Board.ROWS - 1;
   }
 
   private void allUnitsDeadByPlayer() {
-    if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).size() == 0
-        || getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).size() == 0) {
+    if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).isEmpty()
+        || getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).isEmpty()) {
       gameStage = GameStage.ENDED;
     }
   }

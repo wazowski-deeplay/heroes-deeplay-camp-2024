@@ -6,7 +6,6 @@ import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.dto.server.ErrorConnectionResponseDto;
 import io.deeplay.camp.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.dto.server.ServerDto;
-import io.deeplay.camp.dto.server.ServerDtoType;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.manager.ClientManager;
@@ -71,6 +70,9 @@ public class Session implements Runnable {
         case MAKE_MOVE, PLACE_UNIT, CHANGE_PLAYER:
           gamePartyManager.processGameAction(clientDto);
           return;
+        case GET_PARTIES:
+          gamePartyManager.processGetParties(clientDto);
+          return;
         case DISCONNECT:
           closeResources();
           return;
@@ -94,7 +96,7 @@ public class Session implements Runnable {
     } else if (e instanceof GameException gameException) {
       logger.error("{} {}", gameException.getErrorCode(), gameException.getMessage());
       sendErrorToClient(
-              new ErrorGameResponseDto(gameException.getErrorCode(),gameException.getMessage()));
+          new ErrorGameResponseDto(gameException.getErrorCode(), gameException.getMessage()));
     } else {
       logger.error("{}", e.getMessage());
     }
