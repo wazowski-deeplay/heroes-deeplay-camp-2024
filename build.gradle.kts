@@ -6,9 +6,6 @@ plugins {
     checkstyle
 }
 
-group = "io.deeplay.camp"
-version = "1.0-SNAPSHOT"
-
 // Для всего проекта включая все модули
 allprojects {
     repositories {
