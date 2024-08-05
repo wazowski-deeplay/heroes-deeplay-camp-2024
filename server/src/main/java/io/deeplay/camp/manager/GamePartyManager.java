@@ -8,11 +8,13 @@ import io.deeplay.camp.dto.client.ClientDto;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
 import io.deeplay.camp.dto.client.game.GiveUpDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
+import io.deeplay.camp.dto.client.game.OfferGiveUpDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.dto.server.GamePartyInfoDto;
+import io.deeplay.camp.dto.server.OfferGiveUpServerDto;
 import io.deeplay.camp.exceptions.GameException;
 import io.deeplay.camp.exceptions.GameManagerException;
 import io.deeplay.camp.mechanics.PlayerType;
@@ -161,6 +163,26 @@ public class GamePartyManager implements Runnable {
     }
   }
 
+  public void popUpWindow(UUID gamePartyId, UUID clientId) throws GameManagerException {
+    String message;
+    try{
+    GameParty gameParty = gameParties.get(gamePartyId);
+      OfferGiveUpServerDto offerGiveUpServerDto =
+          new OfferGiveUpServerDto(gameParty.getGamePartyId());
+    if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+      message = JsonConverter.serialize(offerGiveUpServerDto);
+      logger.info("Предложение сдаться для 2 игрока");
+      ClientManager.getInstance().sendMessage(gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+    }
+    else {
+      message = JsonConverter.serialize(offerGiveUpServerDto);
+      logger.error("Предложение сдаться для 1 игрока");
+      ClientManager.getInstance().sendMessage(gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+    }
+    }catch (JsonProcessingException e) {
+      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+    }
+  }
   /**
    * Метод обработки игровых действий со стороны клиентов.
    *
@@ -172,22 +194,44 @@ public class GamePartyManager implements Runnable {
       case MAKE_MOVE -> {
         MakeMoveDto makeMoveDto = (MakeMoveDto) clientDto;
         GameParty gameParty = gameParties.get(makeMoveDto.getGamePartyId());
+        if (gameParty == null){
+          logger.error("Ошибка gameparty null. MakeMove");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
         gameParty.processMakeMove(makeMoveDto);
       }
       case PLACE_UNIT -> {
         PlaceUnitDto placeUnitDto = (PlaceUnitDto) clientDto;
         GameParty gameParty = gameParties.get(placeUnitDto.getGamePartyId());
+        if (gameParty == null){
+          logger.error("Ошибка gameparty null. PlaceUnit");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
         gameParty.processPlaceUnit(placeUnitDto);
       }
       case CHANGE_PLAYER -> {
         ChangePlayerDto changePlayerDto = (ChangePlayerDto) clientDto;
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
+        if (gameParty == null){
+          logger.error("Ошибка gameparty null. Change player");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
         gameParty.processChangePlayer(changePlayerDto);
       }
       case GIVE_UP -> {
         GiveUpDto giveUpDto = (GiveUpDto) clientDto;
         GameParty gameParty = gameParties.get(giveUpDto.getGamePartyId());
+        if (gameParty == null){
+          logger.error("Ошибка gameparty null. Giveup");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
         gameParty.processGiveUp(giveUpDto);
+      }
+      case OFFER_GIVE_UP -> {
+        OfferGiveUpDto offerGiveUpDto = (OfferGiveUpDto) clientDto;
+        UUID clientId = offerGiveUpDto.getClientId();
+        UUID gamePartyId = offerGiveUpDto.getGamePartyId();
+        popUpWindow(gamePartyId, clientId);
       }
       default -> {
         logger.error("Не возможное действие");

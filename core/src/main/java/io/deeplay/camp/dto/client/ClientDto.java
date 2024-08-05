@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.dto.client.game.ChangePlayerDto;
 import io.deeplay.camp.dto.client.game.GiveUpDto;
 import io.deeplay.camp.dto.client.game.MakeMoveDto;
+import io.deeplay.camp.dto.client.game.OfferGiveUpDto;
 import io.deeplay.camp.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.dto.client.party.JoinGamePartyDto;
@@ -23,6 +24,8 @@ import lombok.Setter;
   @JsonSubTypes.Type(value = CreateGamePartyDto.class),
   @JsonSubTypes.Type(value = JoinGamePartyDto.class),
   @JsonSubTypes.Type(value = GiveUpDto.class),
+  @JsonSubTypes.Type(value = OfferGiveUpDto.class),
+
 })
 public abstract class ClientDto {
   private ClientDtoType clientDtoType;

@@ -8,6 +8,8 @@ import io.deeplay.camp.dto.server.ServerDto;
 import java.io.*;
 import java.net.Socket;
 import java.util.UUID;
+
+import io.deeplay.camp.mechanics.GameStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +88,9 @@ public class ClientProcess {
       switch (serverDto.getServerDtoType()) {
         case GAME_STATE:
           gameStatePlayer.updateBoard(serverDto);
+          if(gameStatePlayer.gameState.getGameStage() == GameStage.ENDED){
+            System.out.println("Игра окончена");
+          }
           // Обновление доски
           return;
         case GAME_PARTY_INFO:
@@ -93,6 +98,12 @@ public class ClientProcess {
           gamePartyId = gamePartyInfoDto.getGamePartyId();
           System.out.println(gamePartyId);
           // Обновление инфы о текущей пати
+          return;
+        case OFFER_GIVE_UP:
+          System.out.println("Может сдашься? Пропишите giveup чтобы сдаться.");
+          return;
+        case OFFER_CONTINUE_GAME:
+          System.out.println("Хочешь продолжить игру?");
           return;
         case ERROR_CONNECTION_INFO:
           ErrorConnectionResponseDto errorConnectionResponseDto =

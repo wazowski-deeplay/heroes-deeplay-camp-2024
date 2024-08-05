@@ -68,7 +68,7 @@ public class Session implements Runnable {
         case CREATE_PARTY, JOIN_PARTY:
           gamePartyManager.processCreateOrJoinGameParty(clientDto);
           return;
-        case MAKE_MOVE, PLACE_UNIT, CHANGE_PLAYER, GIVE_UP:
+        case MAKE_MOVE, PLACE_UNIT, CHANGE_PLAYER, GIVE_UP,OFFER_GIVE_UP:
           gamePartyManager.processGameAction(clientDto);
           return;
         case DISCONNECT:
