@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
   @JsonSubTypes.Type(value = ErrorConnectionResponseDto.class),
   @JsonSubTypes.Type(value = ErrorGameResponseDto.class),
   @JsonSubTypes.Type(value = GamePartiesDto.class),
+  @JsonSubTypes.Type(value = OfferDrawServerDto.class),
+  @JsonSubTypes.Type(value = DrawServerDto.class),
 })
 public abstract class ServerDto {
   ServerDtoType serverDtoType;

@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 /** Класс-синглтон, хранящий в себе всех клиентов. */
 public class ClientManager {
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
-
-  private final Map<UUID, ClientHandler> clients;
-
   private static ClientManager instance;
+  private final Map<UUID, ClientHandler> clients;
 
   private ClientManager() {
     this.clients = new ConcurrentHashMap<>();

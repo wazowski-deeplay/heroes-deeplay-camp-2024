@@ -42,4 +42,16 @@ public class Players {
     }
     return null;
   }
+
+  public UUID getPlayerByPlayerType(PlayerType playerType) {
+    for (Player player : hashMap.values()) {
+      if (player instanceof HumanPlayer) {
+        if (((HumanPlayer) player).getPlayerType() == playerType) {
+          return ((HumanPlayer) player).getClientId();
+        }
+      } else if (player instanceof AiPlayer) {
+      }
+    }
+    return null;
+  }
 }

@@ -10,14 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServerHandler {
+  private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
   // Принимающий с сервера
   private final BufferedReader reader;
   // Отдающий на сервер
   private final BufferedWriter writer;
+  private final Socket socket;
   // Чтение из консоли
   private BufferedReader inputUser;
-  private final Socket socket;
-  private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
   public ServerHandler(Socket socket) {
     this.socket = socket;

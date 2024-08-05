@@ -9,6 +9,7 @@ public enum ErrorCode {
   // Ход
   MOVE_IS_NOT_AVAILABLE("Сейчас нельзя сделать ход!"),
   MOVE_IS_NOT_CORRECT("Некорректный ход!"),
+  GAME_IS_OVER("Игра окончена"),
   // Расстановка
   BOARD_IS_NOT_FULL("Не заполнена"),
   PLACEMENT_INCORRECT("Введены не корректные координаты"),

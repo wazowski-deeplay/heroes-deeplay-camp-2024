@@ -13,12 +13,11 @@ import org.slf4j.LoggerFactory;
 
 /** Класс, содержащий информацию о клиенте и инструменты для общения с ним. */
 public class ClientHandler {
+  private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
   @Getter private UUID clientId;
   private Socket clientSocket;
   @Getter private BufferedReader reader;
   private BufferedWriter writer;
-
-  private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
   public ClientHandler(Socket clientSocket) {
     try {

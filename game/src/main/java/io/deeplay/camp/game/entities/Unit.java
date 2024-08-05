@@ -77,12 +77,12 @@ public abstract class Unit implements GeneralBuff {
     this.armor = armor;
   }
 
-  public void setMoved(boolean isMoved) {
-    this.isMoved = isMoved;
-  }
-
   public boolean getMoved() {
     return isMoved;
+  }
+
+  public void setMoved(boolean isMoved) {
+    this.isMoved = isMoved;
   }
 
   public boolean isAlive() {

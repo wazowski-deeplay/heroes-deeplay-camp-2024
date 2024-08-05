@@ -19,6 +19,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,12 +35,6 @@ class ServerTest {
 
   private static BufferedReader clientIn3;
   private static BufferedWriter clientOut3;
-
-  @BeforeEach
-  public void setUpServerAndClients() {
-    setUpServer();
-    setUpClients();
-  }
 
   public static void setUpServer() {
     Server server = new Server(8080);
@@ -73,6 +69,22 @@ class ServerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @BeforeEach
+  public void setUpServerAndClients() {
+    setUpServer();
+    setUpClients();
+  }
+
+  @AfterEach
+  void tearDown() throws IOException {
+    clientIn1.close();
+    clientOut1.close();
+    clientIn2.close();
+    clientOut2.close();
+    clientIn3.close();
+    clientOut3.close();
   }
 
   @Test
