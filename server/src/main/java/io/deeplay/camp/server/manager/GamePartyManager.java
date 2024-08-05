@@ -5,13 +5,18 @@ import io.deeplay.camp.core.dto.GameType;
 import io.deeplay.camp.core.dto.JsonConverter;
 import io.deeplay.camp.core.dto.client.ClientDto;
 import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.core.dto.client.game.DrawDto;
+import io.deeplay.camp.core.dto.client.game.GiveUpDto;
 import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
+import io.deeplay.camp.core.dto.client.game.OfferDrawDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
+import io.deeplay.camp.core.dto.server.DrawServerDto;
 import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
+import io.deeplay.camp.core.dto.server.OfferDrawServerDto;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
@@ -30,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GamePartyManager {
-  private final Map<UUID, GameParty> gameParties;
   private static final Logger logger = LoggerFactory.getLogger(GamePartyManager.class);
+  private final Map<UUID, GameParty> gameParties;
   private final ScheduledExecutorService executorService;
 
   public GamePartyManager() {
@@ -166,26 +171,47 @@ public class GamePartyManager {
     }
   }
 
-  public void popUpWindow(UUID gamePartyId, UUID clientId) throws GameManagerException {
+  public void offerDraw(UUID gamePartyId, UUID clientId) throws GameManagerException {
+    String message;
+    try {
+      GameParty gameParty = gameParties.get(gamePartyId);
+      OfferDrawServerDto offerGiveUpServerDto =
+          new OfferDrawServerDto(gameParty.getGamePartyId());
+      if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+        message = JsonConverter.serialize(offerGiveUpServerDto);
+        logger.info("Предложение ничьи для 2 игрока");
+        gameParty.setDraw(0,true);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+      } else {
+        message = JsonConverter.serialize(offerGiveUpServerDto);
+        logger.error("Предложение ничьи для 1 игрока");
+        gameParty.setDraw(1,true);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+      }
+    } catch (JsonProcessingException e) {
+      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+    }
+  }
+
+  public void acceptDraw(UUID gamePartyId, UUID clientId) throws GameManagerException {
     String message;
     try{
     GameParty gameParty = gameParties.get(gamePartyId);
-      OfferGiveUpServerDto offerGiveUpServerDto =
-          new OfferGiveUpServerDto(gameParty.getGamePartyId());
+    DrawServerDto drawServerDto = new DrawServerDto(gameParty.getGamePartyId());
     if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
-      message = JsonConverter.serialize(offerGiveUpServerDto);
-      logger.info("Предложение сдаться для 2 игрока");
-      ClientManager.getInstance().sendMessage(gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
-    }
-    else {
-      message = JsonConverter.serialize(offerGiveUpServerDto);
-      logger.error("Предложение сдаться для 1 игрока");
-      ClientManager.getInstance().sendMessage(gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+      message = JsonConverter.serialize(drawServerDto);
+      logger.info("Подтверждение ничьи первым игроком");
+      gameParty.setDraw(0,true);
     }
     }catch (JsonProcessingException e) {
       throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
     }
   }
+
   /**
    * Метод обработки игровых действий со стороны клиентов.
    *
@@ -197,7 +223,7 @@ public class GamePartyManager {
       case MAKE_MOVE -> {
         MakeMoveDto makeMoveDto = (MakeMoveDto) clientDto;
         GameParty gameParty = gameParties.get(makeMoveDto.getGamePartyId());
-        if (gameParty == null){
+        if (gameParty == null) {
           logger.error("Ошибка gameparty null. MakeMove");
           throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
         }
@@ -206,7 +232,7 @@ public class GamePartyManager {
       case PLACE_UNIT -> {
         PlaceUnitDto placeUnitDto = (PlaceUnitDto) clientDto;
         GameParty gameParty = gameParties.get(placeUnitDto.getGamePartyId());
-        if (gameParty == null){
+        if (gameParty == null) {
           logger.error("Ошибка gameparty null. PlaceUnit");
           throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
         }
@@ -215,7 +241,7 @@ public class GamePartyManager {
       case CHANGE_PLAYER -> {
         ChangePlayerDto changePlayerDto = (ChangePlayerDto) clientDto;
         GameParty gameParty = gameParties.get(changePlayerDto.getGamePartyId());
-        if (gameParty == null){
+        if (gameParty == null) {
           logger.error("Ошибка gameparty null. Change player");
           throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
         }
@@ -224,17 +250,31 @@ public class GamePartyManager {
       case GIVE_UP -> {
         GiveUpDto giveUpDto = (GiveUpDto) clientDto;
         GameParty gameParty = gameParties.get(giveUpDto.getGamePartyId());
-        if (gameParty == null){
+        if (gameParty == null) {
           logger.error("Ошибка gameparty null. Giveup");
           throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
         }
         gameParty.processGiveUp(giveUpDto);
       }
-      case OFFER_GIVE_UP -> {
-        OfferGiveUpDto offerGiveUpDto = (OfferGiveUpDto) clientDto;
-        UUID clientId = offerGiveUpDto.getClientId();
-        UUID gamePartyId = offerGiveUpDto.getGamePartyId();
-        popUpWindow(gamePartyId, clientId);
+      case OFFER_DRAW -> {
+        OfferDrawDto offerDrawDto = (OfferDrawDto) clientDto;
+        if(gameParties.get(offerDrawDto.getGamePartyId()) == null) {
+          logger.error("Ошибка gameparty null. OfferDraw");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
+        UUID clientId = offerDrawDto.getClientId();
+        UUID gamePartyId = offerDrawDto.getGamePartyId();
+        offerDraw(gamePartyId, clientId);
+      }
+      case DRAW -> {
+        DrawDto drawDto = (DrawDto) clientDto;
+        if(gameParties.get(drawDto.getGamePartyId()) == null) {
+          logger.error("Ошибка gameparty null. Draw");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
+        UUID clientId = drawDto.getClientId();
+        UUID gamePartyId = drawDto.getGamePartyId();
+
       }
       default -> {
         logger.error("Не возможное действие");
@@ -271,7 +311,6 @@ public class GamePartyManager {
   private void scheduleCheckEndedTask() {
     executorService.scheduleAtFixedRate(
         () -> {
-          System.out.println(gameParties.size());
           for (GameParty gameParty : gameParties.values()) {
             if (gameParty.isGameEnded()) {
               gameParties.remove(gameParty.getGamePartyId());

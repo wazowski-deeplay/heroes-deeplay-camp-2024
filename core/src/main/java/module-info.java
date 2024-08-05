@@ -10,4 +10,10 @@ module io.deeplay.camp.core {
   requires com.fasterxml.jackson.databind;
   requires static lombok;
   requires io.deeplay.camp.game;
+
+  opens io.deeplay.camp.core.dto.client to com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.core.dto.client.party to com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.core.dto.client.game to com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.core.dto.client.connection to com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.core.dto.server to com.fasterxml.jackson.databind;
 }

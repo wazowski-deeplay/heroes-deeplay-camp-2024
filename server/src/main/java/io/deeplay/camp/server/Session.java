@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 
 /** Класс сессии. Отвечает за диспетчеризацию запросов клиента. */
 public class Session implements Runnable {
+  private static final Logger logger = LoggerFactory.getLogger(Session.class);
   private final ClientHandler clientHandler;
   private final GamePartyManager gamePartyManager;
-  private static final Logger logger = LoggerFactory.getLogger(Session.class);
 
   public Session(Socket clientSocket, GamePartyManager gamePartyManager) {
     this.clientHandler = new ClientHandler(clientSocket);
@@ -68,7 +68,7 @@ public class Session implements Runnable {
         case CREATE_PARTY, JOIN_PARTY:
           gamePartyManager.processCreateOrJoinGameParty(clientDto);
           return;
-        case MAKE_MOVE, PLACE_UNIT, CHANGE_PLAYER, GIVE_UP,OFFER_GIVE_UP:
+        case MAKE_MOVE, PLACE_UNIT, CHANGE_PLAYER, GIVE_UP, OFFER_DRAW, DRAW:
           gamePartyManager.processGameAction(clientDto);
           return;
         case GET_PARTIES:

@@ -49,10 +49,9 @@ public class Players {
         if (((HumanPlayer) player).getPlayerType() == playerType) {
           return ((HumanPlayer) player).getClientId();
         }
+      } else if (player instanceof AiPlayer) {
       }
-      else if(player instanceof AiPlayer){}
     }
     return null;
   }
-
 }

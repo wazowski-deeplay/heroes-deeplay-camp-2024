@@ -12,19 +12,19 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.UUID;
 
-import io.deeplay.camp.mechanics.GameStage;
+import io.deeplay.camp.game.mechanics.GameStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ClientProcess {
 
+  private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
   private Socket socket;
   private UUID gamePartyId;
   private GameStatePlayer gameStatePlayer;
   private BufferedReader inputUser;
   private ServerHandler serverHandler;
   private ParserRequest parserRequest;
-  private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
   public ClientProcess(String addr, int port) {
     try {
@@ -38,6 +38,45 @@ public class ClientProcess {
     }
     new ReadResponse().start();
     new WriteRequest().start();
+  }
+
+  private void handleResponse(ServerDto serverDto) {
+    try {
+      switch (serverDto.getServerDtoType()) {
+        case GAME_STATE:
+          gameStatePlayer.updateBoard(serverDto);
+          if (gameStatePlayer.gameState.getGameStage() == GameStage.ENDED) {
+            System.out.println("Игра окончена");
+          }
+          // Обновление доски
+          return;
+        case GAME_PARTY_INFO:
+          GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
+          gamePartyId = gamePartyInfoDto.getGamePartyId();
+          System.out.println(gamePartyId);
+          // Обновление инфы о текущей пати
+          return;
+        case OFFER_DRAW:
+          System.out.println("Может ничья? Пропиши draw чтобы согласиться.");
+          return;
+        case OFFER_CONTINUE_GAME:
+          System.out.println("Хочешь продолжить игру?");
+          return;
+        case ERROR_CONNECTION_INFO:
+          ErrorConnectionResponseDto errorConnectionResponseDto =
+              (ErrorConnectionResponseDto) serverDto;
+          System.out.println(errorConnectionResponseDto.getConnectionErrorCode());
+          return;
+        case ERROR_GAME_INFO:
+          ErrorGameResponseDto errorGameResponseDto = (ErrorGameResponseDto) serverDto;
+          System.out.println(errorGameResponseDto.getMessage());
+          return;
+        default:
+          return;
+      }
+    } catch (Exception e) {
+      logger.error("Server error", e);
+    }
   }
 
   private class ReadResponse extends Thread {
@@ -65,7 +104,7 @@ public class ClientProcess {
         String userWord;
         try {
           userWord = inputUser.readLine();
-          ClientDto clientDto = null;
+          ClientDto clientDto;
           if (parserRequest.convert(userWord, gamePartyId) != null) {
             clientDto = parserRequest.convert(userWord, gamePartyId);
           } else {
@@ -75,48 +114,10 @@ public class ClientProcess {
           String sendDto = JsonConverter.serialize(clientDto);
           serverHandler.sendRequest(sendDto);
         } catch (IOException e) {
+
           serverHandler.downService();
         }
       }
-    }
-  }
-
-  private void handleResponse(ServerDto serverDto) {
-    try {
-      switch (serverDto.getServerDtoType()) {
-        case GAME_STATE:
-          gameStatePlayer.updateBoard(serverDto);
-          if(gameStatePlayer.gameState.getGameStage() == GameStage.ENDED){
-            System.out.println("Игра окончена");
-          }
-          // Обновление доски
-          return;
-        case GAME_PARTY_INFO:
-          GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
-          gamePartyId = gamePartyInfoDto.getGamePartyId();
-          System.out.println(gamePartyId);
-          // Обновление инфы о текущей пати
-          return;
-        case OFFER_GIVE_UP:
-          System.out.println("Может сдашься? Пропишите giveup чтобы сдаться.");
-          return;
-        case OFFER_CONTINUE_GAME:
-          System.out.println("Хочешь продолжить игру?");
-          return;
-        case ERROR_CONNECTION_INFO:
-          ErrorConnectionResponseDto errorConnectionResponseDto =
-              (ErrorConnectionResponseDto) serverDto;
-          System.out.println(errorConnectionResponseDto.getConnectionErrorCode());
-          return;
-        case ERROR_GAME_INFO:
-          ErrorGameResponseDto errorGameResponseDto = (ErrorGameResponseDto) serverDto;
-          System.out.println(errorGameResponseDto.getMessage());
-          return;
-        default:
-          return;
-      }
-    } catch (Exception e) {
-      logger.error("Server error", e);
     }
   }
 }

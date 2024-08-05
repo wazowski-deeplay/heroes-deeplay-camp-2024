@@ -8,6 +8,7 @@ import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
+import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.ErrorCode;
@@ -54,15 +55,15 @@ public class GameState {
       }
     }
     if (countRound == 0) {
-        winner = winnerOrDraw();
-        gameStage = GameStage.ENDED;
+      winner = winnerOrDraw();
+      gameStage = GameStage.ENDED;
     }
   }
 
   // методы чисто для применения, проверка происходит до их использования
   public void makeMove(MakeMoveEvent move) throws GameException {
 
-    if (gameStage == GameStage.ENDED){
+    if (gameStage == GameStage.ENDED) {
       throw new GameException(ErrorCode.GAME_IS_OVER);
     }
 
@@ -205,7 +206,7 @@ public class GameState {
   }
 
   public void makePlacement(PlaceUnitEvent placement) throws GameException {
-    if (gameStage == GameStage.ENDED){
+    if (gameStage == GameStage.ENDED) {
       throw new GameException(ErrorCode.GAME_IS_OVER);
     }
     if (isValidPlacement(placement)) {
@@ -398,28 +399,27 @@ public class GameState {
     }
   }
 
-  private PlayerType winnerOrDraw(){
-    if(board.enumerateUnits(0,Board.ROWS/2).size()>board.enumerateUnits(Board.ROWS/2,Board.ROWS).size()){
+  private PlayerType winnerOrDraw() {
+    if (board.enumerateUnits(0, Board.ROWS / 2).size()
+        > board.enumerateUnits(Board.ROWS / 2, Board.ROWS).size()) {
       return PlayerType.FIRST_PLAYER;
-    }
-    else if (board.enumerateUnits(0,Board.ROWS/2).size()<board.enumerateUnits(Board.ROWS/2,Board.ROWS).size()){
+    } else if (board.enumerateUnits(0, Board.ROWS / 2).size()
+        < board.enumerateUnits(Board.ROWS / 2, Board.ROWS).size()) {
       return PlayerType.SECOND_PLAYER;
-    }
-    else {
+    } else {
       return PlayerType.DRAW;
     }
   }
 
   public void giveUp(GiveUpEvent giveUpEvent) {
-    if (giveUpEvent.getPlayerType() == PlayerType.FIRST_PLAYER){
+    if (giveUpEvent.getPlayerType() == PlayerType.FIRST_PLAYER) {
       winner = PlayerType.SECOND_PLAYER;
       gameStage = GameStage.ENDED;
-      logger.atInfo().log("Победитель - {}, Состояние игры {}",winner,gameStage);
-    }
-    else if(giveUpEvent.getPlayerType() == PlayerType.SECOND_PLAYER){
+      logger.atInfo().log("Победитель - {}, Состояние игры {}", winner, gameStage);
+    } else if (giveUpEvent.getPlayerType() == PlayerType.SECOND_PLAYER) {
       winner = PlayerType.FIRST_PLAYER;
       gameStage = GameStage.ENDED;
-      logger.atInfo().log("Победитель - {}, Состояние игры {}",winner,gameStage);
+      logger.atInfo().log("Победитель - {}, Состояние игры {}", winner, gameStage);
     }
   }
 }

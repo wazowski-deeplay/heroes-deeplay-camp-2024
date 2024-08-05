@@ -47,8 +47,7 @@ public class DtoToEventConverter {
     return new ChangePlayerEvent(playerType);
   }
 
-  public static GiveUpEvent convert (PlayerType playerType){
+  public static GiveUpEvent convert(PlayerType playerType) {
     return new GiveUpEvent(playerType);
   }
-
 }

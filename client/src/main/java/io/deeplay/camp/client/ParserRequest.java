@@ -3,9 +3,10 @@ package io.deeplay.camp.client;
 import io.deeplay.camp.core.dto.GameType;
 import io.deeplay.camp.core.dto.client.ClientDto;
 import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.core.dto.client.game.DrawDto;
 import io.deeplay.camp.core.dto.client.game.GiveUpDto;
-import io.deeplay.camp.core.dto.client.game.OfferGiveUpDto;
 import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
+import io.deeplay.camp.core.dto.client.game.OfferDrawDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
@@ -13,6 +14,15 @@ import io.deeplay.camp.game.entities.UnitType;
 import java.util.UUID;
 
 public class ParserRequest {
+
+  public static boolean isNumeric(String str) {
+    try {
+      Double.parseDouble(str);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
 
   public ClientDto convert(String userWord, UUID gamePartyId) {
     ClientDto clientDto = null;
@@ -104,22 +114,19 @@ public class ParserRequest {
       }
       clientDto = new GiveUpDto(gamePartyId);
     }
-    if(userCommand[0].equals("offer_giveup")){
+    if(userCommand[0].equals("offer_draw")){
       if (userCommand.length != 1){
         return null;
       }
-      clientDto = new OfferGiveUpDto(gamePartyId);
+      clientDto = new OfferDrawDto(gamePartyId);
+    }
+    if(userCommand[0].equals("draw")){
+      if (userCommand.length != 1){
+        return null;
+      }
+      clientDto = new DrawDto(gamePartyId);
     }
     return clientDto;
-  }
-
-  public static boolean isNumeric(String str) {
-    try {
-      Double.parseDouble(str);
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
   }
 
   private int charToInt(String str) {

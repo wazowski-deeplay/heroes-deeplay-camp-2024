@@ -1,6 +1,10 @@
 package io.deeplay.camp.game;
 
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import io.deeplay.camp.game.events.ChangePlayerEvent;
 import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
@@ -9,10 +13,6 @@ import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.game.mechanics.RandomBot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GameTest {
   private Game game;
