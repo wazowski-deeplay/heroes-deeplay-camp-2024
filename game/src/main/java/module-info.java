@@ -10,4 +10,13 @@ module io.deeplay.camp.game {
   requires com.fasterxml.jackson.annotation;
   requires org.slf4j;
   requires java.desktop;
+
+  opens io.deeplay.camp.game.entities to
+      com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.game.exceptions to
+      com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.game.mechanics to
+      com.fasterxml.jackson.databind;
+  opens io.deeplay.camp.game.events to
+      com.fasterxml.jackson.databind;
 }

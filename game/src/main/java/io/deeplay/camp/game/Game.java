@@ -1,6 +1,7 @@
 package io.deeplay.camp.game;
 
 import io.deeplay.camp.game.events.ChangePlayerEvent;
+import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.events.StartGameEvent;
@@ -33,5 +34,9 @@ public class Game implements GameListener {
   @Override
   public void makeMove(MakeMoveEvent makeMoveEvent) throws GameException {
     gameState.makeMove(makeMoveEvent);
+  }
+
+  public void giveUp(GiveUpEvent giveUpEvent) throws GameException {
+    gameState.giveUp(giveUpEvent);
   }
 }
