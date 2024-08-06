@@ -2,16 +2,15 @@ package io.deeplay.camp.client;
 
 import io.deeplay.camp.core.dto.GameType;
 import io.deeplay.camp.core.dto.client.ClientDto;
-import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
-import io.deeplay.camp.core.dto.client.game.DrawDto;
-import io.deeplay.camp.core.dto.client.game.GiveUpDto;
-import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
-import io.deeplay.camp.core.dto.client.game.OfferDrawDto;
-import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
+import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.game.entities.UnitType;
+
+import java.util.HashMap;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class ParserRequest {
 
@@ -24,9 +23,22 @@ public class ParserRequest {
     }
   }
 
-  public ClientDto convert(String userWord, UUID gamePartyId) {
+  public ClientDto convert(String userWord, UUID gamePartyId, HashMap<Integer, UUID> ids) {
     ClientDto clientDto = null;
     String[] userCommand = userWord.split("\\s+");
+    String regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+    Pattern pattern = Pattern.compile(regex);
+    if(userCommand[0].equals("checkout")){
+      if (pattern.matcher(userCommand[1]).matches()){
+        clientDto = new SwitchPartyDto(UUID.fromString(userCommand[1]));
+      }
+      else if(isNumeric(userCommand[1])){
+        if (Integer.parseInt(userCommand[1]) > 0
+                && Integer.parseInt(userCommand[1]) <= ids.size()) {
+          clientDto = new SwitchPartyDto(ids.get(Integer.parseInt(userCommand[1])));
+        }
+      }
+    }
     if (userCommand[0].equals("makemove")) {
       for (int i = 1; i < 5; i++) {
         if (!isNumeric(userCommand[i])) {
@@ -104,8 +116,15 @@ public class ParserRequest {
       if (userCommand.length != 2) {
         return null;
       }
-
-      clientDto = new JoinGamePartyDto(UUID.fromString(userCommand[1]));
+      if (pattern.matcher(userCommand[1]).matches()){
+        clientDto = new JoinGamePartyDto(UUID.fromString(userCommand[1]));
+      }
+      else if(isNumeric(userCommand[1])){
+        if (Integer.parseInt(userCommand[1]) > 0
+                && Integer.parseInt(userCommand[1]) <= ids.size()) {
+          clientDto = new JoinGamePartyDto(ids.get(Integer.parseInt(userCommand[1])));
+        }
+      }
     }
     if (userCommand[0].equals("giveup")) {
       if (userCommand.length != 1) {
@@ -124,6 +143,12 @@ public class ParserRequest {
         return null;
       }
       clientDto = new DrawDto(gamePartyId);
+    }
+    if (userCommand[0].equals("getparties")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
+      clientDto = new GetPartiesDto();
     }
     return clientDto;
   }

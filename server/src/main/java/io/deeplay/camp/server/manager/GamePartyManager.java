@@ -18,6 +18,7 @@ import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.OfferDrawServerDto;
 import io.deeplay.camp.game.exceptions.GameException;
+import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.exceptions.GameManagerException;
@@ -245,6 +246,11 @@ public class GamePartyManager {
           throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
         }
         gameParty.processChangePlayer(changePlayerDto);
+      }
+      case SWITCH_PARTY -> {
+        SwitchPartyDto switchPartyDto = (SwitchPartyDto) clientDto;
+        GameParty gameParty = gameParties.get(switchPartyDto.getGamePartyId());
+        gameParty.processSwitchParty(switchPartyDto);
       }
       case GIVE_UP -> {
         GiveUpDto giveUpDto = (GiveUpDto) clientDto;

@@ -11,14 +11,15 @@ public class GameStatePlayer {
   UUID gamePartyId;
   Cui cui;
 
-  public GameStatePlayer() {
+  public GameStatePlayer(UUID gamePartyId) {
     cui = new Cui();
+    this.gamePartyId = gamePartyId;
   }
 
   public void updateBoard(ServerDto serverDto) {
     GameStateDto gameStateDto = (GameStateDto) serverDto;
     gameState = gameStateDto.getGameState();
-    gamePartyId = gameStateDto.getGamePartyId();
-    cui.updateCui(gameState.getCurrentBoard());
+    cui.updateCui(gameState.getCurrentBoard(), gamePartyId);
+
   }
 }

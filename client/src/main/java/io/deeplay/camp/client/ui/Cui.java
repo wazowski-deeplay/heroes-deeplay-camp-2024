@@ -6,6 +6,7 @@ import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import java.util.UUID;
 
 public class Cui {
   String separator = System.lineSeparator();
@@ -25,13 +26,15 @@ public class Cui {
     frame.setVisible(true);
   }
 
-  public void updateCui(Board board) {
-    outInFrame(board);
+  public void updateCui(Board board, UUID id) {
+    outInFrame(board, id);
   }
 
-  public void outInFrame(Board board) {
+  public void outInFrame(Board board, UUID id) {
 
     field.setText(null);
+    field.append(separator);
+    field.append(id.toString());
     field.append(separator);
     field.append(separator);
     String s = "20";
