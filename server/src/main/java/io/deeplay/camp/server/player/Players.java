@@ -5,7 +5,9 @@ import io.deeplay.camp.game.mechanics.PlayerType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class Players {
   Map<PlayerType, Player> hashMap;
 
@@ -50,6 +52,7 @@ public class Players {
           return ((HumanPlayer) player).getClientId();
         }
       } else if (player instanceof AiPlayer) {
+
       }
     }
     return null;

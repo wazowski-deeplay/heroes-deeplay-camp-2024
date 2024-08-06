@@ -13,10 +13,10 @@ import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
-import io.deeplay.camp.core.dto.server.DrawServerDto;
 import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.OfferDrawServerDto;
+import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
 import io.deeplay.camp.game.mechanics.PlayerType;
@@ -104,7 +104,8 @@ public class GamePartyManager {
       gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
       gameParties.put(gameParty.getGamePartyId(), gameParty);
       logger.info("Партия создалась");
-      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
+      GamePartyInfoDto gamePartyInfoDto =
+          new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
       sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
     } catch (GameManagerException e) {
       logger.error("Ошибка в создании игры между игроком и игроком{}", e.getConnectionErrorCode());
@@ -127,7 +128,8 @@ public class GamePartyManager {
       gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
       gameParties.put(gameParty.getGamePartyId(), gameParty);
 
-      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
+      GamePartyInfoDto gamePartyInfoDto =
+          new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
       sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
       logger.info("");
       gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER, gameParty));
@@ -155,7 +157,8 @@ public class GamePartyManager {
       }
       GameParty gameParty = gameParties.get(gamePartyId);
       if (!gameParty.getPlayers().isFull()) {
-        GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.SECOND_PLAYER);
+        GamePartyInfoDto gamePartyInfoDto =
+            new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.SECOND_PLAYER);
         sendGamePartyInfo(clientId, gamePartyInfoDto);
 
         gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));
@@ -177,23 +180,34 @@ public class GamePartyManager {
     try {
       GameParty gameParty = gameParties.get(gamePartyId);
       OfferDrawServerDto offerGiveUpServerDto = new OfferDrawServerDto(gameParty.getGamePartyId());
-      if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
-        message = JsonConverter.serialize(offerGiveUpServerDto);
-        logger.info("Предложение ничьи для 2 игрока");
-        gameParty.setDraw(0, true);
-        ClientManager.getInstance()
-            .sendMessage(
-                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+      if (gameParty.getPlayers().getHashMap().get(PlayerType.SECOND_PLAYER) instanceof AiPlayer) {
+        DrawEvent drawEvent =
+            ((AiPlayer) gameParty.getPlayers().getHashMap().get(PlayerType.SECOND_PLAYER))
+                .getBot()
+                .generateDrawEvent(gameParty.getGame().getGameState());
+        logger.info(" Результаты передаваемые AI player {}", drawEvent.getDraw());
+        gameParty.processDraw(drawEvent.getDraw());
       } else {
-        message = JsonConverter.serialize(offerGiveUpServerDto);
-        logger.error("Предложение ничьи для 1 игрока");
-        gameParty.setDraw(1, true);
-        ClientManager.getInstance()
-            .sendMessage(
-                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+        if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+          message = JsonConverter.serialize(offerGiveUpServerDto);
+          logger.info("Предложение ничьи для 2 игрока");
+          gameParty.setIndexDraw(0, true);
+          ClientManager.getInstance()
+              .sendMessage(
+                  gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+        } else {
+          message = JsonConverter.serialize(offerGiveUpServerDto);
+          logger.error("Предложение ничьи для 1 игрока");
+          gameParty.setIndexDraw(1, true);
+          ClientManager.getInstance()
+              .sendMessage(
+                  gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+        }
       }
     } catch (JsonProcessingException e) {
       throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+    } catch (GameException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -202,16 +216,15 @@ public class GamePartyManager {
       GameParty gameParty = gameParties.get(gamePartyId);
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
         logger.info("Подтверждение ничьи первым игроком");
-        gameParty.setDraw(0, true);
+        gameParty.setIndexDraw(0, true);
         gameParty.processDraw(gameParty.getDraw());
-      }
-      else if(gameParty.getPlayers().getPlayerTypeById(clientId)==PlayerType.SECOND_PLAYER){
+      } else if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.SECOND_PLAYER) {
         logger.info("Подтверждение ничьи вторым игроком");
-        gameParty.setDraw(1, true);
+        gameParty.setIndexDraw(1, true);
         gameParty.processDraw(gameParty.getDraw());
       }
     } catch (GameException e) {
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 

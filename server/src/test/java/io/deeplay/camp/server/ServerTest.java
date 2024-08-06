@@ -19,7 +19,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,10 +45,10 @@ class ServerTest {
   }
 
   public void tearDownServer() {
-    if (server != null){
+    if (server != null) {
       server.stop();
     }
-    if (serverThread != null && serverThread.isAlive()){
+    if (serverThread != null && serverThread.isAlive()) {
       serverThread.interrupt();
     }
   }
@@ -103,7 +102,7 @@ class ServerTest {
   }
 
   @Test
-  void createHumanVsBotGamePartyTest(){
+  void createHumanVsBotGamePartyTest() {
     // Отправляем запрос на создание игры против бота.
     CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_BOT);
     String request =
@@ -161,11 +160,12 @@ class ServerTest {
   void joinGamePartyTest() {
     CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
     String request =
-            Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
+        Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
     Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
 
     JoinGamePartyDto joinGamePartyDto = new JoinGamePartyDto(createHumanVsHumanParty());
-    String request1 = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto));
+    String request1 =
+        Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto));
     Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut2, request1));
 
     String gamePartyInfo = Assertions.assertDoesNotThrow(() -> clientIn2.readLine());

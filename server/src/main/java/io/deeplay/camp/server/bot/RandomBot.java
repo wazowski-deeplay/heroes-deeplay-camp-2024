@@ -8,6 +8,7 @@ import io.deeplay.camp.game.entities.Mage;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
+import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.GameException;
@@ -104,6 +105,22 @@ public class RandomBot extends Bot {
       }
     }
     return null;
+  }
+
+  private boolean randomBoolean(double probability) {
+    return Math.random() < probability;
+  }
+
+  @Override
+  public DrawEvent generateDrawEvent(GameState gameState) {
+    double probability = 0.3;
+    boolean result = randomBoolean(probability);
+    List<Boolean> listResult = new ArrayList<>();
+    listResult.add(true);
+    listResult.add(result);
+    DrawEvent drawEvent = new DrawEvent();
+    drawEvent.setDraw(listResult);
+    return drawEvent;
   }
 
   // Добавление возможных юнитов в один список
