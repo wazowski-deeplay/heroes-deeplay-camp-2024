@@ -104,7 +104,7 @@ public class GamePartyManager {
       gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, firstHumanPlayerId));
       gameParties.put(gameParty.getGamePartyId(), gameParty);
       logger.info("Партия создалась");
-      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
       sendGamePartyInfo(firstHumanPlayerId, gamePartyInfoDto);
     } catch (GameManagerException e) {
       logger.error("Ошибка в создании игры между игроком и игроком{}", e.getConnectionErrorCode());
@@ -127,7 +127,7 @@ public class GamePartyManager {
       gameParty.addPlayer(new HumanPlayer(PlayerType.FIRST_PLAYER, humanPlayerId));
       gameParties.put(gameParty.getGamePartyId(), gameParty);
 
-      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+      GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.FIRST_PLAYER);
       sendGamePartyInfo(humanPlayerId, gamePartyInfoDto);
       logger.info("");
       gameParty.addPlayer(new AiPlayer(PlayerType.SECOND_PLAYER, gameParty));
@@ -155,7 +155,7 @@ public class GamePartyManager {
       }
       GameParty gameParty = gameParties.get(gamePartyId);
       if (!gameParty.getPlayers().isFull()) {
-        GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId());
+        GamePartyInfoDto gamePartyInfoDto = new GamePartyInfoDto(gameParty.getGamePartyId(), PlayerType.SECOND_PLAYER);
         sendGamePartyInfo(clientId, gamePartyInfoDto);
 
         gameParty.addPlayer(new HumanPlayer(PlayerType.SECOND_PLAYER, clientId));

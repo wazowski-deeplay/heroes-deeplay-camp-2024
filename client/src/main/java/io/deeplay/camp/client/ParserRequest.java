@@ -7,7 +7,6 @@ import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.game.entities.UnitType;
-
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -28,13 +27,12 @@ public class ParserRequest {
     String[] userCommand = userWord.split("\\s+");
     String regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
     Pattern pattern = Pattern.compile(regex);
-    if(userCommand[0].equals("checkout")){
-      if (pattern.matcher(userCommand[1]).matches()){
+    if (userCommand[0].equals("checkout")) {
+      if (pattern.matcher(userCommand[1]).matches()) {
         clientDto = new SwitchPartyDto(UUID.fromString(userCommand[1]));
-      }
-      else if(isNumeric(userCommand[1])){
+      } else if (isNumeric(userCommand[1])) {
         if (Integer.parseInt(userCommand[1]) > 0
-                && Integer.parseInt(userCommand[1]) <= ids.size()) {
+            && Integer.parseInt(userCommand[1]) <= ids.size()) {
           clientDto = new SwitchPartyDto(ids.get(Integer.parseInt(userCommand[1])));
         }
       }
@@ -116,12 +114,11 @@ public class ParserRequest {
       if (userCommand.length != 2) {
         return null;
       }
-      if (pattern.matcher(userCommand[1]).matches()){
+      if (pattern.matcher(userCommand[1]).matches()) {
         clientDto = new JoinGamePartyDto(UUID.fromString(userCommand[1]));
-      }
-      else if(isNumeric(userCommand[1])){
+      } else if (isNumeric(userCommand[1])) {
         if (Integer.parseInt(userCommand[1]) > 0
-                && Integer.parseInt(userCommand[1]) <= ids.size()) {
+            && Integer.parseInt(userCommand[1]) <= ids.size()) {
           clientDto = new JoinGamePartyDto(ids.get(Integer.parseInt(userCommand[1])));
         }
       }

@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class SwitchPartyDto extends ClientDto {
-    private UUID gamePartyId;
+  private UUID gamePartyId;
 
-    public SwitchPartyDto(UUID gamePartyId) {
-        super(ClientDtoType.SWITCH_PARTY);
-        this.gamePartyId = gamePartyId;
-    }
+  public SwitchPartyDto(UUID gamePartyId) {
+    super(ClientDtoType.SWITCH_PARTY);
+    this.gamePartyId = gamePartyId;
+  }
 }

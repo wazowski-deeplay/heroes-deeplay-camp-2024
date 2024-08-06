@@ -18,7 +18,6 @@ public class ClientProcess {
   private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
   private Socket socket;
   private UUID gamePartyId;
-  private GameStatePlayer gameStatePlayer;
   private BufferedReader inputUser;
   private HashMap<Integer, UUID> gamePartiesId;
   private HashMap<UUID, GameStatePlayer> gameStatesPlayer;
@@ -47,27 +46,40 @@ public class ClientProcess {
           GameStateDto gameStateDto = (GameStateDto) serverDto;
           gamePartyId = gameStateDto.getGamePartyId();
           gameStatesPlayer.get(gameStateDto.getGamePartyId()).updateBoard(serverDto);
-          if (gameStatePlayer.gameState.getGameStage() == GameStage.ENDED) {
-            System.out.println("Игра окончена");
+          if (gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState.getGameStage()
+              == GameStage.ENDED) {
+            System.out.println("игра окончена");
+            System.out.println("хотите начать новую игру?");
+            gameStatesPlayer.get(gameStateDto.getGamePartyId()).downGameState();
+            gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState = null;
+            gameStatesPlayer.remove(gameStateDto.getGamePartyId());
+            for (int i = 0; i < gamePartiesId.size(); i++) {
+              if (gamePartiesId.get(i + 1) == gameStateDto.getGamePartyId()) {
+                gamePartiesId.remove(i + 1);
+                break;
+              }
+            }
           }
-          // Обновление доски
           return;
         case GAME_PARTY_INFO:
           GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
-          this.gameStatesPlayer.put(gamePartyInfoDto.getGamePartyId(), new GameStatePlayer(gamePartyInfoDto.getGamePartyId()));
+          this.gameStatesPlayer.put(
+              gamePartyInfoDto.getGamePartyId(),
+              new GameStatePlayer(
+                  gamePartyInfoDto.getGamePartyId(), gamePartyInfoDto.getPlayerType()));
           gamePartyId = gamePartyInfoDto.getGamePartyId();
           System.out.println(gamePartyId);
           // Обновление инфы о текущей пати
           return;
         case GAME_PARTIES:
           GamePartiesDto gamePartiesDto = (GamePartiesDto) serverDto;
-          System.out.println("hui");
-          for(int i = 0;i < gamePartiesDto.getGamePartiesIds().size();i++){
-            gamePartiesId.put(i+1, gamePartiesDto.getGamePartiesIds().get(i));
+          for (int i = 0; i < gamePartiesDto.getGamePartiesIds().size(); i++) {
+            gamePartiesId.put(i + 1, gamePartiesDto.getGamePartiesIds().get(i));
           }
-          for(int i = 0;i < gamePartiesId.size(); i++){
-            System.out.println(i+1 + ". " + gamePartiesId.get(i+1));
+          for (int i = 0; i < gamePartiesId.size(); i++) {
+            System.out.println(i + 1 + ". " + gamePartiesId.get(i + 1));
           }
+          return;
         case OFFER_DRAW:
           System.out.println("Может ничья? Пропиши draw чтобы согласиться.");
           return;
