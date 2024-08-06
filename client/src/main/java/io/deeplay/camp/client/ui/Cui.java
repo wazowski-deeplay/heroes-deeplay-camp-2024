@@ -2,7 +2,11 @@ package io.deeplay.camp.client.ui;
 
 import io.deeplay.camp.game.entities.Board;
 import io.deeplay.camp.game.entities.Unit;
+import io.deeplay.camp.game.mechanics.GameStage;
+import io.deeplay.camp.game.mechanics.GameState;
+import io.deeplay.camp.game.mechanics.PlayerType;
 import java.awt.Font;
+import java.util.UUID;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -12,8 +16,9 @@ public class Cui {
   JFrame frame;
   JTextArea field;
   JPanel content;
+  PlayerType gamePlayer;
 
-  public Cui() {
+  public Cui(PlayerType playerType) {
     frame = new JFrame();
     frame.setSize(800, 500);
     field = new JTextArea(20, 50);
@@ -23,15 +28,21 @@ public class Cui {
     content.add(field);
     frame.add(content);
     frame.setVisible(true);
+    this.gamePlayer = playerType;
   }
 
-  public void updateCui(Board board) {
-    outInFrame(board);
+  public void updateCui(GameState gameState, UUID id) {
+    outInFrame(gameState, id);
   }
 
-  public void outInFrame(Board board) {
-
+  public void outInFrame(GameState gameState, UUID id) {
+    Board board = gameState.getCurrentBoard();
     field.setText(null);
+    field.append(separator);
+    field.append(id.toString());
+    field.append(separator);
+    field.append(separator);
+    field.append("SECOND_PLAYER");
     field.append(separator);
     field.append(separator);
     String s = "20";
@@ -42,18 +53,37 @@ public class Cui {
             String.format(
                 "%-" + s + "s",
                 outUnitIsMoved(board.getUnit(column, row))
+                    + outUnitIsGeneral(board.getUnit(column, row))
                     + outUnitInfo(board.getUnit(column, row))));
       }
       field.append(separator);
       field.append(separator);
     }
-
     field.append(String.format("%-25s", "#"));
     field.append(String.format("%-25s", "0"));
     field.append(String.format("%-27s", "1"));
     field.append(String.format("%-26s", "2"));
     field.append(separator);
     field.append(separator);
+    field.append("FIRST_PLAYER");
+    field.append(separator);
+    field.append(separator);
+    field.append("Вы являетесь " + gamePlayer.name());
+    field.append(separator);
+    field.append(separator);
+    if (gameState.getGameStage() == GameStage.ENDED) {
+      field.append("Победитель = " + gameState.getWinner().name());
+      System.out.println("Победитель = " + gameState.getWinner().name());
+      field.append(separator);
+      field.append(separator);
+    }
+  }
+
+  public void downCuiFrame() {
+    field = null;
+    content = null;
+    frame.setVisible(false);
+    frame = null;
   }
 
   // Методы для отображения стринговой информации о юните
@@ -64,6 +94,17 @@ public class Cui {
     }
     if (unit.getMoved()) {
       result = "!";
+    }
+    return result;
+  }
+
+  private String outUnitIsGeneral(Unit unit) {
+    String result = "";
+    if (unit == null) {
+      return "";
+    }
+    if (unit.isGeneral()) {
+      result = "G";
     }
     return result;
   }

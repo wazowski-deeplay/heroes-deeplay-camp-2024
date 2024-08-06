@@ -7,6 +7,7 @@ public enum ClientDtoType {
   START_GAME,
   CREATE_PARTY,
   JOIN_PARTY,
+  SWITCH_PARTY,
   GIVE_UP,
   OFFER_DRAW,
   DRAW,
