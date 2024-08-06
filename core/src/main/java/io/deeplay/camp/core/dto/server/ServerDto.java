@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "serverDtoType")
 @JsonSubTypes({
+  @JsonSubTypes.Type(value = OfferRestartServerDto.class),
+  @JsonSubTypes.Type(value = RestartServerDto.class),
   @JsonSubTypes.Type(value = GamePartyInfoDto.class),
   @JsonSubTypes.Type(value = GameStateDto.class),
   @JsonSubTypes.Type(value = ErrorConnectionResponseDto.class),

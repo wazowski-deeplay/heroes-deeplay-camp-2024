@@ -38,7 +38,6 @@ public class Cui {
   public void outInFrame(GameState gameState, UUID id) {
     Board board = gameState.getCurrentBoard();
     field.setText(null);
-    field.append(separator);
     field.append(id.toString());
     field.append(separator);
     field.append(separator);

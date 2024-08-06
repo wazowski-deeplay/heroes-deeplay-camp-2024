@@ -11,6 +11,7 @@ import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.core.dto.client.game.OfferDrawDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
+import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
@@ -18,7 +19,10 @@ import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.OfferDrawServerDto;
 import io.deeplay.camp.game.events.DrawEvent;
+import io.deeplay.camp.core.dto.server.*;
+import io.deeplay.camp.game.Game;
 import io.deeplay.camp.game.exceptions.GameException;
+import io.deeplay.camp.core.dto.server.OfferRestartServerDto;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.exceptions.GameManagerException;
@@ -44,7 +48,7 @@ public class GamePartyManager {
   public GamePartyManager() {
     this.gameParties = new ConcurrentHashMap<>();
     this.executorService = Executors.newSingleThreadScheduledExecutor();
-    scheduleCheckEndedTask();
+    //scheduleCheckEndedTask();
   }
 
   /**
@@ -254,6 +258,49 @@ public class GamePartyManager {
     }
   }
 
+  public void offerRestart(UUID gamePartyId, UUID clientId) throws GameManagerException {
+    String message;
+    try {
+      GameParty gameParty = gameParties.get(gamePartyId);
+      OfferRestartServerDto offerRestartServerDto = new OfferRestartServerDto(gameParty.getGamePartyId());
+      if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+        message = JsonConverter.serialize(offerRestartServerDto);
+        logger.info("Предложение рестарта для 2 игрока");
+        gameParty.setRestart(0, true);
+        ClientManager.getInstance()
+                .sendMessage(
+                        gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+      } else {
+        message = JsonConverter.serialize(offerRestartServerDto);
+        logger.error("Предложение рестарта для 1 игрока");
+        gameParty.setRestart(1, true);
+        ClientManager.getInstance()
+                .sendMessage(
+                        gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+      }
+    } catch (JsonProcessingException e) {
+      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+    }
+  }
+
+  public void acceptRestart(UUID gamePartyId, UUID clientId) throws GameManagerException {
+    try {
+      GameParty gameParty = gameParties.get(gamePartyId);
+      if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+        logger.info("Подтверждение рестарта первым игроком");
+        gameParty.setRestart(0, true);
+        gameParty.processRestart(gameParty.getRestart());
+      }
+      else if(gameParty.getPlayers().getPlayerTypeById(clientId)==PlayerType.SECOND_PLAYER){
+        logger.info("Подтверждение рестарта вторым игроком");
+        gameParty.setRestart(1, true);
+        gameParty.processRestart(gameParty.getRestart());
+      }
+    } catch (GameException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /**
    * Метод обработки игровых действий со стороны клиентов.
    *
@@ -322,6 +369,26 @@ public class GamePartyManager {
         UUID clientId = drawDto.getClientId();
         UUID gamePartyId = drawDto.getGamePartyId();
         acceptDraw(gamePartyId, clientId);
+      }
+      case OFFER_RESTART_GAME -> {
+        OfferRestartDto offerRestartDto = (OfferRestartDto) clientDto;
+        if (gameParties.get(offerRestartDto.getGamePartyId()) == null) {
+          logger.error("Ошибка gameparty null. OfferRestart");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
+        UUID clientId = offerRestartDto.getClientId();
+        UUID gamePartyId = offerRestartDto.getGamePartyId();
+        offerRestart(gamePartyId, clientId);
+      }
+      case RESTART -> {
+        RestartDto restartDto = (RestartDto) clientDto;
+        if (gameParties.get(restartDto.getGamePartyId()) == null) {
+          logger.error("Ошибка gameparty null. Restart");
+          throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+        }
+        UUID clientId = restartDto.getClientId();
+        UUID gamePartyId = restartDto.getGamePartyId();
+        acceptRestart(gamePartyId, clientId);
       }
       default -> {
         logger.error("Не возможное действие");
