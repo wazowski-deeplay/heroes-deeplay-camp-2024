@@ -1,26 +1,23 @@
 package io.deeplay.camp.server;
 
 import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
-import io.deeplay.camp.core.dto.client.game.DrawDto;
 import io.deeplay.camp.core.dto.client.game.GiveUpDto;
 import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
+import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.core.dto.server.GameStateDto;
-import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
 import io.deeplay.camp.game.Game;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
-import io.deeplay.camp.game.events.DrawEvent;
+import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
-import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.server.exceptions.GameManagerException;
 import io.deeplay.camp.server.player.Player;
 import io.deeplay.camp.server.player.Players;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +33,7 @@ public class GameParty {
   private final Game game;
   private final UUID gamePartyId;
   private final Players players;
-  private List<Boolean> draw = new ArrayList<>();
+  @Setter List<Boolean> draw = new ArrayList<>();
 
   public GameParty(UUID gamePartyId) {
     players = new Players();
@@ -101,7 +98,7 @@ public class GameParty {
     players.updateGameState(gameStateDto);
   }
 
-  public void setDraw(int index, Boolean value) {
+  public void setIndexDraw(int index, Boolean value) {
     draw.set(index, value);
   }
 

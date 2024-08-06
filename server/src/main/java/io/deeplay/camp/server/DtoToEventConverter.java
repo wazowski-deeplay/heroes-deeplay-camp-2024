@@ -11,8 +11,8 @@ import io.deeplay.camp.game.entities.Mage;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
-import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.GiveUpEvent;
+import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.mechanics.PlayerType;
 
