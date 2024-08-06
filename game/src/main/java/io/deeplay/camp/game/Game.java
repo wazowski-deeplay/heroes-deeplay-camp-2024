@@ -7,9 +7,8 @@ import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.events.StartGameEvent;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameState;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class Game implements GameListener {

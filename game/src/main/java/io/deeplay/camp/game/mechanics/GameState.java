@@ -432,5 +432,4 @@ public class GameState {
       winner = PlayerType.DRAW;
     }
   }
-
 }
