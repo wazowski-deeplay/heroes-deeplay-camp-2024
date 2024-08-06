@@ -1,6 +1,7 @@
 package io.deeplay.camp.server;
 
 import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
+import io.deeplay.camp.core.dto.client.game.DrawDto;
 import io.deeplay.camp.core.dto.client.game.GiveUpDto;
 import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
@@ -8,6 +9,7 @@ import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.core.dto.server.GameStateDto;
 import io.deeplay.camp.game.Game;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
+import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.events.GiveUpEvent;
@@ -69,6 +71,11 @@ public class GameParty {
     GiveUpEvent giveUpEvent =
         DtoToEventConverter.convert(players.getPlayerTypeById(giveUpDto.getClientId()));
     game.giveUp(giveUpEvent);
+    updateGameStateForPlayers();
+  }
+
+  public void processDraw(List<Boolean> value) throws GameException {
+    game.draw(value);
     updateGameStateForPlayers();
   }
 
