@@ -7,6 +7,8 @@ import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import java.util.UUID;
+
+import io.deeplay.camp.core.dto.server.RestartServerDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,8 @@ import lombok.Setter;
   @JsonSubTypes.Type(value = GiveUpDto.class),
   @JsonSubTypes.Type(value = OfferDrawDto.class),
   @JsonSubTypes.Type(value = DrawDto.class),
+  @JsonSubTypes.Type(value = OfferRestartDto.class),
+  @JsonSubTypes.Type(value = RestartDto.class),
 })
 public abstract class ClientDto {
   private ClientDtoType clientDtoType;

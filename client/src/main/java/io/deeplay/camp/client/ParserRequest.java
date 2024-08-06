@@ -147,6 +147,18 @@ public class ParserRequest {
       }
       clientDto = new GetPartiesDto();
     }
+    if (userCommand[0].equals("offer_restart")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
+      clientDto = new OfferRestartDto(gamePartyId);
+    }
+    if (userCommand[0].equals("restart")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
+      clientDto = new RestartDto(gamePartyId);
+    }
     return clientDto;
   }
 

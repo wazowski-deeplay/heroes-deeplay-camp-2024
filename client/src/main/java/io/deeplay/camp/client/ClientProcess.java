@@ -50,6 +50,7 @@ public class ClientProcess {
               == GameStage.ENDED) {
             System.out.println("игра окончена");
             System.out.println("хотите начать новую игру?");
+            /*
             gameStatesPlayer.get(gameStateDto.getGamePartyId()).downGameState();
             gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState = null;
             gameStatesPlayer.remove(gameStateDto.getGamePartyId());
@@ -59,6 +60,7 @@ public class ClientProcess {
                 break;
               }
             }
+             */
           }
           return;
         case GAME_PARTY_INFO:
@@ -83,8 +85,8 @@ public class ClientProcess {
         case OFFER_DRAW:
           System.out.println("Может ничья? Пропиши draw чтобы согласиться.");
           return;
-        case OFFER_CONTINUE_GAME:
-          System.out.println("Хочешь продолжить игру?");
+        case OFFER_RESTART_GAME:
+          System.out.println("Хочешь продолжить игру? Пропиши restart чтобы согласиться.");
           return;
         case ERROR_CONNECTION_INFO:
           ErrorConnectionResponseDto errorConnectionResponseDto =

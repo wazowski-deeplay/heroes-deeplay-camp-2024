@@ -30,10 +30,11 @@ import org.slf4j.LoggerFactory;
 @Getter
 public class GameParty {
   private static final Logger logger = LoggerFactory.getLogger(Session.class);
-  private final Game game;
+  private Game game;
   private final UUID gamePartyId;
   private final Players players;
   @Setter List<Boolean> draw = new ArrayList<>();
+  private List<Boolean> restart = new ArrayList<>();
 
   public GameParty(UUID gamePartyId) {
     players = new Players();
@@ -41,6 +42,8 @@ public class GameParty {
     game = new Game();
     draw.add(false);
     draw.add(false);
+    restart.add(false);
+    restart.add(false);
   }
 
   public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
@@ -81,6 +84,15 @@ public class GameParty {
     updateGameStateForPlayers();
   }
 
+  public void processRestart(List<Boolean> value) throws GameException {
+    draw.set(0,false);
+    draw.set(1,false);
+    game = new Game();
+    restart.set(0,false);
+    restart.set(1,false);
+    updateGameStateForPlayers();
+  }
+
   public void addPlayer(Player player) throws GameManagerException {
     if (players.isFull()) {
       logger.error("Ошибка добавления игрока, пати переполненна");
@@ -99,6 +111,10 @@ public class GameParty {
   }
 
   public void setIndexDraw(int index, Boolean value) {
+    draw.set(index, value);
+  }
+
+  public void setRestart(int index, Boolean value) {
     draw.set(index, value);
   }
 

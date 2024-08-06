@@ -451,7 +451,7 @@ public class GameState {
   }
 
   public void draw(List<Boolean> value) {
-    if (value.get(0) == true && value.get(1) == true) {
+    if (value.get(0) && value.get(1)) {
       gameStage = GameStage.ENDED;
       winner = PlayerType.DRAW;
     }
