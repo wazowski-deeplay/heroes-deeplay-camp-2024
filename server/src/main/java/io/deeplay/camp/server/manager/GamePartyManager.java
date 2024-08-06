@@ -197,17 +197,20 @@ public class GamePartyManager {
   }
 
   public void acceptDraw(UUID gamePartyId, UUID clientId) throws GameManagerException {
-    String message;
     try {
       GameParty gameParty = gameParties.get(gamePartyId);
-      DrawServerDto drawServerDto = new DrawServerDto(gameParty.getGamePartyId());
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
-        message = JsonConverter.serialize(drawServerDto);
         logger.info("Подтверждение ничьи первым игроком");
         gameParty.setDraw(0, true);
+        gameParty.processDraw(gameParty.getDraw());
       }
-    } catch (JsonProcessingException e) {
-      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
+      else if(gameParty.getPlayers().getPlayerTypeById(clientId)==PlayerType.SECOND_PLAYER){
+        logger.info("Подтверждение ничьи вторым игроком");
+        gameParty.setDraw(1, true);
+        gameParty.processDraw(gameParty.getDraw());
+      }
+    } catch (GameException e) {
+        throw new RuntimeException(e);
     }
   }
 
@@ -273,6 +276,7 @@ public class GamePartyManager {
         }
         UUID clientId = drawDto.getClientId();
         UUID gamePartyId = drawDto.getGamePartyId();
+        acceptDraw(gamePartyId, clientId);
       }
       default -> {
         logger.error("Не возможное действие");

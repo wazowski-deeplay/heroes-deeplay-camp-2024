@@ -36,10 +36,22 @@ class ServerTest {
   private static BufferedReader clientIn3;
   private static BufferedWriter clientOut3;
 
+  private static Server server;
+  private static Thread serverThread;
+
   public static void setUpServer() {
-    Server server = new Server(8080);
-    Thread serverThread = new Thread(server::start);
+    server = new Server(8080);
+    serverThread = new Thread(server::start);
     serverThread.start();
+  }
+
+  public void tearDownServer() {
+    if (server != null){
+      server.stop();
+    }
+    if (serverThread != null && serverThread.isAlive()){
+      serverThread.interrupt();
+    }
   }
 
   public static void setUpClients() {
@@ -72,9 +84,11 @@ class ServerTest {
   }
 
   @BeforeEach
-  public void setUpServerAndClients() {
+  public void setUpServerAndClients() throws InterruptedException {
     setUpServer();
+    Thread.sleep(1000);
     setUpClients();
+    Thread.sleep(1000);
   }
 
   @AfterEach
@@ -85,16 +99,16 @@ class ServerTest {
     clientOut2.close();
     clientIn3.close();
     clientOut3.close();
+    tearDownServer();
   }
 
   @Test
-  void createHumanVsBotGamePartyTest() {
+  void createHumanVsBotGamePartyTest(){
     // Отправляем запрос на создание игры против бота.
     CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_BOT);
     String request =
         Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
     Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
-
     // Получаем ответ с информацией о пати.
     String gamePartyInfo = Assertions.assertDoesNotThrow(() -> clientIn1.readLine());
     ServerDto gamePartyInfoDto =
@@ -145,9 +159,14 @@ class ServerTest {
 
   @Test
   void joinGamePartyTest() {
+    CreateGamePartyDto createGamePartyDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
+    String request =
+            Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(createGamePartyDto));
+    Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut1, request));
+
     JoinGamePartyDto joinGamePartyDto = new JoinGamePartyDto(createHumanVsHumanParty());
-    String request = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto));
-    Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut2, request));
+    String request1 = Assertions.assertDoesNotThrow(() -> JsonConverter.serialize(joinGamePartyDto));
+    Assertions.assertDoesNotThrow(() -> writeRequestToServer(clientOut2, request1));
 
     String gamePartyInfo = Assertions.assertDoesNotThrow(() -> clientIn2.readLine());
     ServerDto gamePartyInfoDto =

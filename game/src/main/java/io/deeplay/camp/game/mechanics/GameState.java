@@ -8,6 +8,7 @@ import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
+import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
@@ -17,6 +18,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -422,4 +425,12 @@ public class GameState {
       logger.atInfo().log("Победитель - {}, Состояние игры {}", winner, gameStage);
     }
   }
+
+  public void draw(List<Boolean> value) {
+    if (value.get(0) == true && value.get(1) == true) {
+      gameStage = GameStage.ENDED;
+      winner = PlayerType.DRAW;
+    }
+  }
+
 }

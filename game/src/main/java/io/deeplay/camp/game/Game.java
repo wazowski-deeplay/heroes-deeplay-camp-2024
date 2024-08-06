@@ -9,6 +9,8 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameState;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class Game implements GameListener {
 
@@ -38,5 +40,8 @@ public class Game implements GameListener {
 
   public void giveUp(GiveUpEvent giveUpEvent) throws GameException {
     gameState.giveUp(giveUpEvent);
+  }
+  public void draw(List<Boolean> value) throws GameException {
+    gameState.draw(value);
   }
 }
