@@ -16,6 +16,9 @@ public class Knight extends Unit {
     int diceRoll = (int) (Math.random() * 20);
     if (diceRoll + accuracy > targetUnit.getArmor()) {
       targetUnit.setCurrentHp(targetUnit.getCurrentHp() - damage);
+      hitTarget = true;
+    } else {
+      hitTarget = false;
     }
     isMoved = true;
   }
