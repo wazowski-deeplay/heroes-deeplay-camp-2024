@@ -38,7 +38,7 @@ public class Cui {
   public void outInFrame(GameState gameState, UUID id) {
     Board board = gameState.getCurrentBoard();
     field.setText(null);
-    field.append(id.toString());
+    field.append("ID room: " + id.toString());
     field.append(separator);
     field.append(separator);
     field.append("SECOND_PLAYER");
@@ -67,11 +67,11 @@ public class Cui {
     field.append("FIRST_PLAYER");
     field.append(separator);
     field.append(separator);
-    field.append("Вы являетесь " + gamePlayer.name());
+    field.append("You are " + gamePlayer.name());
     field.append(separator);
     field.append(separator);
     if (gameState.getGameStage() == GameStage.ENDED) {
-      field.append("Победитель = " + gameState.getWinner().name());
+      field.append("Winner = " + gameState.getWinner().name());
       System.out.println("Победитель = " + gameState.getWinner().name());
       field.append(separator);
       field.append(separator);

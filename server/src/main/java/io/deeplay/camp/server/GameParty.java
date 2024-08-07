@@ -93,6 +93,17 @@ public class GameParty {
     updateGameStateForPlayers();
   }
 
+  public void closeParty(UUID escapeClient) throws GameException {
+    GiveUpEvent giveUpEvent =
+            DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
+    if(players.isFull()){
+      game.giveUp(giveUpEvent);
+    } else if (!players.isFull() || game.getGameState().getGameStage() == GameStage.ENDED) {
+      game.exitGame(giveUpEvent);
+    }
+    game = null;
+  }
+
   public void addPlayer(Player player) throws GameManagerException {
     if (players.isFull()) {
       logger.error("Ошибка добавления игрока, пати переполненна");

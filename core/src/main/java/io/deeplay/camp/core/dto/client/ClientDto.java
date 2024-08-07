@@ -2,8 +2,10 @@ package io.deeplay.camp.core.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.deeplay.camp.core.dto.client.connection.DisconnectDto;
 import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.core.dto.client.party.ExitGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import java.util.UUID;
@@ -29,6 +31,8 @@ import lombok.Setter;
   @JsonSubTypes.Type(value = DrawDto.class),
   @JsonSubTypes.Type(value = OfferRestartDto.class),
   @JsonSubTypes.Type(value = RestartDto.class),
+  @JsonSubTypes.Type(value = DisconnectDto.class),
+  @JsonSubTypes.Type(value = ExitGamePartyDto.class),
 })
 public abstract class ClientDto {
   private ClientDtoType clientDtoType;

@@ -9,5 +9,6 @@ public enum ServerDtoType {
   ERROR_CONNECTION_INFO,
   GAME_PARTIES,
   ERROR_GAME_INFO,
-  DRAW
+  DRAW,
+  EXIT_PARTY
 }

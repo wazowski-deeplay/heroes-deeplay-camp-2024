@@ -2,8 +2,10 @@ package io.deeplay.camp.client;
 
 import io.deeplay.camp.core.dto.GameType;
 import io.deeplay.camp.core.dto.client.ClientDto;
+import io.deeplay.camp.core.dto.client.connection.DisconnectDto;
 import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.core.dto.client.party.ExitGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.game.entities.UnitType;
@@ -36,6 +38,20 @@ public class ParserRequest {
           clientDto = new SwitchPartyDto(ids.get(Integer.parseInt(userCommand[1])));
         }
       }
+    }
+    if (userCommand[0].equals("exitgame")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
+      clientDto = new ExitGamePartyDto(gamePartyId);
+      return clientDto;
+    }
+    if (userCommand[0].equals("disconnect")) {
+      if (userCommand.length != 1) {
+        return null;
+      }
+      clientDto = new DisconnectDto(gamePartyId);
+      return clientDto;
     }
     if (userCommand[0].equals("makemove")) {
       for (int i = 1; i < 5; i++) {

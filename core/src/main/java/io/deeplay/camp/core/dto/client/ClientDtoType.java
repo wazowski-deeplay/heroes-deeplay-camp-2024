@@ -14,5 +14,6 @@ public enum ClientDtoType {
   OFFER_DRAW,
   DRAW,
   GET_PARTIES,
-  DISCONNECT
+  DISCONNECT,
+  EXIT_PARTY
 }

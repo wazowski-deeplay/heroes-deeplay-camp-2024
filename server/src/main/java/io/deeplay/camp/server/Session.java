@@ -77,6 +77,9 @@ public class Session implements Runnable {
         case DISCONNECT:
           closeResources();
           return;
+        case EXIT_PARTY:
+          gamePartyManager.processExitGame(clientDto);
+          return;
         default:
           throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
       }
