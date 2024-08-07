@@ -1,6 +1,7 @@
 package io.deeplay.camp.client;
 
 import io.deeplay.camp.client.ui.Cui;
+import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.GameStateDto;
 import io.deeplay.camp.core.dto.server.ServerDto;
 import io.deeplay.camp.game.mechanics.GameState;
@@ -22,7 +23,13 @@ public class GameStatePlayer {
   public void updateBoard(ServerDto serverDto) {
     GameStateDto gameStateDto = (GameStateDto) serverDto;
     gameState = gameStateDto.getGameState();
-    cui.updateCui(gameState, gamePartyId);
+    cui.updateCui(gameState, gamePartyId, playerTypeInCurrentGame);
+  }
+  public void cleanBoard(ServerDto serverDto) {
+    GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
+    playerTypeInCurrentGame = gamePartyInfoDto.getPlayerType();
+    gamePartyId = gamePartyInfoDto.getGamePartyId();
+    cui.cleanCui(gamePartyId, playerTypeInCurrentGame);
   }
 
   public void downGameState() {

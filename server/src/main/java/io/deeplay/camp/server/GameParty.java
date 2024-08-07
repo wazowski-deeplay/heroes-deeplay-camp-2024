@@ -15,6 +15,7 @@ import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
+import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.exceptions.GameManagerException;
 import io.deeplay.camp.server.player.Player;
 import io.deeplay.camp.server.player.Players;
@@ -33,8 +34,8 @@ public class GameParty {
   private Game game;
   private final UUID gamePartyId;
   private final Players players;
+  @Setter List<Boolean> restart = new ArrayList<>();
   @Setter List<Boolean> draw = new ArrayList<>();
-  private List<Boolean> restart = new ArrayList<>();
 
   public GameParty(UUID gamePartyId) {
     players = new Players();
@@ -85,12 +86,15 @@ public class GameParty {
   }
 
   public void processRestart(List<Boolean> value) throws GameException {
+    if(value.get(0) && value.get(1)){
     draw.set(0,false);
     draw.set(1,false);
+    game.restartGame();
     game = new Game();
     restart.set(0,false);
     restart.set(1,false);
     updateGameStateForPlayers();
+    }
   }
 
   public void closeParty(UUID escapeClient) throws GameException {
@@ -103,6 +107,7 @@ public class GameParty {
     }
     game = null;
   }
+
 
   public void addPlayer(Player player) throws GameManagerException {
     if (players.isFull()) {
@@ -126,7 +131,7 @@ public class GameParty {
   }
 
   public void setRestart(int index, Boolean value) {
-    draw.set(index, value);
+    restart.set(index, value);
   }
 
   public boolean isGameEnded() {

@@ -54,10 +54,16 @@ public class ClientProcess {
           return;
         case GAME_PARTY_INFO:
           GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
+          if(this.gameStatesPlayer.containsKey(gamePartyInfoDto.getGamePartyId())){
+            this.gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).playerTypeInCurrentGame = gamePartyInfoDto.getPlayerType();
+            gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).cleanBoard(serverDto);
+          }
+          else{
           this.gameStatesPlayer.put(
               gamePartyInfoDto.getGamePartyId(),
               new GameStatePlayer(
                   gamePartyInfoDto.getGamePartyId(), gamePartyInfoDto.getPlayerType()));
+          }
           gamePartyId = gamePartyInfoDto.getGamePartyId();
           System.out.println(gamePartyId);
           // Обновление инфы о текущей пати
@@ -79,6 +85,7 @@ public class ClientProcess {
           return;
         case EXIT_PARTY:
           ExitPartyServerDto thisGameStateDto = (ExitPartyServerDto) serverDto;
+          System.out.println("Игра "+ thisGameStateDto.getGamePartyId().toString() + " завершена.");
           gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).downGameState();
           gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).gameState = null;
           gameStatesPlayer.remove(thisGameStateDto.getGamePartyId());
