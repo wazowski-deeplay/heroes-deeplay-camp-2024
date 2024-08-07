@@ -15,6 +15,8 @@ import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.ExitGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
+import io.deeplay.camp.core.dto.server.*;
+import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
@@ -124,20 +126,26 @@ public class GamePartyManager {
     }
   }
 
-
   private PlayerType randomPlayerType(UUID gamePartyId) throws GameManagerException {
     List<PlayerType> randomPayerTypesValues = new ArrayList<>();
     randomPayerTypesValues.add(PlayerType.FIRST_PLAYER);
     randomPayerTypesValues.add(PlayerType.SECOND_PLAYER);
-    if (gameParties.get(gamePartyId).getPlayers().getHashMap().isEmpty()){
+    if (gameParties.get(gamePartyId).getPlayers().getHashMap().isEmpty()) {
       Random rand = new Random();
       return randomPayerTypesValues.get(rand.nextInt(randomPayerTypesValues.size()));
-    } else if (gameParties.get(gamePartyId).getPlayers().getHashMap().containsKey(PlayerType.SECOND_PLAYER)) {
+    } else if (gameParties
+        .get(gamePartyId)
+        .getPlayers()
+        .getHashMap()
+        .containsKey(PlayerType.SECOND_PLAYER)) {
       return PlayerType.FIRST_PLAYER;
-    } else if (gameParties.get(gamePartyId).getPlayers().getHashMap().containsKey(PlayerType.FIRST_PLAYER)) {
+    } else if (gameParties
+        .get(gamePartyId)
+        .getPlayers()
+        .getHashMap()
+        .containsKey(PlayerType.FIRST_PLAYER)) {
       return PlayerType.SECOND_PLAYER;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -289,12 +297,87 @@ public class GamePartyManager {
       GameParty gameParty = gameParties.get(gamePartyId);
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
         logger.info("Подтверждение рестарта первым игроком");
-        gameParty.setRestart(0, true);
-        gameParty.processRestart(gameParty.getRestart());
+        gameParties.get(gamePartyId).setRestart(0, true);
+        if (gameParty.getPlayers().getHashMap().get(PlayerType.SECOND_PLAYER) instanceof AiPlayer) {
+          gameParties.get(gamePartyId).setRestart(1, true);
+          gameParty.getPlayers().clearPlayersType();
+
+          gameParty.addPlayer(
+                  new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), clientId));
+          gameParty.addPlayer(new AiPlayer(randomPlayerType(gameParty.getGamePartyId()), gameParty));
+
+          gameParty.processRestart(gameParty.getRestart());
+
+          GamePartyInfoDto gamePartyInfoHumanPlayerDto =
+                  new GamePartyInfoDto(
+                          gameParty.getGamePartyId(), gameParty.getPlayers().getPlayerTypeById(clientId));
+          sendGamePartyInfo(clientId, gamePartyInfoHumanPlayerDto);
+
+        } else {
+          UUID anotherPlayerId = gameParty.getPlayers().getPlayerByAnotherPlayerId(clientId);
+          gameParty.getPlayers().clearPlayersType();
+
+          gameParty.addPlayer(
+              new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), clientId));
+          gameParty.addPlayer(
+              new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), anotherPlayerId));
+
+          gameParty.processRestart(gameParty.getRestart());
+
+          gameParty.updateGameStateForPlayers();
+
+          GamePartyInfoDto gamePartyInfoFirstPlayerDto =
+              new GamePartyInfoDto(
+                  gameParty.getGamePartyId(), gameParty.getPlayers().getPlayerTypeById(clientId));
+          sendGamePartyInfo(clientId, gamePartyInfoFirstPlayerDto);
+          GamePartyInfoDto gamePartyInfoSecondPlayerDto =
+              new GamePartyInfoDto(
+                  gameParty.getGamePartyId(),
+                  gameParty.getPlayers().getPlayerTypeById(anotherPlayerId));
+          sendGamePartyInfo(anotherPlayerId, gamePartyInfoSecondPlayerDto);
+        }
       } else if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.SECOND_PLAYER) {
         logger.info("Подтверждение рестарта вторым игроком");
-        gameParty.setRestart(1, true);
-        gameParty.processRestart(gameParty.getRestart());
+        gameParties.get(gamePartyId).setRestart(1, true);
+        if (gameParty.getPlayers().getHashMap().get(PlayerType.FIRST_PLAYER) instanceof AiPlayer) {
+          gameParties.get(gamePartyId).setRestart(0, true);
+          gameParty.getPlayers().clearPlayersType();
+
+          gameParty.addPlayer(
+                  new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), clientId));
+          gameParty.addPlayer(new AiPlayer(randomPlayerType(gameParty.getGamePartyId()), gameParty));
+
+          gameParty.processRestart(gameParty.getRestart());
+
+          GamePartyInfoDto gamePartyInfoHumanPlayerDto =
+                  new GamePartyInfoDto(
+                          gameParty.getGamePartyId(), gameParty.getPlayers().getPlayerTypeById(clientId));
+          sendGamePartyInfo(clientId, gamePartyInfoHumanPlayerDto);
+
+        } else {
+          UUID anotherPlayerId = gameParty.getPlayers().getPlayerByAnotherPlayerId(clientId);
+
+          gameParty.getPlayers().clearPlayersType();
+
+          gameParty.addPlayer(
+              new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), clientId));
+          gameParty.addPlayer(
+              new HumanPlayer(randomPlayerType(gameParty.getGamePartyId()), anotherPlayerId));
+
+          gameParty.processRestart(gameParty.getRestart());
+
+          gameParty.updateGameStateForPlayers();
+
+          GamePartyInfoDto gamePartyInfoFirstPlayerDto =
+              new GamePartyInfoDto(
+                  gameParty.getGamePartyId(), gameParty.getPlayers().getPlayerTypeById(clientId));
+          sendGamePartyInfo(clientId, gamePartyInfoFirstPlayerDto);
+          GamePartyInfoDto gamePartyInfoSecondPlayerDto =
+              new GamePartyInfoDto(
+                  gameParty.getGamePartyId(),
+                  gameParty.getPlayers().getPlayerTypeById(anotherPlayerId));
+          sendGamePartyInfo(anotherPlayerId, gamePartyInfoSecondPlayerDto);
+        }
       }
     } catch (GameException e) {
       throw new RuntimeException(e);

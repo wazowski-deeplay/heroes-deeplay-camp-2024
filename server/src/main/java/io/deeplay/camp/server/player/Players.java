@@ -35,7 +35,11 @@ public class Players {
         if (((HumanPlayer) player).getClientId().equals(clientId)) {
           return player.getPlayerType();
         }
-      } else if (player instanceof AiPlayer) {
+      } else if (player instanceof AiPlayer) {//TODO
+        if (((AiPlayer) player).getGameParty().getGame().getGameState().getCurrentPlayer()
+                == PlayerType.FIRST_PLAYER) {
+          return player.getPlayerType();
+        }
         if (((AiPlayer) player).getGameParty().getGame().getGameState().getCurrentPlayer()
             == PlayerType.SECOND_PLAYER) {
           return player.getPlayerType();
@@ -57,4 +61,30 @@ public class Players {
     }
     return null;
   }
+
+  public void clearPlayersType(){
+    hashMap = new HashMap<>();
+  }
+
+  public void setPlayerById(UUID playerId, PlayerType playerType){
+    for (Player player : hashMap.values()) {
+      if (player instanceof HumanPlayer) {
+        if (((HumanPlayer) player).getClientId().equals(playerId)) {
+          player.playerType = playerType;
+        }
+      }
+    }
+  }
+
+  public UUID getPlayerByAnotherPlayerId(UUID anotherPlayerId){
+    for (Player player : hashMap.values()) {
+      if (player instanceof HumanPlayer) {
+        if (!((HumanPlayer) player).getClientId().equals(anotherPlayerId)) {
+          return ((HumanPlayer) player).getClientId();
+        }
+      }
+    }
+    return null;
+  }
+
 }
