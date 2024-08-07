@@ -28,6 +28,7 @@ public abstract class Unit implements GeneralBuff {
   @Getter protected AttackType attackType;
   // Поле для проверки, походил ли данный юнит в этом ходу или нет
   protected boolean isMoved = false;
+  @Getter boolean hitTarget = false;
 
   public Unit(
       UnitType unitType,

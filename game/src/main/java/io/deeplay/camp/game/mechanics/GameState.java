@@ -2,24 +2,25 @@ package io.deeplay.camp.game.mechanics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.deeplay.camp.game.entities.Army;
+import io.deeplay.camp.game.entities.AttackInfo;
 import io.deeplay.camp.game.entities.AttackType;
 import io.deeplay.camp.game.entities.Board;
+import io.deeplay.camp.game.entities.Defender;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
-import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -64,31 +65,53 @@ public class GameState {
   }
 
   // методы чисто для применения, проверка происходит до их использования
-  public void makeMove(MakeMoveEvent move) throws GameException {
+  public List<AttackInfo> makeMove(MakeMoveEvent move) throws GameException {
 
     if (gameStage == GameStage.ENDED) {
       throw new GameException(ErrorCode.GAME_IS_OVER);
     }
 
+    List<AttackInfo> attackResult = new ArrayList<>();
     if (isValidMove(move)) {
-      if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getAttackType()
-          == AttackType.MASS_ATTACK) {
-        if (board.getUnit(move.getFrom().x(), move.getFrom().y()).getPlayerType()
-            == PlayerType.FIRST_PLAYER) {
-          for (int i = 0; i < armySecond.getUnits().length; i++) {
-            board
-                .getUnit(move.getFrom().x(), move.getFrom().y())
-                .playMove(armySecond.getUnits()[i]);
+      Unit attacker = board.getUnit(move.getFrom().x(), move.getFrom().y());
+      List<Defender> defenders = new ArrayList<>();
+
+      if (attacker.getAttackType() == AttackType.MASS_ATTACK) {
+        if (attacker.getPlayerType() == PlayerType.FIRST_PLAYER) {
+          for (Unit defender : armySecond.getUnits()) {
+            attacker.playMove(defender);
+            if (attacker.isHitTarget()) {
+              Defender unitDefender = new Defender(defender, true);
+              defenders.add(unitDefender);
+            } else {
+              Defender unitDefender = new Defender(defender, false);
+              defenders.add(unitDefender);
+            }
           }
         } else {
-          for (int i = 0; i < armyFirst.getUnits().length; i++) {
-            board.getUnit(move.getFrom().x(), move.getFrom().y()).playMove(armyFirst.getUnits()[i]);
+          for (Unit defender : armyFirst.getUnits()) {
+            attacker.playMove(defender);
+            if (attacker.isHitTarget()) {
+              Defender unitDefender = new Defender(defender, true);
+              defenders.add(unitDefender);
+            } else {
+              Defender unitDefender = new Defender(defender, false);
+              defenders.add(unitDefender);
+            }
           }
         }
+        attackResult.add(new AttackInfo(attacker, defenders));
       } else {
-        board
-            .getUnit(move.getFrom().x(), move.getFrom().y())
-            .playMove(board.getUnit(move.getTo().x(), move.getTo().y()));
+        Unit defender = board.getUnit(move.getTo().x(), move.getTo().y());
+        attacker.playMove(defender);
+        if (attacker.isHitTarget()) {
+          Defender unitDefender = new Defender(defender, true);
+          defenders.add(unitDefender);
+        } else {
+          Defender unitDefender = new Defender(defender, false);
+          defenders.add(unitDefender);
+        }
+        attackResult.add(new AttackInfo(attacker, defenders));
       }
       logger.atInfo().log(
           "This {}({},{}) attack enemy or heal ({},{})",
@@ -101,6 +124,7 @@ public class GameState {
       armyFirst.isAliveGeneral();
       armySecond.isAliveGeneral();
     }
+    return attackResult;
   }
 
   public boolean isValidMove(MakeMoveEvent move) throws GameException {

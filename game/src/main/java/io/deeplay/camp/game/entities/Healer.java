@@ -14,6 +14,7 @@ public class Healer extends Unit {
   @Override
   public void playMove(Unit targetUnit) {
     targetUnit.setCurrentHp(targetUnit.getCurrentHp() + damage);
+    hitTarget = true;
     isMoved = true;
   }
 }
