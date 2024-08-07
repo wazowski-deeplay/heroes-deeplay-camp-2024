@@ -48,19 +48,8 @@ public class ClientProcess {
           gameStatesPlayer.get(gameStateDto.getGamePartyId()).updateBoard(serverDto);
           if (gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState.getGameStage()
               == GameStage.ENDED) {
-            System.out.println("игра окончена");
-            System.out.println("хотите начать новую игру?");
-            /*
-            gameStatesPlayer.get(gameStateDto.getGamePartyId()).downGameState();
-            gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState = null;
-            gameStatesPlayer.remove(gameStateDto.getGamePartyId());
-            for (int i = 0; i < gamePartiesId.size(); i++) {
-              if (gamePartiesId.get(i + 1) == gameStateDto.getGamePartyId()) {
-                gamePartiesId.remove(i + 1);
-                break;
-              }
-            }
-             */
+            System.out.println("Игра окончена");
+            System.out.println("Хотите начать новую игру? Для этого пропишите restart или exitgame.");
           }
           return;
         case GAME_PARTY_INFO:
@@ -87,6 +76,18 @@ public class ClientProcess {
           return;
         case OFFER_RESTART_GAME:
           System.out.println("Хочешь продолжить игру? Пропиши restart чтобы согласиться.");
+          return;
+        case EXIT_PARTY:
+          ExitPartyServerDto thisGameStateDto = (ExitPartyServerDto) serverDto;
+          gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).downGameState();
+          gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).gameState = null;
+          gameStatesPlayer.remove(thisGameStateDto.getGamePartyId());
+          for (int i = 0; i < gamePartiesId.size(); i++) {
+            if (gamePartiesId.get(i + 1) == thisGameStateDto.getGamePartyId()) {
+              gamePartiesId.remove(i + 1);
+              break;
+            }
+          }
           return;
         case ERROR_CONNECTION_INFO:
           ErrorConnectionResponseDto errorConnectionResponseDto =

@@ -52,7 +52,9 @@ public class Game implements GameListener {
   public void draw(List<Boolean> value) throws GameException {
     gameState.draw(value);
   }
-
+  public void exitGame(GiveUpEvent giveUpEvent) throws GameException {
+    gameState.exitGame(giveUpEvent);
+  }
   public void restart(List<Boolean> value) throws GameException {
     if (value.get(0) && value.get(1)) {
       gameState = new GameState();

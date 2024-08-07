@@ -450,6 +450,16 @@ public class GameState {
     }
   }
 
+  public void exitGame(GiveUpEvent giveUpEvent) {
+    if (giveUpEvent.getPlayerType() == PlayerType.FIRST_PLAYER) {
+      gameStage = GameStage.ENDED;
+      logger.atInfo().log("Первый игрок покинул свою игру");
+    } else if (giveUpEvent.getPlayerType() == PlayerType.SECOND_PLAYER) {
+      gameStage = GameStage.ENDED;
+      logger.atInfo().log("Второй игрок покинул свою игру");
+    }
+  }
+
   public void draw(List<Boolean> value) {
     if (value.get(0) && value.get(1)) {
       gameStage = GameStage.ENDED;

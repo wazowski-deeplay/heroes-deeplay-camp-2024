@@ -4,7 +4,8 @@ module io.deeplay.camp.core {
   exports io.deeplay.camp.core.dto.client;
   exports io.deeplay.camp.core.dto.client.game;
   exports io.deeplay.camp.core.dto.client.party;
-
+  exports io.deeplay.camp.core.dto.client.connection;
+  
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.core;
   requires com.fasterxml.jackson.databind;

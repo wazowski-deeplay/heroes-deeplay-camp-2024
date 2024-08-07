@@ -13,6 +13,7 @@ import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
 import io.deeplay.camp.core.dto.client.game.SwitchPartyDto;
 import io.deeplay.camp.core.dto.client.game.*;
 import io.deeplay.camp.core.dto.client.party.CreateGamePartyDto;
+import io.deeplay.camp.core.dto.client.party.ExitGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import io.deeplay.camp.core.dto.server.ConnectionErrorCode;
 import io.deeplay.camp.core.dto.server.GamePartiesDto;
@@ -20,9 +21,8 @@ import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.OfferDrawServerDto;
 import io.deeplay.camp.game.events.DrawEvent;
 import io.deeplay.camp.core.dto.server.*;
-import io.deeplay.camp.game.Game;
-import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.core.dto.server.OfferRestartServerDto;
+import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.exceptions.GameManagerException;
@@ -48,7 +48,7 @@ public class GamePartyManager {
   public GamePartyManager() {
     this.gameParties = new ConcurrentHashMap<>();
     this.executorService = Executors.newSingleThreadScheduledExecutor();
-    //scheduleCheckEndedTask();
+    // scheduleCheckEndedTask();
   }
 
   /**
@@ -262,21 +262,22 @@ public class GamePartyManager {
     String message;
     try {
       GameParty gameParty = gameParties.get(gamePartyId);
-      OfferRestartServerDto offerRestartServerDto = new OfferRestartServerDto(gameParty.getGamePartyId());
+      OfferRestartServerDto offerRestartServerDto =
+          new OfferRestartServerDto(gameParty.getGamePartyId());
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
         message = JsonConverter.serialize(offerRestartServerDto);
         logger.info("Предложение рестарта для 2 игрока");
         gameParty.setRestart(0, true);
         ClientManager.getInstance()
-                .sendMessage(
-                        gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
       } else {
         message = JsonConverter.serialize(offerRestartServerDto);
         logger.error("Предложение рестарта для 1 игрока");
         gameParty.setRestart(1, true);
         ClientManager.getInstance()
-                .sendMessage(
-                        gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
       }
     } catch (JsonProcessingException e) {
       throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
@@ -290,14 +291,47 @@ public class GamePartyManager {
         logger.info("Подтверждение рестарта первым игроком");
         gameParty.setRestart(0, true);
         gameParty.processRestart(gameParty.getRestart());
-      }
-      else if(gameParty.getPlayers().getPlayerTypeById(clientId)==PlayerType.SECOND_PLAYER){
+      } else if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.SECOND_PLAYER) {
         logger.info("Подтверждение рестарта вторым игроком");
         gameParty.setRestart(1, true);
         gameParty.processRestart(gameParty.getRestart());
       }
     } catch (GameException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public void exitGame(UUID gamePartyId, UUID clientId) throws GameManagerException, GameException {
+    String message;
+    try {
+      GameParty gameParty = gameParties.get(gamePartyId);
+      ExitPartyServerDto exitGamePartyDto = new ExitPartyServerDto(gameParty.getGamePartyId());
+      if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
+        message = JsonConverter.serialize(exitGamePartyDto);
+        logger.info("Первый игрок покидает игру - " + gamePartyId);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+        gameParties.get(gamePartyId).closeParty(clientId);
+        gameParties.remove(gamePartyId);
+
+      } else {
+        message = JsonConverter.serialize(exitGamePartyDto);
+        logger.error("Второй игрок покидает игру - " + gamePartyId);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.FIRST_PLAYER), message);
+        ClientManager.getInstance()
+            .sendMessage(
+                gameParty.getPlayers().getPlayerByPlayerType(PlayerType.SECOND_PLAYER), message);
+        gameParties.get(gamePartyId).closeParty(clientId);
+        gameParties.remove(gamePartyId);
+      }
+    } catch (JsonProcessingException e) {
+      throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
     }
   }
 
@@ -420,6 +454,17 @@ public class GamePartyManager {
     GamePartiesDto gamePartiesDto = new GamePartiesDto(partiesIds);
     UUID clientId = clientDto.getClientId();
     ClientManager.getInstance().sendMessage(clientId, JsonConverter.serialize(gamePartiesDto));
+  }
+
+  public void processExitGame(ClientDto clientDto) throws GameManagerException, GameException {
+    ExitGamePartyDto exitGamePartyDto = (ExitGamePartyDto) clientDto;
+    if (gameParties.get(exitGamePartyDto.getGamePartyId()) == null) {
+      logger.error("Ошибка gameparty null. Exit Party");
+      throw new GameManagerException(ConnectionErrorCode.NON_EXISTENT_CONNECTION);
+    }
+    UUID clientId = exitGamePartyDto.getClientId();
+    UUID gamePartyId = exitGamePartyDto.getGamePartyId();
+    exitGame(gamePartyId, clientId);
   }
 
   private void scheduleCheckEndedTask() {
