@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class OfferRestartServerDto extends ServerDto {
-    private UUID gamePartyId;
+  private UUID gamePartyId;
 
-    public OfferRestartServerDto(UUID gamePartyId) {
-        super(ServerDtoType.OFFER_RESTART_GAME);
-        this.gamePartyId = gamePartyId;
-    }
+  public OfferRestartServerDto(UUID gamePartyId) {
+    super(ServerDtoType.OFFER_RESTART_GAME);
+    this.gamePartyId = gamePartyId;
+  }
 }

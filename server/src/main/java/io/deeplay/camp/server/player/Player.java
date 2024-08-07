@@ -17,4 +17,6 @@ public abstract class Player {
   }
 
   public abstract void updateGameState(GameStateDto gameStateDto);
+
+  public abstract boolean isBotPlayer();
 }

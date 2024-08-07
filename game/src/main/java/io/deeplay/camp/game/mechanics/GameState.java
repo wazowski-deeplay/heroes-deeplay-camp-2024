@@ -249,7 +249,12 @@ public class GameState {
   public boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
-    logger.atInfo().log("Checking placement for unit {} at ({}, {}) {}", placement.getUnit(), x, y, placement.getUnit().getPlayerType());
+    logger.atInfo().log(
+        "Checking placement for unit {} at ({}, {}) {}",
+        placement.getUnit(),
+        x,
+        y,
+        placement.getUnit().getPlayerType());
     if (placement.getUnit().getPlayerType() != getCurrentPlayer()) {
       logger.error("Not your turn");
       throw new GameException(ErrorCode.NOT_YOUR_TURN);
@@ -467,7 +472,7 @@ public class GameState {
     }
   }
 
-  public void restartGame(){
+  public void restartGame() {
     board = null;
     armyFirst = null;
     armySecond = null;

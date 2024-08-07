@@ -2,10 +2,9 @@ package io.deeplay.camp.core.dto.client.connection;
 
 import io.deeplay.camp.core.dto.client.ClientDto;
 import io.deeplay.camp.core.dto.client.ClientDtoType;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @NoArgsConstructor
 @Getter

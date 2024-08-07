@@ -36,14 +36,16 @@ public class AiPlayer extends Player {
             if (place == null) {
               gameParty.processChangePlayer(new ChangePlayerDto(gameParty.getGamePartyId()));
             } else {
-              gameParty.processPlaceUnit(
-                  new PlaceUnitDto(
+              PlaceUnitDto placeUnitDto = new PlaceUnitDto(
                       gameParty.getGamePartyId(),
                       place.getColumns(),
                       place.getRows(),
                       place.getUnit().getUnitType(),
                       place.isInProcess(),
-                      place.isGeneral()));
+                      place.isGeneral());
+              placeUnitDto.setClientId(null);
+              gameParty.processPlaceUnit(
+                  placeUnitDto);
             }
           } catch (GameException e) {
             throw new RuntimeException(e);
@@ -72,5 +74,10 @@ public class AiPlayer extends Player {
         }
       }
     }
+  }
+
+  @Override
+  public boolean isBotPlayer() {
+    return true;
   }
 }

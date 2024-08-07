@@ -25,6 +25,7 @@ public class GameStatePlayer {
     gameState = gameStateDto.getGameState();
     cui.updateCui(gameState, gamePartyId, playerTypeInCurrentGame);
   }
+
   public void cleanBoard(ServerDto serverDto) {
     GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
     playerTypeInCurrentGame = gamePartyInfoDto.getPlayerType();

@@ -15,7 +15,6 @@ import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
-import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.exceptions.GameManagerException;
 import io.deeplay.camp.server.player.Player;
 import io.deeplay.camp.server.player.Players;
@@ -86,28 +85,26 @@ public class GameParty {
   }
 
   public void processRestart(List<Boolean> value) throws GameException {
-    if(value.get(0) && value.get(1)){
-    draw.set(0,false);
-    draw.set(1,false);
-    game.restartGame();
-    game = new Game();
-    restart.set(0,false);
-    restart.set(1,false);
-    updateGameStateForPlayers();
+    if (value.get(0) && value.get(1)) {
+      draw.set(0, false);
+      draw.set(1, false);
+      game.restartGame();
+      game = new Game();
+      restart.set(0, false);
+      restart.set(1, false);
+      updateGameStateForPlayers();
     }
   }
 
   public void closeParty(UUID escapeClient) throws GameException {
-    GiveUpEvent giveUpEvent =
-            DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
-    if(players.isFull()){
+    GiveUpEvent giveUpEvent = DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
+    if (players.isFull()) {
       game.giveUp(giveUpEvent);
     } else if (!players.isFull() || game.getGameState().getGameStage() == GameStage.ENDED) {
       game.exitGame(giveUpEvent);
     }
     game = null;
   }
-
 
   public void addPlayer(Player player) throws GameManagerException {
     if (players.isFull()) {

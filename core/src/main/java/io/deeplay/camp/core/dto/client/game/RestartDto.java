@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class RestartDto extends ClientDto {
-    private UUID gamePartyId;
+  private UUID gamePartyId;
 
-    public RestartDto(UUID gamePartyId) {
-        super(ClientDtoType.RESTART);
-        this.gamePartyId = gamePartyId;
-    }
+  public RestartDto(UUID gamePartyId) {
+    super(ClientDtoType.RESTART);
+    this.gamePartyId = gamePartyId;
+  }
 }

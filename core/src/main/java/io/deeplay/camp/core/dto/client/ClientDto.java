@@ -9,8 +9,6 @@ import io.deeplay.camp.core.dto.client.party.ExitGamePartyDto;
 import io.deeplay.camp.core.dto.client.party.GetPartiesDto;
 import io.deeplay.camp.core.dto.client.party.JoinGamePartyDto;
 import java.util.UUID;
-
-import io.deeplay.camp.core.dto.server.RestartServerDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

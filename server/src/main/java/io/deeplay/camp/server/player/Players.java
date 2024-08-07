@@ -30,18 +30,17 @@ public class Players {
   }
 
   public PlayerType getPlayerTypeById(UUID clientId) {
-    for (Player player : hashMap.values()) {
-      if (player instanceof HumanPlayer) {
-        if (((HumanPlayer) player).getClientId().equals(clientId)) {
-          return player.getPlayerType();
+    if (clientId != null) {
+      for (Player player : hashMap.values()) {
+        if (player instanceof HumanPlayer) {
+          if (((HumanPlayer) player).getClientId() == clientId) {
+            return player.getPlayerType();
+          }
         }
-      } else if (player instanceof AiPlayer) {//TODO
-        if (((AiPlayer) player).getGameParty().getGame().getGameState().getCurrentPlayer()
-                == PlayerType.FIRST_PLAYER) {
-          return player.getPlayerType();
-        }
-        if (((AiPlayer) player).getGameParty().getGame().getGameState().getCurrentPlayer()
-            == PlayerType.SECOND_PLAYER) {
+      }
+    } else {
+      for (Player player : hashMap.values()) {
+        if (player instanceof AiPlayer) {
           return player.getPlayerType();
         }
       }
@@ -55,18 +54,16 @@ public class Players {
         if (((HumanPlayer) player).getPlayerType() == playerType) {
           return ((HumanPlayer) player).getClientId();
         }
-      } else if (player instanceof AiPlayer) {
-
       }
     }
     return null;
   }
 
-  public void clearPlayersType(){
+  public void clearPlayersType() {
     hashMap = new HashMap<>();
   }
 
-  public void setPlayerById(UUID playerId, PlayerType playerType){
+  public void setPlayerById(UUID playerId, PlayerType playerType) {
     for (Player player : hashMap.values()) {
       if (player instanceof HumanPlayer) {
         if (((HumanPlayer) player).getClientId().equals(playerId)) {
@@ -76,7 +73,7 @@ public class Players {
     }
   }
 
-  public UUID getPlayerByAnotherPlayerId(UUID anotherPlayerId){
+  public UUID getPlayerByAnotherPlayerId(UUID anotherPlayerId) {
     for (Player player : hashMap.values()) {
       if (player instanceof HumanPlayer) {
         if (!((HumanPlayer) player).getClientId().equals(anotherPlayerId)) {
@@ -86,5 +83,4 @@ public class Players {
     }
     return null;
   }
-
 }
