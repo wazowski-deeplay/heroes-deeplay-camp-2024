@@ -35,6 +35,7 @@ public class Cui {
     gamePlayer = playerType;
     outInFrame(gameState, id);
   }
+
   public void cleanCui(UUID id, PlayerType playerType) {
     gamePlayer = playerType;
     outInFrame(null, id);
@@ -42,10 +43,9 @@ public class Cui {
 
   public void outInFrame(GameState gameState, UUID idRoom) {
     Board board = null;
-    if(gameState == null){
+    if (gameState == null) {
       board = new Board();
-    }
-    else{
+    } else {
       board = gameState.getCurrentBoard();
     }
     field.setText(null);
@@ -84,7 +84,7 @@ public class Cui {
     field.append("You are " + gamePlayer.name());
     field.append(separator);
     field.append(separator);
-    if(gameState != null){
+    if (gameState != null) {
       if (gameState.getGameStage() == GameStage.ENDED) {
         field.append("Winner = " + gameState.getWinner().name());
         System.out.println("Победитель = " + gameState.getWinner().name());

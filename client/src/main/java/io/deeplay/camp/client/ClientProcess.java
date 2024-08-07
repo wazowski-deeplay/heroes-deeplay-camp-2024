@@ -49,20 +49,21 @@ public class ClientProcess {
           if (gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState.getGameStage()
               == GameStage.ENDED) {
             System.out.println("Игра окончена");
-            System.out.println("Хотите начать новую игру? Для этого пропишите restart или exitgame.");
+            System.out.println(
+                "Хотите начать новую игру? Для этого пропишите restart или exitgame.");
           }
           return;
         case GAME_PARTY_INFO:
           GamePartyInfoDto gamePartyInfoDto = (GamePartyInfoDto) serverDto;
-          if(this.gameStatesPlayer.containsKey(gamePartyInfoDto.getGamePartyId())){
-            this.gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).playerTypeInCurrentGame = gamePartyInfoDto.getPlayerType();
+          if (this.gameStatesPlayer.containsKey(gamePartyInfoDto.getGamePartyId())) {
+            this.gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).playerTypeInCurrentGame =
+                gamePartyInfoDto.getPlayerType();
             gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).cleanBoard(serverDto);
-          }
-          else{
-          this.gameStatesPlayer.put(
-              gamePartyInfoDto.getGamePartyId(),
-              new GameStatePlayer(
-                  gamePartyInfoDto.getGamePartyId(), gamePartyInfoDto.getPlayerType()));
+          } else {
+            this.gameStatesPlayer.put(
+                gamePartyInfoDto.getGamePartyId(),
+                new GameStatePlayer(
+                    gamePartyInfoDto.getGamePartyId(), gamePartyInfoDto.getPlayerType()));
           }
           gamePartyId = gamePartyInfoDto.getGamePartyId();
           System.out.println(gamePartyId);
@@ -85,7 +86,8 @@ public class ClientProcess {
           return;
         case EXIT_PARTY:
           ExitPartyServerDto thisGameStateDto = (ExitPartyServerDto) serverDto;
-          System.out.println("Игра "+ thisGameStateDto.getGamePartyId().toString() + " завершена.");
+          System.out.println(
+              "Игра " + thisGameStateDto.getGamePartyId().toString() + " завершена.");
           gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).downGameState();
           gameStatesPlayer.get(thisGameStateDto.getGamePartyId()).gameState = null;
           gameStatesPlayer.remove(thisGameStateDto.getGamePartyId());

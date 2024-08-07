@@ -35,6 +35,11 @@ public class HumanPlayer extends Player {
     }
   }
 
+  @Override
+  public boolean isBotPlayer() {
+    return false;
+  }
+
   public void sendMessage(String message) {
     ClientManager.getInstance().sendMessage(clientId, message);
   }
