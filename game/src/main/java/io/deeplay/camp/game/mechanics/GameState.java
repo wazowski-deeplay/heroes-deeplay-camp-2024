@@ -61,6 +61,8 @@ public class GameState {
     if (countRound == 0) {
       winner = winnerOrDraw();
       gameStage = GameStage.ENDED;
+      logger.atInfo().log(
+              "Result {}, game is {}", winner, gameStage);
     }
   }
 
@@ -424,10 +426,14 @@ public class GameState {
     if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).size() == 0) {
       winner = PlayerType.SECOND_PLAYER;
       gameStage = GameStage.ENDED;
+      logger.atInfo().log(
+              "Result {}, is {}", winner, gameStage);
     }
     if (getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).size() == 0) {
       winner = PlayerType.FIRST_PLAYER;
       gameStage = GameStage.ENDED;
+      logger.atInfo().log(
+              "Result {}, is {}", winner, gameStage);
     }
   }
 

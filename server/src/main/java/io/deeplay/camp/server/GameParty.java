@@ -16,6 +16,7 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.server.exceptions.GameManagerException;
+import io.deeplay.camp.server.player.AiPlayer;
 import io.deeplay.camp.server.player.Player;
 import io.deeplay.camp.server.player.Players;
 import java.util.ArrayList;
@@ -47,11 +48,25 @@ public class GameParty {
   }
 
   public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
-    PlaceUnitEvent placeUnitEvent =
-        DtoToEventConverter.convert(
-            placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
-    game.placeUnit(placeUnitEvent);
-    updateGameStateForPlayers();
+    int countAi =  0;
+    for(Player player : players.getHashMap().values()){
+      if(player instanceof AiPlayer){
+        countAi++;
+      }
+    }
+    if(countAi != 2){
+      PlaceUnitEvent placeUnitEvent =
+          DtoToEventConverter.convert(
+              placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
+      game.placeUnit(placeUnitEvent);
+      updateGameStateForPlayers();
+    }
+    else{
+      PlaceUnitEvent placeUnitEvent =
+          DtoToEventConverter.convert(placeUnitDto, game.getGameState().getCurrentPlayer());
+      game.placeUnit(placeUnitEvent);
+      updateGameStateForPlayers();
+    }
   }
 
   public void processMakeMove(MakeMoveDto makeMoveRequest) throws GameException {
@@ -97,10 +112,16 @@ public class GameParty {
   }
 
   public void closeParty(UUID escapeClient) throws GameException {
+    if(escapeClient != null){
     GiveUpEvent giveUpEvent = DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
     if (players.isFull()) {
       game.giveUp(giveUpEvent);
     } else if (!players.isFull() || game.getGameState().getGameStage() == GameStage.ENDED) {
+      game.exitGame(giveUpEvent);
+    }
+    }
+    else{
+      GiveUpEvent giveUpEvent = DtoToEventConverter.convert(game.getGameState().getCurrentPlayer());
       game.exitGame(giveUpEvent);
     }
     game = null;
