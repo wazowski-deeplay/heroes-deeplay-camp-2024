@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="io.deeplay.camp.app.controller.GameConfigController">
+
+    <VBox alignment="CENTER" layoutX="56.0" layoutY="20.0" prefHeight="360" prefWidth="487.0" spacing="20">
+        <Label text="Выберите режим игры:">
+            <font>
+                <Font size="20.0"/>
+            </font>
+        </Label>
+        <HBox alignment="CENTER" spacing="10">
+            <RadioButton fx:id="humanModeRadio" onAction="#modeSelected" text="Против человека">
+                <font>
+                    <Font size="17.0"/>
+                </font>
+            </RadioButton>
+            <RadioButton fx:id="botModeRadio" onAction="#modeSelected" text="Против бота">
+                <font>
+                    <Font size="17.0"/>
+                </font>
+            </RadioButton>
+        </HBox>
+
+        <HBox fx:id="botHBox" alignment="CENTER" disable="true" spacing="10" visible="false">
+            <Label text="Выберите бота:"/>
+            <ComboBox fx:id="botComboBox"/>
+        </HBox>
+
+        <Button onAction="#createGame" prefHeight="61.0" prefWidth="174.0" text="Создать игру">
+            <font>
+                <Font name="System Bold Italic" size="20.0"/>
+            </font>
+        </Button>
+    </VBox>
+    <Button layoutX="14.0" layoutY="14.0" onAction="#goBack" text="Назад"/>
+
+</AnchorPane>
