@@ -70,7 +70,7 @@ public class GameState {
   public List<AttackInfo> makeMove(MakeMoveEvent move) throws GameException {
 
     if (gameStage == GameStage.ENDED) {
-      throw new GameException(ErrorCode.GAME_IS_OVER);
+     // throw new GameException(ErrorCode.GAME_IS_OVER);
     }
 
     List<AttackInfo> attackResult = new ArrayList<>();

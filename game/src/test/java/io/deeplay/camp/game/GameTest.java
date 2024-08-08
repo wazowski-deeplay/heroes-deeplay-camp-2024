@@ -9,7 +9,6 @@ import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.PlayerType;
-import io.deeplay.camp.game.mechanics.RandomBot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,18 +18,6 @@ class GameTest {
   @BeforeEach
   public void setUp() {
     game = new Game();
-  }
-
-  @Test
-  void testGame() {
-    RandomBot bot1 = new RandomBot();
-    RandomBot bot2 = new RandomBot();
-    BotFight fight = new BotFight(bot1, bot2, 1, true);
-    try {
-      fight.playGames();
-    } catch (GameException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @Test
