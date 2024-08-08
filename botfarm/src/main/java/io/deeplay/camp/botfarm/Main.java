@@ -22,9 +22,10 @@ public class Main {
 
     RandomBot bot1 = new RandomBot();
     RandomBot bot2 = new RandomBot();
-    BotFight fight1 = new BotFight(bot1, bot2, 5, true);
-    BotFight fight2 = new BotFight(bot1, bot2, 5, true);
-    BotFight fight3 = new BotFight(bot1, bot2, 5, true);
+    for(int i = 0; i<2;i++){
+      BotFight fight = new BotFight(bot1, bot2, 10, true);
+    }
+
   }
 
   public static boolean deleteFilesForPathByPrefix(final String path, final String prefix) {
