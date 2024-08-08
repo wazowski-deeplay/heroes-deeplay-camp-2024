@@ -13,6 +13,7 @@ import io.deeplay.camp.game.mechanics.PlayerType;
 
 import java.awt.Font;
 import java.io.IOException;
+import java.util.Timer;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -31,6 +32,7 @@ public class BotFight extends Thread{
     RandomBot botSecond;
     boolean consoleOut = true;
     boolean outInfoGame;
+    final Timer timer = new Timer();
 
     String separator = System.getProperty("line.separator");
 
@@ -39,7 +41,9 @@ public class BotFight extends Thread{
     JFrame frame;
     JTextArea area1;
     JPanel contents;
+
     Thread threadFight;
+    TimerForBot timerForBot;
 
 
     public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) throws IOException {
@@ -49,8 +53,10 @@ public class BotFight extends Thread{
         fightId = (int)(100000+Math.random()*999999);
         gameAnalisys = new GameAnalisys(countGame, fightId);
         this.outInfoGame = infoGame;
-
         threadFight = new Thread(this);
+
+        timerForBot = new TimerForBot(threadFight, timer);
+        timer.schedule(timerForBot, 30000);
 
         frame = new JFrame();
         frame.setSize(800, 500);
@@ -61,6 +67,8 @@ public class BotFight extends Thread{
         contents.add(area1);
         frame.add(contents);
         frame.setVisible(true);
+
+        threadFight.start();
 
     }
 
@@ -96,43 +104,11 @@ public class BotFight extends Thread{
                 game.changePlayer(new ChangePlayerEvent(game.getGameState().getCurrentPlayer()));
             }
 
-            calcResult(gameCount);
-
             game = null;
         }
 
         if (outInfoGame) {
             gameAnalisys.outputInfo();
-        }
-    }
-
-    public void calcResult(int countGame) {
-        if (botFirst
-                .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
-                .size()
-                > botSecond
-                .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
-                .size()) {
-            winsFirstPlayer++;
-            gameAnalisys.reviewGame(PlayerType.FIRST_PLAYER, game.getGameState(), countGame);
-
-        } else if (botFirst
-                .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
-                .size()
-                < botSecond
-                .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
-                .size()) {
-            winsSecondPlayer++;
-            gameAnalisys.reviewGame(PlayerType.SECOND_PLAYER, game.getGameState(), countGame);
-
-        } else if (botFirst
-                .enumerationPlayerUnits(PlayerType.FIRST_PLAYER, game.getGameState().getCurrentBoard())
-                .size()
-                == botSecond
-                .enumerationPlayerUnits(PlayerType.SECOND_PLAYER, game.getGameState().getCurrentBoard())
-                .size()) {
-            countDraw++;
-            gameAnalisys.reviewGame(PlayerType.DRAW, game.getGameState(), countGame);
         }
     }
 

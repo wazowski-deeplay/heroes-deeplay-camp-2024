@@ -25,9 +25,6 @@ public class Main {
     BotFight fight1 = new BotFight(bot1, bot2, 5, true);
     BotFight fight2 = new BotFight(bot1, bot2, 5, true);
     BotFight fight3 = new BotFight(bot1, bot2, 5, true);
-    fight1.start();
-    fight2.start();
-    fight3.start();
   }
 
   public static boolean deleteFilesForPathByPrefix(final String path, final String prefix) {
