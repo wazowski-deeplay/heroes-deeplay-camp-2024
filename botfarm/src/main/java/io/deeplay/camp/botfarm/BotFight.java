@@ -2,7 +2,6 @@ package io.deeplay.camp.botfarm;
 
 import io.deeplay.camp.botfarm.bots.RandomBot;
 import io.deeplay.camp.game.Game;
-import io.deeplay.camp.game.GameAnalisys;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
@@ -13,11 +12,12 @@ import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.game.mechanics.PlayerType;
 
 import java.awt.Font;
+import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class BotFight {
+public class BotFight extends Thread{
 
     private static int winsFirstPlayer = 0;
     private static int winsSecondPlayer = 0;
@@ -31,17 +31,27 @@ public class BotFight {
     RandomBot botSecond;
     boolean consoleOut = true;
     boolean outInfoGame;
+
     String separator = System.getProperty("line.separator");
+
+    int fightId;
+
     JFrame frame;
     JTextArea area1;
     JPanel contents;
+    Thread threadFight;
 
-    public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) {
+
+    public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) throws IOException {
         this.botFirst = botFirst;
         this.botSecond = botSecond;
         this.countGame = countGame;
-        gameAnalisys = new GameAnalisys(countGame);
+        fightId = (int)(100000+Math.random()*999999);
+        gameAnalisys = new GameAnalisys(countGame, fightId);
         this.outInfoGame = infoGame;
+
+        threadFight = new Thread(this);
+
         frame = new JFrame();
         frame.setSize(800, 500);
         area1 = new JTextArea(20, 50);
@@ -51,9 +61,25 @@ public class BotFight {
         contents.add(area1);
         frame.add(contents);
         frame.setVisible(true);
+
     }
 
-    public void playGames() throws GameException, InterruptedException {
+    @Override
+    public void run() {
+        try {
+            playGames();
+            frame.setVisible(false);
+            threadFight.interrupt();
+        } catch (GameException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void playGames() throws GameException, InterruptedException, IOException {
         for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
             game = new Game();
@@ -74,10 +100,6 @@ public class BotFight {
 
             game = null;
         }
-
-        System.out.println("Count Wins 1 Player = " + winsFirstPlayer);
-        System.out.println("Count Wins 2 Player  = " + winsSecondPlayer);
-        System.out.println("Draws = " + countDraw);
 
         if (outInfoGame) {
             gameAnalisys.outputInfo();
