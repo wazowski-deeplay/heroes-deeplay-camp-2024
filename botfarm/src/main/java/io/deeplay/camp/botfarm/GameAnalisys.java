@@ -25,6 +25,7 @@ public class GameAnalisys {
   int[][] favorMageSecond;
   UnitType[][] generalType;
   PlayerType[] winners;
+  long[][] avgTimeMove;
   Board currentBoard;
   int countGame;
   String separator = System.lineSeparator();
@@ -44,6 +45,7 @@ public class GameAnalisys {
     favorMageSecond = new int[countGame][3];
     generalType = new UnitType[countGame][2];
     winners = new PlayerType[countGame];
+    avgTimeMove = new long[countGame][2];
     this.gameId = gameId;
     String path = "C:\\Deeplay\\deeplay-heroes\\botfarm\\src\\main\\java\\io\\deeplay\\camp\\botfarm";
     fileOutput = new File(path + "\\resultgame"+gameId+".txt");
@@ -51,13 +53,18 @@ public class GameAnalisys {
 
   }
 
+  public void reviewTimeMove(long timeMove, int countGame){
+    avgTimeMove[countGame][0] += timeMove;
+    avgTimeMove[countGame][1] += 1;
+  }
+
   // Подсчитывает результаты одной игры
-  public void reviewGame(PlayerType playerWinner, GameState gameState, int countGame) {
+  public void reviewGame(GameState gameState, int countGame) {
     int[] knightCount = new int[2];
     int[] archerCount = new int[2];
     int[] mageCount = new int[2];
     int[] healerCount = new int[2];
-    winners[countGame] = playerWinner;
+    winners[countGame] = gameState.getWinner();
 
     generalType[countGame][0] = gameState.getArmyFirst().getGeneralType();
     generalType[countGame][1] = gameState.getArmySecond().getGeneralType();
@@ -126,6 +133,7 @@ public class GameAnalisys {
     writer.append(String.format("%-" + tab2 + "s", "CountAr2"));
     writer.append(String.format("%-" + tab2 + "s", "CountMa2"));
     writer.append(String.format("%-" + tab2 + "s", "CountHe2"));
+    writer.append(String.format("%-" + tab2 + "s", "AvgMoBot"));
 
     for (int i = 0; i < countGame; i++) {
       writer.append(separator);
@@ -141,6 +149,7 @@ public class GameAnalisys {
       writer.append(String.format("%-" + tab + "d", favorArcherSecond[i][0]));
       writer.append(String.format("%-" + tab + "d", favorMageSecond[i][0]));
       writer.append(String.format("%-" + tab + "d", favorHealerSecond[i][0]));
+      writer.append(String.format("%-" + tab + "f", (float)avgTimeMove[i][0]/avgTimeMove[i][1]));
     }
     writer.append(separator);
     writer.close();
