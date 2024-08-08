@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<Pane fx:id="unitPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="106.0" prefWidth="146.0" style="-fx-background-color: rgba(128, 128, 128, 0.5);"
+      xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="io.deeplay.camp.app.controller.UnitMovementController">
+    <Button fx:id="unitButton" onAction="#handleUnitClick" layoutX="12.0" layoutY="4.0" mnemonicParsing="false"
+            prefHeight="97.0" prefWidth="69.0" text="Unit"/>
+    <VBox layoutX="96.0" layoutY="4.0" prefHeight="90.0" prefWidth="40.0" spacing="10.0"> <!-- Устанавливаем spacing -->
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="♥:" textFill="#f20000"/>
+            <Label fx:id="healthLabel" prefHeight="17.0" prefWidth="22.0" text="100"/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="⧩:" textFill="#0900ff"/>
+            <Label fx:id="armorLabel" prefHeight="17.0" prefWidth="22.0" text="100"/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="⚔:"/>
+            <Label fx:id="damageLabel" prefHeight="17.0" prefWidth="22.0" text="100"/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="🞋:" textFill="#3ca821"/>
+            <Label fx:id="accuracyLabel" prefHeight="17.0" prefWidth="22.0" text="100"/>
+        </HBox>
+    </VBox>
+</Pane>

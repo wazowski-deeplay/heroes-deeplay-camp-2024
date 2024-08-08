@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.String?>
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="106.0"
+      prefWidth="146.0" style="-fx-background-color: rgba(128, 128, 128, 0.1);" xmlns="http://javafx.com/javafx/22"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.deeplay.camp.app.controller.UnitPlacementController">
+    <VBox layoutX="96.0" layoutY="4.0" prefHeight="90.0" prefWidth="40.0" spacing="10.0">
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="♥:" textFill="#f20000"/>
+            <Label fx:id="healthLabel" prefHeight="17.0" prefWidth="22.0" text=" "/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="⧩:" textFill="#0900ff"/>
+            <Label fx:id="armorLabel" prefHeight="17.0" prefWidth="22.0" text=" "/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="⚔:"/>
+            <Label fx:id="damageLabel" prefHeight="17.0" prefWidth="22.0" text=" "/>
+        </HBox>
+        <HBox prefHeight="10.0" prefWidth="29.0">
+            <Label prefHeight="17.0" prefWidth="17.0" text="🞋:" textFill="#3ca821"/>
+            <Label fx:id="accuracyLabel" prefHeight="17.0" prefWidth="22.0"/>
+        </HBox>
+    </VBox>
+    <ComboBox fx:id="unitComboBox" layoutX="6.0" layoutY="29.0" prefHeight="25.0" prefWidth="81.0">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="Knight"/>
+                <String fx:value="Archer"/>
+                <String fx:value="Wizard"/>
+                <String fx:value="Healer"/>
+            </FXCollections>
+        </items>
+    </ComboBox>
+    <CheckBox fx:id="generalCheckbox" layoutX="17.0" layoutY="59.0" mnemonicParsing="false" text="Генерал"/>
+</Pane>

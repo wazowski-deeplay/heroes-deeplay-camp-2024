@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            prefHeight="200" prefWidth="300" style="-fx-background-color: #f0f0f0;">
+    <center>
+        <Label text="Ожидание" style="-fx-font-size: 24pt; -fx-font-weight: bold;"
+               BorderPane.alignment="CENTER"/>
+    </center>
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+</BorderPane>
