@@ -69,6 +69,13 @@ public class AiPlayer extends Player {
             throw new RuntimeException(e);
           }
         }
+        case ENDED -> {
+            try {
+                gameParty.closeParty(null);
+            } catch (GameException e) {
+                throw new RuntimeException(e);
+            }
+        }
         default -> {
           System.out.println("Неопознанное состояние");
         }
