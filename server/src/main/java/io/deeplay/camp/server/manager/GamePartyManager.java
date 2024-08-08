@@ -92,6 +92,7 @@ public class GamePartyManager {
     switch (gameType) {
       case HUMAN_VS_BOT -> createHumanVsBotParty(clientId);
       case HUMAN_VS_HUMAN -> createHumanVsHumanParty(clientId);
+      case BOT_VS_BOT -> createBotVsBotParty(clientId);
       default -> {
         logger.error("Ошибка выбора типа игры");
         throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
@@ -175,6 +176,29 @@ public class GamePartyManager {
       throw e;
     } catch (Exception e) {
       logger.error("Неизвестная ошибка при создании игры между игроком и ботом {}", e.getMessage());
+      throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
+    }
+  }
+
+  /**
+   * Метод создания битвы бота с ботом. Создаёт пати и сразу добавляет бота и бота как игроков.
+   *
+   *
+   * @param humanPlayerId Id клиента, запросившего создание.
+   */
+  private void createBotVsBotParty(UUID humanPlayerId) throws GameManagerException {
+    try {
+      GameParty gameParty = new GameParty(UUID.randomUUID());
+      gameParties.put(gameParty.getGamePartyId(), gameParty);
+      gameParty.addPlayer(new AiPlayer(randomPlayerType(gameParty.getGamePartyId()), gameParty));
+      gameParty.addPlayer(new AiPlayer(randomPlayerType(gameParty.getGamePartyId()), gameParty));
+      logger.info("");
+    } catch (GameManagerException e) {
+      logger.error(
+              "Ошибка при создании игры между ботом и ботом {} ", e.getConnectionErrorCode());
+      throw e;
+    } catch (Exception e) {
+      logger.error("Неизвестная ошибка при создании игры между ботом и ботом {}", e.getMessage());
       throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
     }
   }

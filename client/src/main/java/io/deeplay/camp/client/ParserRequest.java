@@ -122,7 +122,9 @@ public class ParserRequest {
         clientDto = new CreateGamePartyDto(GameType.HUMAN_VS_HUMAN);
       } else if (userCommand[1].equals("vs_bot")) {
         clientDto = new CreateGamePartyDto(GameType.HUMAN_VS_BOT);
-      } else {
+      } else if (userCommand[1].equals("bot_vs_bot")){
+        clientDto = new CreateGamePartyDto(GameType.BOT_VS_BOT);
+      } else{
         return null;
       }
     }
