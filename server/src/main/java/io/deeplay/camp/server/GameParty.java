@@ -78,7 +78,7 @@ public class GameParty {
 
   public void processChangePlayer(ChangePlayerDto changePlayerRequest) throws GameException {
     ChangePlayerEvent changePlayerEvent =
-        DtoToEventConverter.convert(changePlayerRequest, game.getGameState().getCurrentPlayer());
+        DtoToEventConverter.convert(changePlayerRequest, players.getPlayerTypeById(changePlayerRequest.getClientId()));
     game.changePlayer(changePlayerEvent);
     updateGameStateForPlayers();
   }
