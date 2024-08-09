@@ -558,6 +558,11 @@ public class GamePartyManager {
 
   public void processGetParties(ClientDto clientDto) throws JsonProcessingException {
     List<UUID> partiesIds = new ArrayList<>(gameParties.keySet());
+    for(UUID id : partiesIds){
+      if(gameParties.get(id).getPlayers().getInPlayersAi()){
+        partiesIds.remove(id);
+      }
+    }
     GamePartiesDto gamePartiesDto = new GamePartiesDto(partiesIds);
     UUID clientId = clientDto.getClientId();
     ClientManager.getInstance().sendMessage(clientId, JsonConverter.serialize(gamePartiesDto));
