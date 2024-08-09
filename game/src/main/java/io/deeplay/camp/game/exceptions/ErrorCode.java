@@ -15,7 +15,8 @@ public enum ErrorCode {
   PLACEMENT_INCORRECT("Введены не корректные координаты"),
   GENERAL_IS_MISSING("Отсутствует генерал"),
   TOO_MANY_GENERAL("Слишком много генералов"),
-  NOT_YOUR_TURN("Не твоя очередь");
+  NOT_YOUR_TURN("Не твоя очередь"),
+  UNDEFINED_ERROR("не известная ошибка");
 
   private final String message;
 
