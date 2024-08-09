@@ -83,4 +83,13 @@ public class Players {
     }
     return null;
   }
+
+  public boolean getInPlayersAi(){
+    for (Player player : hashMap.values()) {
+      if(player instanceof AiPlayer){
+        return true;
+      }
+    }
+    return false;
+  }
 }
