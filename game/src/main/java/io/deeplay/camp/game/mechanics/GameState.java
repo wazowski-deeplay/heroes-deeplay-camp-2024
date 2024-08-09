@@ -317,6 +317,24 @@ public class GameState {
   }
 
   public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
+    if(changePlayerEvent.getRequester()!=currentPlayer){
+      throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
+    }
+    if(gameStage == GameStage.PLACEMENT_STAGE){
+      if(changePlayerEvent.getRequester()==PlayerType.FIRST_PLAYER){
+        if(!board.isFullFirstPlayerPart()){
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+      }
+      else if(changePlayerEvent.getRequester()==PlayerType.SECOND_PLAYER){
+        if(!board.isFullSecondPlayerPart()){
+          throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
+        }
+      }
+      else {
+        throw new GameException(ErrorCode.UNDEFINED_ERROR);
+      }
+    }
     if (isValidChangePlayer(changePlayerEvent)) {
       changeCurrentPlayer();
     } else {
