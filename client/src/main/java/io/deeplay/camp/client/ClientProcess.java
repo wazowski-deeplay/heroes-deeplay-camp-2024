@@ -23,12 +23,14 @@ public class ClientProcess {
   private HashMap<UUID, GameStatePlayer> gameStatesPlayer;
   private ServerHandler serverHandler;
   private ParserRequest parserRequest;
+  private UserInputHandler userInputHandler;
 
   public ClientProcess(String addr, int port) {
     try {
       this.socket = new Socket(addr, port);
       this.serverHandler = new ServerHandler(socket);
       this.parserRequest = new ParserRequest();
+      this.userInputHandler = new UserInputHandler();
       this.inputUser = new BufferedReader(new InputStreamReader(System.in));
       this.gameStatesPlayer = new HashMap<>();
       this.gamePartiesId = new HashMap<>();
@@ -44,11 +46,10 @@ public class ClientProcess {
       switch (serverDto.getServerDtoType()) {
         case GAME_STATE:
           GameStateDto gameStateDto = (GameStateDto) serverDto;
-          gamePartyId = gameStateDto.getGamePartyId();
-          gameStatesPlayer.get(gameStateDto.getGamePartyId()).updateBoard(serverDto);
+          gameStatesPlayer.get(gameStateDto.getGamePartyId()).updateBoard(serverDto, gamePartyId);
           if (gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState.getGameStage()
               == GameStage.ENDED) {
-            System.out.println("Игра окончена");
+            System.out.println("Иhumanгра окончена");
             System.out.println(
                 "Хотите начать новую игру? Для этого пропишите restart или exitgame.");
           }
@@ -58,7 +59,7 @@ public class ClientProcess {
           if (this.gameStatesPlayer.containsKey(gamePartyInfoDto.getGamePartyId())) {
             this.gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).playerTypeInCurrentGame =
                 gamePartyInfoDto.getPlayerType();
-            gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).cleanBoard(serverDto);
+            gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).cleanBoard(serverDto, gamePartyId);
           } else {
             this.gameStatesPlayer.put(
                 gamePartyInfoDto.getGamePartyId(),
@@ -140,15 +141,19 @@ public class ClientProcess {
         String userWord;
         try {
           userWord = inputUser.readLine();
-          ClientDto clientDto;
-          if (parserRequest.convert(userWord, gamePartyId, gamePartiesId) != null) {
+          ClientDto clientDto = null;
+          if(userInputHandler.isUserHandler(userWord, gamePartiesId) != null){
+            gamePartyId = userInputHandler.isUserHandler(userWord, gamePartiesId);
+            for (GameStatePlayer gameState : gameStatesPlayer.values()) {
+              gameState.getCui().outInFrame(gameState.gameState, gameState.gamePartyId, gamePartyId);
+            }
+          } else if (parserRequest.convert(userWord, gamePartyId, gamePartiesId) != null) {
             clientDto = parserRequest.convert(userWord, gamePartyId, gamePartiesId);
+            String sendDto = JsonConverter.serialize(clientDto);
+            serverHandler.sendRequest(sendDto);
           } else {
             System.out.println("Некорректный ввод данных, попробуйте снова");
-            continue;
           }
-          String sendDto = JsonConverter.serialize(clientDto);
-          serverHandler.sendRequest(sendDto);
         } catch (IOException e) {
 
           serverHandler.downService();

@@ -31,17 +31,17 @@ public class Cui {
     this.gamePlayer = playerType;
   }
 
-  public void updateCui(GameState gameState, UUID id, PlayerType playerType) {
+  public void updateCui(GameState gameState, UUID idRoomGameState, PlayerType playerType, UUID idCurrentGame) {
     gamePlayer = playerType;
-    outInFrame(gameState, id);
+    outInFrame(gameState, idRoomGameState, idCurrentGame);
   }
 
-  public void cleanCui(UUID id, PlayerType playerType) {
+  public void cleanCui(UUID idRoomGameState, PlayerType playerType, UUID idCurrentGame) {
     gamePlayer = playerType;
-    outInFrame(null, id);
+    outInFrame(null, idRoomGameState, idCurrentGame);
   }
 
-  public void outInFrame(GameState gameState, UUID idRoom) {
+  public void outInFrame(GameState gameState, UUID idRoom, UUID currentIdRoom) {
     Board board = null;
     if (gameState == null) {
       board = new Board();
@@ -92,6 +92,15 @@ public class Cui {
         field.append(separator);
       }
     }
+    field.append(separator);
+    field.append(separator);
+    if(currentIdRoom == idRoom){
+      field.append("You choose this room!");
+    }
+    else{
+      field.append("You choose room = " + currentIdRoom.toString());
+    }
+
   }
 
   public void downCuiFrame() {
