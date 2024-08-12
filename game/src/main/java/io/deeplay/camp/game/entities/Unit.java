@@ -27,7 +27,7 @@ public abstract class Unit implements GeneralBuff {
   @Setter @Getter protected PlayerType playerType;
   @Getter protected AttackType attackType;
   // Поле для проверки, походил ли данный юнит в этом ходу или нет
-  protected boolean isMoved = false;
+  @Getter protected boolean isMoved = false;
   @Getter boolean hitTarget = false;
 
   public Unit(
@@ -78,9 +78,7 @@ public abstract class Unit implements GeneralBuff {
     this.armor = armor;
   }
 
-  public boolean getMoved() {
-    return isMoved;
-  }
+
 
   public void setMoved(boolean isMoved) {
     this.isMoved = isMoved;

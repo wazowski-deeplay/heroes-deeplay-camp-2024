@@ -1,5 +1,6 @@
 package io.deeplay.camp.app.model;
 
+import io.deeplay.camp.core.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.core.dto.server.GameStateDto;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,5 +53,11 @@ public class GameModelManager {
   public void updateGame(GameStateDto gameStateDto) {
     GameModel gameModel = parties.get(gameStateDto.getGamePartyId());
     gameModel.updateGameState(gameStateDto.getGameState());
+  }
+
+
+  public void handleGameError(ErrorGameResponseDto errorGameResponseDto) {
+    GameModel gameModel = parties.get(errorGameResponseDto.getGamePartyId());
+    gameModel.handleGameException(errorGameResponseDto);
   }
 }

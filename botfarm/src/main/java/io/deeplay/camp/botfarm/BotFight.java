@@ -35,7 +35,7 @@ public class BotFight extends Thread{
     boolean outInfoGame;
     final Timer timer = new Timer();
 
-    String separator = System.getProperty("line.separator");
+    String separator = System.lineSeparator();
 
     int fightId;
 
@@ -214,7 +214,7 @@ public class BotFight extends Thread{
         if (unit == null) {
             return "";
         }
-        if (unit.getMoved()) {
+        if (unit.isMoved()) {
             result = "!";
         }
         return result;

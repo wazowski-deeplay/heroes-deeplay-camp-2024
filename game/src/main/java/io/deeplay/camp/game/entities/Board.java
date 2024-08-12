@@ -51,7 +51,7 @@ public class Board {
   private boolean isAllMovedPart(int startRow, int endRow) {
     for (int i = startRow; i < endRow; i++) {
       for (int j = 0; j < Board.COLUMNS; j++) {
-        if (!getUnit(i, j).getMoved()) {
+        if (!getUnit(i, j).isMoved()) {
           logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);
           return false;
         }

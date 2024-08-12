@@ -85,7 +85,7 @@ public class RandomBot extends Bot{
             for (int j = shiftRow;
                  j < gameState.getCurrentBoard().getUnits()[i].length / 2 + shiftRow;
                  j++) {
-                if (gameState.getCurrentBoard().getUnit(i, j).getMoved()) {
+                if (gameState.getCurrentBoard().getUnit(i, j).isMoved()) {
                     continue;
                 }
                 PossibleActions<Position, Position> positionPossibleActions =
@@ -148,7 +148,7 @@ public class RandomBot extends Bot{
             for (Position from : unitsCurrentPlayer) {
                 // Хилер проходиться не по юнитам противника, а по своим
                 if (board.getUnit(from.x(), from.y()).getUnitType() == UnitType.HEALER) {
-                    if (!board.getUnit(from.x(), from.y()).getMoved()) {
+                    if (!board.getUnit(from.x(), from.y()).isMoved()) {
                         for (Position to : unitsCurrentPlayer) {
                             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
                             if (canActMove(gameState, move)) {
@@ -165,7 +165,7 @@ public class RandomBot extends Bot{
                     }
                     // Возможные атаки для юнитов выбранного игрока по живым юнитам соперника
                 } else {
-                    if (!board.getUnit(from.x(), from.y()).getMoved()) {
+                    if (!board.getUnit(from.x(), from.y()).isMoved()) {
                         for (Position to : unitsOpponentPlayer) {
                             MakeMoveEvent move = new MakeMoveEvent(from, to, board.getUnit(from.x(), from.y()));
                             if (canActMove(gameState, move)) {

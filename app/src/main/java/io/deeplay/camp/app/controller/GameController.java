@@ -7,6 +7,7 @@ import io.deeplay.camp.core.dto.JsonConverter;
 import io.deeplay.camp.core.dto.client.game.ChangePlayerDto;
 import io.deeplay.camp.core.dto.client.game.MakeMoveDto;
 import io.deeplay.camp.core.dto.client.game.PlaceUnitDto;
+import io.deeplay.camp.core.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.game.entities.Board;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
@@ -17,13 +18,21 @@ import java.io.IOException;
 import java.util.Stack;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import lombok.Setter;
 
 public class GameController {
   /** Модель текущей игры. */
-  private GameModel gameModel;
+  @Setter private GameModel gameModel;
 
   /** Верхняя панель с карточками. */
   @FXML private GridPane topGridPane;
@@ -141,19 +150,30 @@ public class GameController {
    * @param gameState Состояние, которое нужно перенести в gameModel.
    */
   private void updateGameModel(GameState gameState) {
+    gameModel.setCurrentBoard(gameState.getCurrentBoard());
     gameModel.setCurrentPlayer(gameState.getCurrentPlayer());
     gameModel.setGameStage(gameState.getGameStage());
   }
 
   /** Метод, блокирующий панели, на который нельзя нажать в данный момент. */
   private void setUnitsDisable() {
-    for (UnitMovementController[] unitMovementControllerRow : unitMovementControllers) {
-      for (UnitMovementController unitMovementController : unitMovementControllerRow) {
-        if (unitMovementController.getHp() <= 0) {
-          unitMovementController.getPane().setDisable(true);
-        }
-        if (unitMovementController.isMoved()) {
-          unitMovementController.getPane().setDisable(true);
+    Board board = gameModel.getCurrentBoard();
+    Unit[][] units = board.getUnits();
+    for (int row = 0; row < Board.ROWS; row++) {
+      for (int col = 0; col < Board.COLUMNS; col++) {
+        if (units[col][row] != null) {
+          int controllerCol =
+              gameModel.getCurrentPlayer() == PlayerType.FIRST_PLAYER
+                  ? Board.COLUMNS - 1 - col
+                  : col;
+          int controllerRow =
+              gameModel.getCurrentPlayer() == PlayerType.FIRST_PLAYER ? Board.ROWS - 1 - row : row;
+          if (units[col][row].getCurrentHp() <= 0) {
+            unitMovementControllers[controllerCol][controllerRow].getPane().setDisable(true);
+          }
+          if (units[col][row].isMoved() && controllerRow >= 2) {
+            unitMovementControllers[controllerCol][controllerRow].getPane().setDisable(true);
+          }
         }
       }
     }
@@ -336,10 +356,6 @@ public class GameController {
     }
   }
 
-  public void setGameModel(GameModel gameModel) {
-    this.gameModel = gameModel;
-  }
-
   /** Метод обновления доски после клика. */
   public void updateBoardAfterClick() {
     if (clickStack.size() == 1) {
@@ -451,7 +467,6 @@ public class GameController {
         } else {
           setTopGrindDisable(true);
           setBottomGrindDisable(true);
-          updateUnitsMoved();
         }
         setUnitsDisable();
         clickStack.clear();
@@ -459,14 +474,33 @@ public class GameController {
     }
   }
 
-  /** Метод, блокирующий походивших юнитов. */
-  private void updateUnitsMoved() {
-    for (UnitMovementController[] unitMovementControllerRow : unitMovementControllers) {
-      for (UnitMovementController unitMovementController : unitMovementControllerRow) {
-        if (unitMovementController.isMoved()) {
-          unitMovementController.setMoved(false);
-        }
-      }
-    }
+  public void showError(ErrorGameResponseDto errorGameResponseDto) {
+    Stage errorStage = new Stage();
+    errorStage.initModality(Modality.APPLICATION_MODAL);
+    errorStage.initStyle(StageStyle.UTILITY);
+    errorStage.setTitle("Error");
+
+    Label errorLabel = new Label(errorGameResponseDto.getMessage());
+    errorLabel.setWrapText(true);
+
+    VBox vbox = new VBox(errorLabel);
+    vbox.setSpacing(10);
+    vbox.setPadding(new Insets(20));
+
+    Scene scene = new Scene(vbox);
+    errorStage.setScene(scene);
+
+    errorStage.setX(
+        topGridPane.getScene().getWindow().getX()
+            + topGridPane.getScene().getWindow().getWidth() / 2
+            - 200);
+    errorStage.setY(
+        topGridPane.getScene().getWindow().getY()
+            + topGridPane.getScene().getWindow().getHeight() / 2
+            - 100);
+    errorStage.setWidth(400);
+    errorStage.setHeight(200);
+
+    errorStage.showAndWait();
   }
 }

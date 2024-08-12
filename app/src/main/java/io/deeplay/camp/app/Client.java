@@ -5,6 +5,7 @@ import io.deeplay.camp.app.controller.GameJoinController;
 import io.deeplay.camp.app.controller.MainController;
 import io.deeplay.camp.app.model.GameModelManager;
 import io.deeplay.camp.core.dto.JsonConverter;
+import io.deeplay.camp.core.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.core.dto.server.GamePartiesDto;
 import io.deeplay.camp.core.dto.server.GamePartyInfoDto;
 import io.deeplay.camp.core.dto.server.GameStateDto;
@@ -92,7 +93,6 @@ public class Client {
         Platform.runLater(() -> mainController.openGame(gamePartyInfoDto));
       }
       case GAME_STATE -> {
-        System.out.println(message);
         GameStateDto gameStateDto = JsonConverter.deserialize(message, GameStateDto.class);
         gameModelManager.updateGame(gameStateDto);
       }
@@ -101,7 +101,8 @@ public class Client {
         gameJoinController.setParties(gamePartiesDto);
       }
       case ERROR_GAME_INFO -> {
-        // Handle ERROR_GAME_INFO
+        ErrorGameResponseDto errorGameResponseDto = (ErrorGameResponseDto) serverDto;
+        gameModelManager.handleGameError(errorGameResponseDto);
       }
       case ERROR_CONNECTION_INFO -> {
         // Handle ERROR_CONNECTION_INFO
