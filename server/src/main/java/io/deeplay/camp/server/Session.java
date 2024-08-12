@@ -9,6 +9,7 @@ import io.deeplay.camp.core.dto.server.ErrorGameResponseDto;
 import io.deeplay.camp.core.dto.server.ServerDto;
 import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.server.exceptions.GameManagerException;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import io.deeplay.camp.server.manager.ClientManager;
 import io.deeplay.camp.server.manager.GamePartyManager;
 import java.net.Socket;
@@ -97,10 +98,11 @@ public class Session implements Runnable {
       sendErrorToClient(
           new ErrorConnectionResponseDto(
               gameManagerException.getConnectionErrorCode(), gameManagerException.getMessage()));
-    } else if (e instanceof GameException gameException) {
-      logger.error("{} {}", gameException.getErrorCode(), gameException.getMessage());
+    } else if (e instanceof GamePartyException gamePartyException) {
+      logger.error("{} {}", gamePartyException.getGameException().getErrorCode(), gamePartyException.getGameException().getMessage());
       sendErrorToClient(
-          new ErrorGameResponseDto(gameException.getErrorCode(), gameException.getMessage()));
+          new ErrorGameResponseDto(gamePartyException.getGameException().getErrorCode(),
+                  gamePartyException.getGameException().getMessage(), gamePartyException.getGamePartyId()));
     } else {
       logger.error("{}", e.getMessage());
     }

@@ -12,6 +12,7 @@ import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.bot.Bot;
 import io.deeplay.camp.server.bot.RandomBot;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import lombok.Getter;
 
 @Getter
@@ -47,7 +48,7 @@ public class AiPlayer extends Player {
               gameParty.processPlaceUnit(
                   placeUnitDto);
             }
-          } catch (GameException e) {
+          } catch (GamePartyException e) {
             throw new RuntimeException(e);
           }
         }
@@ -65,14 +66,14 @@ public class AiPlayer extends Player {
                       move.getTo().x(),
                       move.getTo().y()));
             }
-          } catch (GameException e) {
+          } catch (GamePartyException e) {
             throw new RuntimeException(e);
           }
         }
         case ENDED -> {
             try {
                 gameParty.closeParty(null);
-            } catch (GameException e) {
+            } catch (GamePartyException e) {
                 throw new RuntimeException(e);
             }
         }

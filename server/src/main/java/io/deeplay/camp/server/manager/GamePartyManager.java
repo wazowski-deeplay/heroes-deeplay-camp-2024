@@ -28,6 +28,7 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.exceptions.GameManagerException;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import io.deeplay.camp.server.player.AiPlayer;
 import io.deeplay.camp.server.player.HumanPlayer;
 import java.util.ArrayList;
@@ -237,7 +238,7 @@ public class GamePartyManager {
     }
   }
 
-  public void offerDraw(UUID gamePartyId, UUID clientId) throws GameManagerException {
+  public void offerDraw(UUID gamePartyId, UUID clientId) throws GameManagerException, GamePartyException {
     String message;
     try {
       GameParty gameParty = gameParties.get(gamePartyId);
@@ -268,13 +269,10 @@ public class GamePartyManager {
       }
     } catch (JsonProcessingException e) {
       throw new GameManagerException(ConnectionErrorCode.SERIALIZABLE_ERROR);
-    } catch (GameException e) {
-      throw new RuntimeException(e);
     }
   }
 
-  public void acceptDraw(UUID gamePartyId, UUID clientId) throws GameManagerException {
-    try {
+  public void acceptDraw(UUID gamePartyId, UUID clientId) throws GamePartyException {
       GameParty gameParty = gameParties.get(gamePartyId);
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
         logger.info("Подтверждение ничьи первым игроком");
@@ -285,9 +283,6 @@ public class GamePartyManager {
         gameParty.setIndexDraw(1, true);
         gameParty.processDraw(gameParty.getDraw());
       }
-    } catch (GameException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public void offerRestart(UUID gamePartyId, UUID clientId) throws GameManagerException {
@@ -316,8 +311,7 @@ public class GamePartyManager {
     }
   }
 
-  public void acceptRestart(UUID gamePartyId, UUID clientId) throws GameManagerException {
-    try {
+  public void acceptRestart(UUID gamePartyId, UUID clientId) throws GameManagerException, GamePartyException {
       GameParty gameParty = gameParties.get(gamePartyId);
       if (gameParty.getPlayers().getPlayerTypeById(clientId) == PlayerType.FIRST_PLAYER) {
         logger.info("Подтверждение рестарта первым игроком");
@@ -403,12 +397,9 @@ public class GamePartyManager {
           sendGamePartyInfo(anotherPlayerId, gamePartyInfoSecondPlayerDto);
         }
       }
-    } catch (GameException e) {
-      throw new RuntimeException(e);
-    }
   }
 
-  public void exitGame(UUID gamePartyId, UUID clientId) throws GameManagerException, GameException {
+  public void exitGame(UUID gamePartyId, UUID clientId) throws GameManagerException, GamePartyException{
     String message;
     try {
       GameParty gameParty = gameParties.get(gamePartyId);
@@ -448,7 +439,7 @@ public class GamePartyManager {
    * @param clientDto Запрос с действием.
    * @throws GameException Если действие некорректно.
    */
-  public void processGameAction(ClientDto clientDto) throws GameException, GameManagerException {
+  public void processGameAction(ClientDto clientDto) throws GameManagerException, GamePartyException {
     switch (clientDto.getClientDtoType()) {
       case MAKE_MOVE -> {
         MakeMoveDto makeMoveDto = (MakeMoveDto) clientDto;
@@ -568,7 +559,7 @@ public class GamePartyManager {
     ClientManager.getInstance().sendMessage(clientId, JsonConverter.serialize(gamePartiesDto));
   }
 
-  public void processExitGame(ClientDto clientDto) throws GameManagerException, GameException {
+  public void processExitGame(ClientDto clientDto) throws GameManagerException, GameException, GamePartyException {
     ExitGamePartyDto exitGamePartyDto = (ExitGamePartyDto) clientDto;
     if (gameParties.get(exitGamePartyDto.getGamePartyId()) == null) {
       logger.error("Ошибка gameparty null. Exit Party");

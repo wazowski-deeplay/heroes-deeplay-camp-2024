@@ -16,6 +16,7 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.server.exceptions.GameManagerException;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import io.deeplay.camp.server.player.AiPlayer;
 import io.deeplay.camp.server.player.Player;
 import io.deeplay.camp.server.player.Players;
@@ -47,84 +48,110 @@ public class GameParty {
     restart.add(false);
   }
 
-  public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GameException {
-    int countAi =  0;
-    for(Player player : players.getHashMap().values()){
-      if(player instanceof AiPlayer){
-        countAi++;
+  public void processPlaceUnit(PlaceUnitDto placeUnitDto) throws GamePartyException {
+    try {
+      int countAi = 0;
+      for (Player player : players.getHashMap().values()) {
+        if (player instanceof AiPlayer) {
+          countAi++;
+        }
       }
+      if (countAi != 2) {
+        PlaceUnitEvent placeUnitEvent =
+                DtoToEventConverter.convert(
+                        placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
+        game.placeUnit(placeUnitEvent);
+        updateGameStateForPlayers();
+      } else {
+        PlaceUnitEvent placeUnitEvent =
+                DtoToEventConverter.convert(placeUnitDto, game.getGameState().getCurrentPlayer());
+        game.placeUnit(placeUnitEvent);
+        updateGameStateForPlayers();
+      }
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
-    if(countAi != 2){
-      PlaceUnitEvent placeUnitEvent =
-          DtoToEventConverter.convert(
-              placeUnitDto, players.getPlayerTypeById(placeUnitDto.getClientId()));
-      game.placeUnit(placeUnitEvent);
+  }
+
+  public void processMakeMove(MakeMoveDto makeMoveRequest) throws GamePartyException {
+    try {
+      MakeMoveEvent makeMoveEvent =
+              DtoToEventConverter.convert(makeMoveRequest, game.getGameState().getCurrentBoard());
+      game.makeMove(makeMoveEvent);
       updateGameStateForPlayers();
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
-    else{
-      PlaceUnitEvent placeUnitEvent =
-          DtoToEventConverter.convert(placeUnitDto, game.getGameState().getCurrentPlayer());
-      game.placeUnit(placeUnitEvent);
+  }
+
+  public void processChangePlayer(ChangePlayerDto changePlayerRequest) throws GamePartyException {
+    try {
+      ChangePlayerEvent changePlayerEvent =
+              DtoToEventConverter.convert(changePlayerRequest, game.getGameState().getCurrentPlayer());
+      game.changePlayer(changePlayerEvent);
       updateGameStateForPlayers();
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
   }
 
-  public void processMakeMove(MakeMoveDto makeMoveRequest) throws GameException {
-    MakeMoveEvent makeMoveEvent =
-        DtoToEventConverter.convert(makeMoveRequest, game.getGameState().getCurrentBoard());
-    game.makeMove(makeMoveEvent);
-    updateGameStateForPlayers();
-  }
-
-  public void processChangePlayer(ChangePlayerDto changePlayerRequest) throws GameException {
-    ChangePlayerEvent changePlayerEvent =
-        DtoToEventConverter.convert(changePlayerRequest, game.getGameState().getCurrentPlayer());
-    game.changePlayer(changePlayerEvent);
-    updateGameStateForPlayers();
-  }
-
-  public void processGiveUp(GiveUpDto giveUpDto) throws GameException {
-    GiveUpEvent giveUpEvent =
-        DtoToEventConverter.convert(players.getPlayerTypeById(giveUpDto.getClientId()));
-    game.giveUp(giveUpEvent);
-    updateGameStateForPlayers();
+  public void processGiveUp(GiveUpDto giveUpDto) throws GamePartyException {
+    try {
+      GiveUpEvent giveUpEvent =
+              DtoToEventConverter.convert(players.getPlayerTypeById(giveUpDto.getClientId()));
+      game.giveUp(giveUpEvent);
+      updateGameStateForPlayers();
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
+    }
   }
 
   public void processSwitchParty(SwitchPartyDto switchPartyDto) {
     updateGameStateForPlayers();
   }
 
-  public void processDraw(List<Boolean> value) throws GameException {
-    game.draw(value);
-    updateGameStateForPlayers();
-  }
-
-  public void processRestart(List<Boolean> value) throws GameException {
-    if (value.get(0) && value.get(1)) {
-      draw.set(0, false);
-      draw.set(1, false);
-      game.restartGame();
-      game = new Game();
-      restart.set(0, false);
-      restart.set(1, false);
+  public void processDraw(List<Boolean> value) throws GamePartyException {
+    try {
+      game.draw(value);
       updateGameStateForPlayers();
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
   }
 
-  public void closeParty(UUID escapeClient) throws GameException {
-    if(escapeClient != null){
-    GiveUpEvent giveUpEvent = DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
-    if (players.isFull()) {
-      game.giveUp(giveUpEvent);
-    } else if (!players.isFull() || game.getGameState().getGameStage() == GameStage.ENDED) {
-      game.exitGame(giveUpEvent);
+  public void processRestart(List<Boolean> value) throws GamePartyException {
+    try {
+      if (value.get(0) && value.get(1)) {
+        draw.set(0, false);
+        draw.set(1, false);
+        game.restartGame();
+        game = new Game();
+        restart.set(0, false);
+        restart.set(1, false);
+        updateGameStateForPlayers();
+      }
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
+  }
+
+  public void closeParty(UUID escapeClient) throws GamePartyException {
+    try {
+      if (escapeClient != null) {
+        GiveUpEvent giveUpEvent = DtoToEventConverter.convert(players.getPlayerTypeById(escapeClient));
+        if (players.isFull()) {
+          game.giveUp(giveUpEvent);
+        } else if (!players.isFull() || game.getGameState().getGameStage() == GameStage.ENDED) {
+          game.exitGame(giveUpEvent);
+        }
+      } else {
+        GiveUpEvent giveUpEvent = DtoToEventConverter.convert(game.getGameState().getCurrentPlayer());
+        game.exitGame(giveUpEvent);
+      }
+      game = null;
+    } catch (GameException e) {
+      throw new GamePartyException(e, gamePartyId);
     }
-    else{
-      GiveUpEvent giveUpEvent = DtoToEventConverter.convert(game.getGameState().getCurrentPlayer());
-      game.exitGame(giveUpEvent);
-    }
-    game = null;
   }
 
   public void addPlayer(Player player) throws GameManagerException {
