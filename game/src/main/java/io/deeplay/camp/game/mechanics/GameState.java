@@ -44,6 +44,15 @@ public class GameState {
     gameStage = GameStage.PLACEMENT_STAGE;
   }
 
+  public GameState(GameState gameState) {
+    this.board = new Board(gameState.board);
+    this.gameStage = gameState.gameStage;
+    this.currentPlayer = gameState.currentPlayer;
+    this.armyFirst = new Army(gameState.armyFirst);
+    this.armySecond = new Army(gameState.armySecond);
+    this.countRound = gameState.countRound;
+    this.winner = gameState.winner;
+  }
   public void changeCurrentPlayer() {
     if (currentPlayer == PlayerType.FIRST_PLAYER) {
       currentPlayer = PlayerType.SECOND_PLAYER;

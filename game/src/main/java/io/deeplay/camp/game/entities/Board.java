@@ -1,5 +1,7 @@
 package io.deeplay.camp.game.entities;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,23 @@ public class Board {
 
   public Board() {
     units = new Unit[COLUMNS][ROWS];
+  }
+
+  public Board(Board board) {
+    units = new Unit[COLUMNS][ROWS];
+    for (int i = 0; i < ROWS; i++) {
+      for (int j = 0; j < COLUMNS; j++) {
+        Unit originalUnit = board.getUnit(j, i);
+        if (originalUnit != null) {
+          try {
+            Constructor<? extends Unit> constructor = originalUnit.getClass().getConstructor(originalUnit.getClass());
+            units[j][i] = (Unit) ((Constructor<?>) constructor).newInstance(originalUnit);
+          } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            logger.error("Failed to create a copy of unit", e);
+          }
+        }
+      }
+    }
   }
 
   public void setUnit(int x, int y, Unit unit) {

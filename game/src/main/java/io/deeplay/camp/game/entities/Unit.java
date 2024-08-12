@@ -47,6 +47,20 @@ public abstract class Unit implements GeneralBuff {
     this.isGeneral = isGeneral;
   }
 
+  public Unit(Unit unit){
+      this.maxHp = unit.getMaxHp();
+      this.currentHp = unit.getCurrentHp();
+      this.damage = unit.getDamage();
+      this.accuracy = unit.getAccuracy();
+      this.armor = unit.getArmor();
+      this.isGeneral = unit.isGeneral;
+      this.unitType = unit.getUnitType();
+      this.playerType = unit.getPlayerType();
+      this.isMoved = unit.isMoved;
+      this.hitTarget = unit.hitTarget;
+      this.attackType = unit.getAttackType();
+  }
+
   public void setAttack(AttackType attackType) {
     this.attackType = attackType;
   }
