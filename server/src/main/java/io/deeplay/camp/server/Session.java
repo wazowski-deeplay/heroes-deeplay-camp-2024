@@ -98,11 +98,11 @@ public class Session implements Runnable {
       sendErrorToClient(
           new ErrorConnectionResponseDto(
               gameManagerException.getConnectionErrorCode(), gameManagerException.getMessage()));
-    } else if (e instanceof GamePartyException gameException) {
-      logger.error("{} {}", gameException.getGameException().getErrorCode(), gameException.getGameException().getMessage());
+    } else if (e instanceof GamePartyException gamePartyException) {
+      logger.error("{} {}", gamePartyException.getGameException().getErrorCode(), gamePartyException.getGameException().getMessage());
       sendErrorToClient(
-          new ErrorGameResponseDto(gameException.getGameException().getErrorCode(),
-                  gameException.getGameException().getMessage(), gameException.getGamePartyId()));
+          new ErrorGameResponseDto(gamePartyException.getGameException().getErrorCode(),
+                  gamePartyException.getGameException().getMessage(), gamePartyException.getGamePartyId()));
     } else {
       logger.error("{}", e.getMessage());
     }

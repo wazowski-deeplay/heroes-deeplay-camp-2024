@@ -48,7 +48,7 @@ public class AiPlayer extends Player {
               gameParty.processPlaceUnit(
                   placeUnitDto);
             }
-          } catch (GameException e) {
+          } catch (GamePartyException e) {
             throw new RuntimeException(e);
           }
         }
@@ -66,14 +66,14 @@ public class AiPlayer extends Player {
                       move.getTo().x(),
                       move.getTo().y()));
             }
-          } catch (GameException e) {
+          } catch (GamePartyException e) {
             throw new RuntimeException(e);
           }
         }
         case ENDED -> {
             try {
                 gameParty.closeParty(null);
-            } catch (GameException e) {
+            } catch (GamePartyException e) {
                 throw new RuntimeException(e);
             }
         }
