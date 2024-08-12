@@ -49,9 +49,12 @@ public class ClientProcess {
           gameStatesPlayer.get(gameStateDto.getGamePartyId()).updateBoard(serverDto, gamePartyId);
           if (gameStatesPlayer.get(gameStateDto.getGamePartyId()).gameState.getGameStage()
               == GameStage.ENDED) {
-            System.out.println("Иhumanгра окончена");
+            System.out.println("Игра окончена");
             System.out.println(
                 "Хотите начать новую игру? Для этого пропишите restart или exitgame.");
+          }
+          for (GameStatePlayer gameState : gameStatesPlayer.values()) {
+            gameState.getCui().outInFrame(gameState.gameState, gameState.gamePartyId, gamePartyId);
           }
           return;
         case GAME_PARTY_INFO:
@@ -59,12 +62,17 @@ public class ClientProcess {
           if (this.gameStatesPlayer.containsKey(gamePartyInfoDto.getGamePartyId())) {
             this.gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).playerTypeInCurrentGame =
                 gamePartyInfoDto.getPlayerType();
-            gameStatesPlayer.get(gamePartyInfoDto.getGamePartyId()).cleanBoard(serverDto, gamePartyId);
+            gameStatesPlayer
+                .get(gamePartyInfoDto.getGamePartyId())
+                .cleanBoard(serverDto, gamePartyId);
           } else {
             this.gameStatesPlayer.put(
                 gamePartyInfoDto.getGamePartyId(),
                 new GameStatePlayer(
                     gamePartyInfoDto.getGamePartyId(), gamePartyInfoDto.getPlayerType()));
+          }
+          for (GameStatePlayer gameState : gameStatesPlayer.values()) {
+            gameState.getCui().outInFrame(gameState.gameState, gameState.gamePartyId, gamePartyId);
           }
           gamePartyId = gamePartyInfoDto.getGamePartyId();
           System.out.println(gamePartyId);
@@ -142,17 +150,22 @@ public class ClientProcess {
         try {
           userWord = inputUser.readLine();
           ClientDto clientDto = null;
-          if(userInputHandler.isUserHandler(userWord, gamePartiesId) != null){
-            gamePartyId = userInputHandler.isUserHandler(userWord, gamePartiesId);
-            for (GameStatePlayer gameState : gameStatesPlayer.values()) {
-              gameState.getCui().outInFrame(gameState.gameState, gameState.gamePartyId, gamePartyId);
+          if (userInputHandler.isUserHandlerWord(userWord)) {
+            if (userInputHandler.isUserHandlerUUID(userWord, gameStatesPlayer) != null) {
+              gamePartyId = userInputHandler.isUserHandlerUUID(userWord, gameStatesPlayer);
             }
-          } else if (parserRequest.convert(userWord, gamePartyId, gamePartiesId) != null) {
-            clientDto = parserRequest.convert(userWord, gamePartyId, gamePartiesId);
+            userInputHandler.isUserHandlerProcess(userWord, gameStatesPlayer);
+          } else if (parserRequest.convert(userWord, gamePartyId, gamePartiesId, gameStatesPlayer)
+              != null) {
+            clientDto =
+                parserRequest.convert(userWord, gamePartyId, gamePartiesId, gameStatesPlayer);
             String sendDto = JsonConverter.serialize(clientDto);
             serverHandler.sendRequest(sendDto);
           } else {
             System.out.println("Некорректный ввод данных, попробуйте снова");
+          }
+          for (GameStatePlayer gameState : gameStatesPlayer.values()) {
+            gameState.getCui().outInFrame(gameState.gameState, gameState.gamePartyId, gamePartyId);
           }
         } catch (IOException e) {
 

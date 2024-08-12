@@ -15,7 +15,20 @@ public class UserInputHandler {
     }
   }
 
-  public UUID isUserHandler(String userWord, HashMap<Integer, UUID> ids) {
+  public boolean isUserHandlerWord(String userWord) {
+    String[] userCommand = userWord.split("\\s+");
+    String regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+    Pattern pattern = Pattern.compile(regex);
+    if (userCommand[0].equals("checkout")) {
+      return true;
+    }
+    if (userCommand[0].equals("getmygame")) {
+      return true;
+    }
+    return false;
+  }
+
+  public UUID isUserHandlerUUID(String userWord, HashMap<UUID, GameStatePlayer> ids) {
     String[] userCommand = userWord.split("\\s+");
     String regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
     Pattern pattern = Pattern.compile(regex);
@@ -25,10 +38,21 @@ public class UserInputHandler {
       } else if (isNumeric(userCommand[1])) {
         if (Integer.parseInt(userCommand[1]) > 0
             && Integer.parseInt(userCommand[1]) <= ids.size()) {
-          return ids.get(Integer.parseInt(userCommand[1]));
+          return ids.get(UUID.fromString(userCommand[1])).gamePartyId;
         }
       }
     }
     return null;
+  }
+
+  public void isUserHandlerProcess(String userWord, HashMap<UUID, GameStatePlayer> ids) {
+    String[] userCommand = userWord.split("\\s+");
+    String regex = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+    Pattern pattern = Pattern.compile(regex);
+    if (userCommand[0].equals("getmygame")) {
+      for (UUID idRoom : ids.keySet()) {
+        System.out.println(idRoom);
+      }
+    }
   }
 }

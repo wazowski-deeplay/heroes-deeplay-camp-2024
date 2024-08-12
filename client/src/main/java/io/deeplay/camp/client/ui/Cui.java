@@ -31,7 +31,8 @@ public class Cui {
     this.gamePlayer = playerType;
   }
 
-  public void updateCui(GameState gameState, UUID idRoomGameState, PlayerType playerType, UUID idCurrentGame) {
+  public void updateCui(
+      GameState gameState, UUID idRoomGameState, PlayerType playerType, UUID idCurrentGame) {
     gamePlayer = playerType;
     outInFrame(gameState, idRoomGameState, idCurrentGame);
   }
@@ -94,13 +95,13 @@ public class Cui {
     }
     field.append(separator);
     field.append(separator);
-    if(currentIdRoom == idRoom){
-      field.append("You choose this room!");
+    if (currentIdRoom != null) {
+      if (currentIdRoom == idRoom) {
+        field.append("You choose this room!");
+      } else {
+        field.append("You choose room = " + currentIdRoom.toString());
+      }
     }
-    else{
-      field.append("You choose room = " + currentIdRoom.toString());
-    }
-
   }
 
   public void downCuiFrame() {
