@@ -28,6 +28,7 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.exceptions.GameManagerException;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import io.deeplay.camp.server.player.AiPlayer;
 import io.deeplay.camp.server.player.HumanPlayer;
 import java.util.ArrayList;

@@ -1,6 +1,8 @@
 package io.deeplay.camp.app.model;
 
 import io.deeplay.camp.app.controller.GameController;
+import io.deeplay.camp.core.dto.server.ErrorGameResponseDto;
+import io.deeplay.camp.game.entities.Board;
 import io.deeplay.camp.game.mechanics.GameStage;
 import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.game.mechanics.PlayerType;
@@ -28,6 +30,7 @@ public class GameModel {
 
   /** Игровой контроллер */
   private GameController gameController;
+  private Board currentBoard;
 
   /**
    * Метод обновления игрового состояния через контроллер.
@@ -45,5 +48,15 @@ public class GameModel {
    */
   public boolean isThisPlayerTurn() {
     return thisPlayer == currentPlayer;
+  }
+
+    public void handleGameException(ErrorGameResponseDto errorGameResponseDto) {
+    Platform.runLater(()->{
+      gameController.showError(errorGameResponseDto);
+    });
+    }
+
+  public void setCurrentBoard(Board currentBoard) {
+    this.currentBoard = currentBoard;
   }
 }

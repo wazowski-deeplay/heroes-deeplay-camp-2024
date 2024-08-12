@@ -12,6 +12,7 @@ import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
 import io.deeplay.camp.server.bot.Bot;
 import io.deeplay.camp.server.bot.RandomBot;
+import io.deeplay.camp.server.exceptions.GamePartyException;
 import lombok.Getter;
 
 @Getter

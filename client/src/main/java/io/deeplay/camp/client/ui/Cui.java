@@ -107,7 +107,7 @@ public class Cui {
     if (unit == null) {
       return "";
     }
-    if (unit.getMoved()) {
+    if (unit.isMoved()) {
       result = "!";
     }
     return result;

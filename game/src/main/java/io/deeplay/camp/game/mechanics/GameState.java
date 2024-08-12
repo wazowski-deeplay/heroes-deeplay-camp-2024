@@ -159,7 +159,7 @@ public class GameState {
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
-    if (attacker.getMoved()) {
+    if (attacker.isMoved()) {
       logger.atInfo().log(
           "This units {}({},{}) already moved this round",
           move.getAttacker().getUnitType(),
