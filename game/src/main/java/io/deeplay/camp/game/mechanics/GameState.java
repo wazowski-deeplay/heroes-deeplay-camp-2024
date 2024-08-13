@@ -53,6 +53,7 @@ public class GameState {
     this.countRound = gameState.countRound;
     this.winner = gameState.winner;
   }
+
   public void changeCurrentPlayer() {
     if (currentPlayer == PlayerType.FIRST_PLAYER) {
       currentPlayer = PlayerType.SECOND_PLAYER;
@@ -70,8 +71,7 @@ public class GameState {
     if (countRound == 0) {
       winner = winnerOrDraw();
       gameStage = GameStage.ENDED;
-      logger.atInfo().log(
-              "Result {}, game is {}", winner, gameStage);
+      logger.atInfo().log("Result {}, game is {}", winner, gameStage);
     }
   }
 
@@ -79,7 +79,7 @@ public class GameState {
   public List<AttackInfo> makeMove(MakeMoveEvent move) throws GameException {
 
     if (gameStage == GameStage.ENDED) {
-     // throw new GameException(ErrorCode.GAME_IS_OVER);
+      // throw new GameException(ErrorCode.GAME_IS_OVER);
     }
 
     List<AttackInfo> attackResult = new ArrayList<>();
@@ -327,21 +327,19 @@ public class GameState {
   }
 
   public void makeChangePlayer(ChangePlayerEvent changePlayerEvent) throws GameException {
-    if(changePlayerEvent.getRequester()!=currentPlayer){
+    if (changePlayerEvent.getRequester() != currentPlayer) {
       throw new GameException(ErrorCode.PLAYER_CHANGE_IS_NOT_AVAILABLE);
     }
-    if(gameStage == GameStage.PLACEMENT_STAGE){
-      if(changePlayerEvent.getRequester()==PlayerType.FIRST_PLAYER){
-        if(!board.isFullFirstPlayerPart()){
+    if (gameStage == GameStage.PLACEMENT_STAGE) {
+      if (changePlayerEvent.getRequester() == PlayerType.FIRST_PLAYER) {
+        if (!board.isFullFirstPlayerPart()) {
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-      }
-      else if(changePlayerEvent.getRequester()==PlayerType.SECOND_PLAYER){
-        if(!board.isFullSecondPlayerPart()){
+      } else if (changePlayerEvent.getRequester() == PlayerType.SECOND_PLAYER) {
+        if (!board.isFullSecondPlayerPart()) {
           throw new GameException(ErrorCode.BOARD_IS_NOT_FULL);
         }
-      }
-      else {
+      } else {
         throw new GameException(ErrorCode.UNDEFINED_ERROR);
       }
     }
@@ -454,14 +452,12 @@ public class GameState {
     if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).size() == 0) {
       winner = PlayerType.SECOND_PLAYER;
       gameStage = GameStage.ENDED;
-      logger.atInfo().log(
-              "Result {}, is {}", winner, gameStage);
+      logger.atInfo().log("Result {}, is {}", winner, gameStage);
     }
     if (getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).size() == 0) {
       winner = PlayerType.FIRST_PLAYER;
       gameStage = GameStage.ENDED;
-      logger.atInfo().log(
-              "Result {}, is {}", winner, gameStage);
+      logger.atInfo().log("Result {}, is {}", winner, gameStage);
     }
   }
 
@@ -514,7 +510,104 @@ public class GameState {
     gameStage = null;
   }
 
-  public GameState getCopy(){
+  public GameState getCopy() {
     return new GameState(this);
+  }
+
+  public List<PlaceUnitEvent> getPossiblePlaces() {
+    PlayerType currentPlayer = getCurrentPlayer();
+    Army army = currentPlayer == PlayerType.FIRST_PLAYER ? getArmyFirst() : getArmySecond();
+    Board board = getBoard();
+    int startRow = currentPlayer == PlayerType.FIRST_PLAYER ? 0 : Board.ROWS / 2;
+    int endRow = currentPlayer == PlayerType.FIRST_PLAYER ? Board.ROWS / 2 : Board.ROWS;
+
+    List<PlaceUnitEvent> possiblePlaces = new ArrayList<>();
+    for (int col = 0; col < Board.COLUMNS; col++) {
+      for (int row = startRow; row < endRow; row++) {
+        if (board.isEmptyCell(col, row)) {
+          boolean isLastEmptyCell = board.hasOneEmptyCell(currentPlayer);
+          for (UnitType unitType : UnitType.values()) {
+            PlaceUnitEvent placeUnitEventWithoutGeneral =
+                new PlaceUnitEvent(
+                    col,
+                    row,
+                    Unit.createUnitByUnitType(unitType, currentPlayer),
+                    currentPlayer,
+                    !isLastEmptyCell,
+                    false);
+            possiblePlaces.add(placeUnitEventWithoutGeneral);
+            if (!army.hasGeneral()) {
+              PlaceUnitEvent placeUnitEventWithGeneral =
+                  new PlaceUnitEvent(
+                      col,
+                      row,
+                      Unit.createUnitByUnitType(unitType, currentPlayer),
+                      currentPlayer,
+                      !isLastEmptyCell,
+                      true);
+              possiblePlaces.add(placeUnitEventWithGeneral);
+            }
+          }
+        }
+      }
+    }
+    return possiblePlaces;
+  }
+
+  public List<MakeMoveEvent> getPossibleMoves() {
+    Board board = getCurrentBoard();
+    List<MakeMoveEvent> possibleMoves = new ArrayList<>();
+    List<Position> unitsPositionsCurrentPlayer;
+    List<Position> unitsPositionsOpponentPlayer;
+    PlayerType currentPlayer = getCurrentPlayer();
+    PlayerType opponentPlayer =
+        currentPlayer == PlayerType.FIRST_PLAYER
+            ? PlayerType.SECOND_PLAYER
+            : PlayerType.FIRST_PLAYER;
+
+    unitsPositionsCurrentPlayer = collectPositionsOfPlayer(currentPlayer, board);
+    unitsPositionsOpponentPlayer = collectPositionsOfPlayer(opponentPlayer, board);
+
+    for (Position from : unitsPositionsCurrentPlayer) {
+      Unit unit = board.getUnit(from.x(), from.y());
+      if (unit.getUnitType() == UnitType.HEALER) {
+        addValidMoves(possibleMoves, unitsPositionsCurrentPlayer, from, unit);
+      } else {
+        addValidMoves(possibleMoves, unitsPositionsOpponentPlayer, from, unit);
+      }
+    }
+
+    return possibleMoves;
+  }
+
+  private void addValidMoves(
+      List<MakeMoveEvent> possibleMoves, List<Position> targetPositions, Position from, Unit unit) {
+    for (Position to : targetPositions) {
+      if (!unit.isMoved()) {
+        MakeMoveEvent move = new MakeMoveEvent(from, to, unit);
+        if (canActMove(move)) {
+          possibleMoves.add(move);
+        }
+      }
+    }
+  }
+
+  private boolean canActMove(MakeMoveEvent move) {
+    try {
+      isValidMove(move);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public List<Position> collectPositionsOfPlayer(PlayerType playerType, Board board) {
+    List<Position> unitPositions = new ArrayList<>();
+    if (playerType == PlayerType.FIRST_PLAYER) {
+      unitPositions.addAll(board.enumerateUnits(0, Board.ROWS / 2));
+    } else {
+      unitPositions.addAll(board.enumerateUnits(Board.ROWS / 2, Board.ROWS));
+    }
+    return unitPositions;
   }
 }
