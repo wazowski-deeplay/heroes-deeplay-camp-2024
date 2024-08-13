@@ -99,4 +99,13 @@ public class Army {
     }
     return isAliveGeneral;
   }
+
+  public boolean hasGeneral() {
+    for (Unit unit : units) {
+      if (unit != null && unit.isGeneral()) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

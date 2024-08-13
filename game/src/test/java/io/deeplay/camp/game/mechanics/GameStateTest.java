@@ -3,14 +3,18 @@ package io.deeplay.camp.game.mechanics;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.deeplay.camp.game.entities.Archer;
+import io.deeplay.camp.game.entities.Board;
 import io.deeplay.camp.game.entities.Healer;
 import io.deeplay.camp.game.entities.Knight;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.events.MakeMoveEvent;
+import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class GameStateTest {
 
@@ -187,4 +191,43 @@ public class GameStateTest {
         assertThrows(GameException.class, () -> gameState.makeMove(makeMove));
     assertEquals(ErrorCode.MOVE_IS_NOT_CORRECT, gameException.getErrorCode());
   }
+
+  @Test
+  void getPossiblePlacesTest() {
+    GameState gameState = new GameState();
+    List<PlaceUnitEvent> possiblePlaces = gameState.getPossiblePlaces();
+    assertEquals(48, possiblePlaces.size());
+
+  }
+
+  @Test
+  void getPossibleMovesKnightsTest() {
+    GameState gameState = new GameState();
+    Board board = gameState.getCurrentBoard();
+    for(int col = 0; col<Board.COLUMNS; col++){
+      for(int row = 0; row<Board.ROWS; row++){
+        PlayerType unitOwner = row > 1? PlayerType.SECOND_PLAYER: PlayerType.FIRST_PLAYER;
+        board.setUnit(col, row, new Knight(unitOwner));
+      }
+    }
+    gameState.setGameStage(GameStage.MOVEMENT_STAGE);
+    List<MakeMoveEvent> possibleMoves = gameState.getPossibleMoves();
+    assertEquals(7, possibleMoves.size());
+  }
+
+  @Test
+  void getPossibleMovesArchersTest() {
+    GameState gameState = new GameState();
+    Board board = gameState.getCurrentBoard();
+    for(int col = 0; col<Board.COLUMNS; col++){
+      for(int row = 0; row<Board.ROWS; row++){
+        PlayerType unitOwner = row > 1? PlayerType.SECOND_PLAYER: PlayerType.FIRST_PLAYER;
+        board.setUnit(col, row, new Archer(unitOwner));
+      }
+    }
+    gameState.setGameStage(GameStage.MOVEMENT_STAGE);
+    List<MakeMoveEvent> possibleMoves = gameState.getPossibleMoves();
+    assertEquals(36, possibleMoves.size());
+  }
+
 }

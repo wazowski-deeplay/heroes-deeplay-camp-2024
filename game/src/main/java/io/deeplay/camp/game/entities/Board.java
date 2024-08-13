@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.deeplay.camp.game.mechanics.PlayerType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -139,5 +141,19 @@ public class Board {
 
   public boolean isEmptyCell(int x, int y) {
     return units[x][y] == null;
+  }
+
+  public boolean hasOneEmptyCell(PlayerType currentPlayer) {
+    int startRow = currentPlayer == PlayerType.FIRST_PLAYER ? 0 : Board.ROWS / 2;
+    int endRow = currentPlayer == PlayerType.FIRST_PLAYER ? Board.ROWS / 2 : Board.ROWS;
+    int emptyCellsAmount = 0;
+    for (int col = 0; col < COLUMNS; col++) {
+      for (int row = startRow; row < endRow; row++) {
+        if (isEmptyCell(col, row)) {
+          emptyCellsAmount++;
+        }
+      }
+    }
+    return emptyCellsAmount == 1;
   }
 }
