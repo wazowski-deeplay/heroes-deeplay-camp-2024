@@ -36,7 +36,7 @@ public interface GeneralBuff {
     ARMOR(4),
     DAMAGE(1),
     ACCURACY(4),
-    MAXHP(6);
+    MAXHP(7);
     final int value;
 
     Buffs(int value) {
