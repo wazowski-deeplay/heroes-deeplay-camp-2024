@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Knight extends Unit {
   public Knight(PlayerType playerType) {
-    super(UnitType.KNIGHT, 15, 13, 5, 5, 15, false);
+    super(UnitType.KNIGHT, 15, 15, 5, 5, 15, false);
     this.playerType = playerType;
     setAttack(AttackType.CLOSE_ATTACK);
   }
