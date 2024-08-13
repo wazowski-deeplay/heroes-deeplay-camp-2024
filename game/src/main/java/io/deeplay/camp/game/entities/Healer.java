@@ -11,6 +11,10 @@ public class Healer extends Unit {
     setAttack(AttackType.LONG_ATTACK);
   }
 
+  public Healer(Healer healer) {
+    super(healer);
+  }
+
   @Override
   public void playMove(Unit targetUnit) {
     targetUnit.setCurrentHp(targetUnit.getCurrentHp() + damage);

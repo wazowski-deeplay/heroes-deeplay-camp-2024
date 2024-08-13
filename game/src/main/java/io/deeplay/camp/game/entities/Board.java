@@ -29,9 +29,13 @@ public class Board {
         Unit originalUnit = board.getUnit(j, i);
         if (originalUnit != null) {
           try {
-            Constructor<? extends Unit> constructor = originalUnit.getClass().getConstructor(originalUnit.getClass());
+            Constructor<? extends Unit> constructor =
+                originalUnit.getClass().getConstructor(originalUnit.getClass());
             units[j][i] = (Unit) ((Constructor<?>) constructor).newInstance(originalUnit);
-          } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+          } catch (NoSuchMethodException
+              | InstantiationException
+              | IllegalAccessException
+              | InvocationTargetException e) {
             logger.error("Failed to create a copy of unit", e);
           }
         }

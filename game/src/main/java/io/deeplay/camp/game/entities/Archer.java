@@ -11,6 +11,10 @@ public class Archer extends Unit {
     setAttack(AttackType.LONG_ATTACK);
   }
 
+  public Archer(Archer archer) {
+    super(archer);
+  }
+
   @Override
   public void playMove(Unit targetUnit) {
     int diceRoll = (int) (Math.random() * 20);

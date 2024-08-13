@@ -260,6 +260,7 @@ public class GameState {
   public boolean isValidPlacement(PlaceUnitEvent placement) throws GameException {
     int x = placement.getColumns();
     int y = placement.getRows();
+
     logger.atInfo().log(
         "Checking placement for unit {} at ({}, {}) {}",
         placement.getUnit(),
@@ -511,5 +512,9 @@ public class GameState {
     armySecond = null;
     currentPlayer = null;
     gameStage = null;
+  }
+
+  public GameState getCopy(){
+    return new GameState(this);
   }
 }

@@ -1,11 +1,10 @@
 package io.deeplay.camp.game.entities;
 
 import io.deeplay.camp.game.mechanics.PlayerType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
@@ -20,6 +19,7 @@ public class Army {
     this.owner = owner;
     units = new Unit[6];
   }
+
   public Army(Army army) {
     this.owner = army.owner;
     this.generalType = army.generalType;
@@ -30,14 +30,19 @@ public class Army {
       Unit originalUnit = army.units[i];
       if (originalUnit != null) {
         try {
-          Constructor<? extends Unit> constructor = originalUnit.getClass().getConstructor(originalUnit.getClass());
+          Constructor<? extends Unit> constructor =
+              originalUnit.getClass().getConstructor(originalUnit.getClass());
           this.units[i] = constructor.newInstance(originalUnit);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException
+            | InstantiationException
+            | IllegalAccessException
+            | InvocationTargetException e) {
           e.printStackTrace();
         }
       }
     }
   }
+
   public void fillArmy(Board board) {
     int index = 0;
     if (this.owner == PlayerType.FIRST_PLAYER) {

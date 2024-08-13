@@ -11,6 +11,10 @@ public class Knight extends Unit {
     setAttack(AttackType.CLOSE_ATTACK);
   }
 
+  public Knight(Knight knight) {
+    super(knight);
+  }
+
   @Override
   public void playMove(Unit targetUnit) {
     int diceRoll = (int) (Math.random() * 20);
