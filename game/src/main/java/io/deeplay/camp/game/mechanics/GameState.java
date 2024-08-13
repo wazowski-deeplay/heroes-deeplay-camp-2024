@@ -1,11 +1,15 @@
 package io.deeplay.camp.game.mechanics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.deeplay.camp.game.entities.Archer;
 import io.deeplay.camp.game.entities.Army;
 import io.deeplay.camp.game.entities.AttackInfo;
 import io.deeplay.camp.game.entities.AttackType;
 import io.deeplay.camp.game.entities.Board;
 import io.deeplay.camp.game.entities.Defender;
+import io.deeplay.camp.game.entities.Healer;
+import io.deeplay.camp.game.entities.Knight;
+import io.deeplay.camp.game.entities.Mage;
 import io.deeplay.camp.game.entities.Position;
 import io.deeplay.camp.game.entities.Unit;
 import io.deeplay.camp.game.entities.UnitType;
@@ -75,13 +79,7 @@ public class GameState {
     }
   }
 
-  // методы чисто для применения, проверка происходит до их использования
   public List<AttackInfo> makeMove(MakeMoveEvent move) throws GameException {
-
-    if (gameStage == GameStage.ENDED) {
-      // throw new GameException(ErrorCode.GAME_IS_OVER);
-    }
-
     List<AttackInfo> attackResult = new ArrayList<>();
     if (isValidMove(move)) {
       Unit attacker = board.getUnit(move.getFrom().x(), move.getFrom().y());
@@ -610,4 +608,29 @@ public class GameState {
     }
     return unitPositions;
   }
+
+  public void setDefaultPlacement() {
+    try{
+      Knight generalKnight = new Knight(PlayerType.FIRST_PLAYER);
+      makePlacement(new PlaceUnitEvent(0, 0, generalKnight, PlayerType.FIRST_PLAYER, true, true));
+      makePlacement(new PlaceUnitEvent(1, 0, new Mage(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(2, 0, new Healer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
+      makeChangePlayer(new ChangePlayerEvent(PlayerType.FIRST_PLAYER));
+
+      generalKnight = new Knight(PlayerType.SECOND_PLAYER);
+      makePlacement(new PlaceUnitEvent(2, 3, generalKnight, PlayerType.SECOND_PLAYER, true, true));
+      makePlacement(new PlaceUnitEvent(1, 3, new Mage(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(0, 3, new Healer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(new PlaceUnitEvent(0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
+      makeChangePlayer(new ChangePlayerEvent(PlayerType.SECOND_PLAYER));
+    }catch (GameException e){
+      logger.info("Не удалась стандартная расстановка!");
+    }
+  }
+
 }
