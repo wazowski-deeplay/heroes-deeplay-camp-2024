@@ -33,10 +33,10 @@ public interface GeneralBuff {
 
   @Getter
   enum Buffs {
-    ARMOR(3),
+    ARMOR(4),
     DAMAGE(1),
-    ACCURACY(3),
-    MAXHP(2);
+    ACCURACY(4),
+    MAXHP(6);
     final int value;
 
     Buffs(int value) {

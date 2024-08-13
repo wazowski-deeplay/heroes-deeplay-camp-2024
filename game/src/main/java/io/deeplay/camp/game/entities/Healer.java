@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Healer extends Unit {
   public Healer(PlayerType playerType) {
-    super(UnitType.HEALER, 10, 10, 5, 15, 12, false);
+    super(UnitType.HEALER, 11, 9, 4, 16, 12, false);
     this.playerType = playerType;
     setAttack(AttackType.LONG_ATTACK);
   }

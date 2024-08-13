@@ -22,8 +22,8 @@ public class Main {
 
     RandomBot bot1 = new RandomBot();
     RandomBot bot2 = new RandomBot();
-    for(int i = 0; i<2;i++){
-      BotFight fight = new BotFight(bot1, bot2, 10, true);
+    for(int i = 0; i<1;i++){
+      BotFight fight = new BotFight(bot1, bot2, 50, true);
     }
 
   }
