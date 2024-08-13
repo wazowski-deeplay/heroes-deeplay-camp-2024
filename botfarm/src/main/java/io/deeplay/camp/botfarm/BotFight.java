@@ -61,8 +61,8 @@ public class BotFight extends Thread{
         area1.setTabSize(10);
         contents = new JPanel();
         contents.add(area1);
-        frame.add(contents);
-        frame.setVisible(true);
+        //frame.add(contents);
+        //frame.setVisible(true);
 
         threadFight.start();
 
