@@ -11,6 +11,10 @@ public class Mage extends Unit {
     setAttack(AttackType.MASS_ATTACK);
   }
 
+  public Mage(Mage mage) {
+    super(mage);
+  }
+
   @Override
   public void playMove(Unit targetUnit) {
     int diceRoll = (int) (Math.random() * 20);

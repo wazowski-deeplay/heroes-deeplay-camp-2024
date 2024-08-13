@@ -47,18 +47,18 @@ public abstract class Unit implements GeneralBuff {
     this.isGeneral = isGeneral;
   }
 
-  public Unit(Unit unit){
-      this.maxHp = unit.getMaxHp();
-      this.currentHp = unit.getCurrentHp();
-      this.damage = unit.getDamage();
-      this.accuracy = unit.getAccuracy();
-      this.armor = unit.getArmor();
-      this.isGeneral = unit.isGeneral;
-      this.unitType = unit.getUnitType();
-      this.playerType = unit.getPlayerType();
-      this.isMoved = unit.isMoved;
-      this.hitTarget = unit.hitTarget;
-      this.attackType = unit.getAttackType();
+  public Unit(Unit unit) {
+    this.maxHp = unit.getMaxHp();
+    this.currentHp = unit.getCurrentHp();
+    this.damage = unit.getDamage();
+    this.accuracy = unit.getAccuracy();
+    this.armor = unit.getArmor();
+    this.isGeneral = unit.isGeneral;
+    this.unitType = unit.getUnitType();
+    this.playerType = unit.getPlayerType();
+    this.isMoved = unit.isMoved;
+    this.hitTarget = unit.hitTarget;
+    this.attackType = unit.getAttackType();
   }
 
   public void setAttack(AttackType attackType) {
@@ -92,8 +92,6 @@ public abstract class Unit implements GeneralBuff {
     this.armor = armor;
   }
 
-
-
   public void setMoved(boolean isMoved) {
     this.isMoved = isMoved;
   }
@@ -112,4 +110,13 @@ public abstract class Unit implements GeneralBuff {
 
   // Методы для реализации в дочерних классах
   public abstract void playMove(Unit targetUnit);
+
+  public static Unit createUnitByUnitType(UnitType unitType, PlayerType playerType) {
+    return switch (unitType) {
+      case KNIGHT -> new Knight(playerType);
+      case MAGE -> new Mage(playerType);
+      case ARCHER -> new Archer(playerType);
+      case HEALER -> new Healer(playerType);
+    };
+  }
 }
