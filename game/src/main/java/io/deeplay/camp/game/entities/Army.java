@@ -1,8 +1,6 @@
 package io.deeplay.camp.game.entities;
 
 import io.deeplay.camp.game.mechanics.PlayerType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,27 +18,13 @@ public class Army {
     units = new Unit[6];
   }
 
-  public Army(Army army) {
+  public Army(Army army, Board board) {
     this.owner = army.owner;
     this.generalType = army.generalType;
     this.isAliveGeneral = army.isAliveGeneral;
     this.isBuffed = army.isBuffed;
     this.units = new Unit[army.units.length];
-    for (int i = 0; i < army.units.length; i++) {
-      Unit originalUnit = army.units[i];
-      if (originalUnit != null) {
-        try {
-          Constructor<? extends Unit> constructor =
-              originalUnit.getClass().getConstructor(originalUnit.getClass());
-          this.units[i] = constructor.newInstance(originalUnit);
-        } catch (NoSuchMethodException
-            | InstantiationException
-            | IllegalAccessException
-            | InvocationTargetException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+    fillArmy(board);
   }
 
   public void fillArmy(Board board) {
@@ -66,9 +50,10 @@ public class Army {
   }
 
   // Обновление возможности ходить для юнитов данной армии
-  public void updateArmyMoves() {
+  public void updateArmy() {
     for (Unit unit : units) {
       unit.setMoved(false);
+      unit.setHitTarget(false);
     }
   }
 

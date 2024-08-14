@@ -52,8 +52,8 @@ public class GameState {
     this.board = new Board(gameState.board);
     this.gameStage = gameState.gameStage;
     this.currentPlayer = gameState.currentPlayer;
-    this.armyFirst = new Army(gameState.armyFirst);
-    this.armySecond = new Army(gameState.armySecond);
+    this.armyFirst = new Army(gameState.armyFirst, this.board);
+    this.armySecond = new Army(gameState.armySecond, this.board);
     this.countRound = gameState.countRound;
     this.winner = gameState.winner;
   }
@@ -64,8 +64,8 @@ public class GameState {
     } else {
       currentPlayer = PlayerType.FIRST_PLAYER;
       if (gameStage == GameStage.MOVEMENT_STAGE) {
-        armyFirst.updateArmyMoves();
-        armySecond.updateArmyMoves();
+        armyFirst.updateArmy();
+        armySecond.updateArmy();
         countRound--;
       }
       if (gameStage == GameStage.PLACEMENT_STAGE) {
