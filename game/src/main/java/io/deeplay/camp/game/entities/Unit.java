@@ -84,7 +84,7 @@ public abstract class Unit implements GeneralBuff {
     this.damage = damage;
   }
 
-  protected void setAccuracy(int accuracy) {
+  public void setAccuracy(int accuracy) {
     this.accuracy = accuracy;
   }
 
@@ -94,6 +94,10 @@ public abstract class Unit implements GeneralBuff {
 
   public void setMoved(boolean isMoved) {
     this.isMoved = isMoved;
+  }
+
+  public void setHitTarget(boolean hitTarget) {
+    this.hitTarget = hitTarget;
   }
 
   public boolean isAlive() {
