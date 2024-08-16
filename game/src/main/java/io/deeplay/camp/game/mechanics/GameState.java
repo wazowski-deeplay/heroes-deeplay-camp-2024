@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -428,6 +429,7 @@ public class GameState {
             && to.y() == from.y() - 1);
   }
 
+
   private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
@@ -525,15 +527,17 @@ public class GameState {
         if (board.isEmptyCell(col, row)) {
           boolean isLastEmptyCell = board.hasOneEmptyCell(currentPlayer);
           for (UnitType unitType : UnitType.values()) {
-            PlaceUnitEvent placeUnitEventWithoutGeneral =
-                new PlaceUnitEvent(
-                    col,
-                    row,
-                    Unit.createUnitByUnitType(unitType, currentPlayer),
-                    currentPlayer,
-                    !isLastEmptyCell,
-                    false);
-            possiblePlaces.add(placeUnitEventWithoutGeneral);
+            if (!isLastEmptyCell || army.hasGeneral()) {
+              PlaceUnitEvent placeUnitEvent = new PlaceUnitEvent(
+                      col,
+                      row,
+                      Unit.createUnitByUnitType(unitType, currentPlayer),
+                      currentPlayer,
+                      !isLastEmptyCell,
+                      false);
+              possiblePlaces.add(placeUnitEvent);
+            }
+
             if (!army.hasGeneral()) {
               PlaceUnitEvent placeUnitEventWithGeneral =
                   new PlaceUnitEvent(
