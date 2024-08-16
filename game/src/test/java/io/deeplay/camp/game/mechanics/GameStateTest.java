@@ -199,6 +199,17 @@ public class GameStateTest {
     assertEquals(48, possiblePlaces.size());
 
   }
+  @Test
+  void getPossiblePlacesLastCellTest() {
+    GameState gameState = new GameState();
+    gameState.getCurrentBoard().setUnit(0, 0, new Healer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(1, 0, new Archer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(2, 0, new Archer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(0, 1, new Knight(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(1, 1, new Knight(PlayerType.FIRST_PLAYER));
+    List<PlaceUnitEvent> possiblePlaces = gameState.getPossiblePlaces();
+    assertEquals(4, possiblePlaces.size());
+  }
 
   @Test
   void getPossibleMovesKnightsTest() {
