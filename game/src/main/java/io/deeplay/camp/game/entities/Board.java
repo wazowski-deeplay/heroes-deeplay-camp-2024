@@ -98,13 +98,13 @@ public class Board {
     for (int i = startRow; i < endRow; i++) {
       for (int j = 0; j < Board.COLUMNS; j++) {
         if (isEmptyCell(j, i)) {
-          logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);
+          /*logger.atInfo().log("Empty cell (X-{},Y-{})", j, i);*/
           continue;
         }
         if (getUnit(j, i).isAlive()) {
           unitPositions.add(new Position(j, i));
         } else {
-          logger.atInfo().log("Dead unit (X-{},Y-{})", j, i);
+          /*logger.atInfo().log("Dead unit (X-{},Y-{})", j, i);*/
         }
       }
     }

@@ -122,13 +122,13 @@ public class GameState {
         }
         attackResult.add(new AttackInfo(attacker, defenders));
       }
-      logger.atInfo().log(
+      /*logger.atInfo().log(
           "This {}({},{}) attack enemy or heal ({},{})",
           move.getAttacker().getUnitType(),
           move.getFrom().x(),
           move.getFrom().y(),
           move.getTo().x(),
-          move.getTo().y());
+          move.getTo().y());*/
       allUnitsDeadByPlayer();
       armyFirst.isAliveGeneral();
       armySecond.isAliveGeneral();
@@ -143,35 +143,35 @@ public class GameState {
     Unit attacker = move.getAttacker();
 
     if (!attacker.isAlive()) {
-      logger.atInfo().log(
+    /*  logger.atInfo().log(
           "This units {}({},{}) already dead, he wont move",
           move.getAttacker().getUnitType(),
           from.x(),
-          from.y());
+          from.y());*/
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (outOfBorder(from.x(), from.y()) || outOfBorder(to.x(), to.y())) {
-      logger.atInfo().log(
+      /*logger.atInfo().log(
           "These coordinates({},{}) or ({},{}) are outside board border",
           from.x(),
           from.x(),
           to.x(),
-          to.y());
+          to.y());*/
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (attacker.getPlayerType() != currentPlayer) {
-      logger.atInfo().log("Enemy units({},{}) cannot be called to move", from.x(), from.y());
+      /*logger.atInfo().log("Enemy units({},{}) cannot be called to move", from.x(), from.y());*/
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
     if (attacker.isMoved()) {
-      logger.atInfo().log(
+     /* logger.atInfo().log(
           "This units {}({},{}) already moved this round",
           move.getAttacker().getUnitType(),
           from.x(),
-          from.y());
+          from.y());*/
       throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
     }
 
@@ -197,17 +197,17 @@ public class GameState {
             result = true;
           }
         } else {
-          logger.atInfo().log(
+          /*logger.atInfo().log(
               "This Knight({},{}) try attack ({},{}), who outside his radius",
               from.x(),
               from.y(),
               to.x(),
-              to.y());
+              to.y());*/
           throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
         }
       } else {
-        logger.atInfo().log(
-            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        /*logger.atInfo().log(
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());*/
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -215,8 +215,8 @@ public class GameState {
       if (attackEnemyUnit && isAliveDefender) {
         result = true;
       } else {
-        logger.atInfo().log(
-            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        /*logger.atInfo().log(
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());*/
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -224,8 +224,8 @@ public class GameState {
       if (attackEnemyUnit && isAliveDefender) {
         result = true;
       } else {
-        logger.atInfo().log(
-            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());
+        /*logger.atInfo().log(
+            "This {} try attack ally or dead unit", move.getAttacker().getUnitType());*/
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -233,8 +233,8 @@ public class GameState {
       if (!attackEnemyUnit && isAliveDefender) {
         result = true;
       } else {
-        logger.atInfo().log(
-            "This {} try heal enemy or dead unit", move.getAttacker().getUnitType());
+       /* logger.atInfo().log(
+            "This {} try heal enemy or dead unit", move.getAttacker().getUnitType());*/
         throw new GameException(ErrorCode.MOVE_IS_NOT_CORRECT);
       }
     }
@@ -525,15 +525,16 @@ public class GameState {
         if (board.isEmptyCell(col, row)) {
           boolean isLastEmptyCell = board.hasOneEmptyCell(currentPlayer);
           for (UnitType unitType : UnitType.values()) {
-            PlaceUnitEvent placeUnitEventWithoutGeneral =
-                new PlaceUnitEvent(
-                    col,
-                    row,
-                    Unit.createUnitByUnitType(unitType, currentPlayer),
-                    currentPlayer,
-                    !isLastEmptyCell,
-                    false);
-            possiblePlaces.add(placeUnitEventWithoutGeneral);
+            if (!isLastEmptyCell || army.hasGeneral()) {
+              PlaceUnitEvent placeUnitEvent = new PlaceUnitEvent(
+                      col,
+                      row,
+                      Unit.createUnitByUnitType(unitType, currentPlayer),
+                      currentPlayer,
+                      !isLastEmptyCell,
+                      false);
+              possiblePlaces.add(placeUnitEvent);
+            }
             if (!army.hasGeneral()) {
               PlaceUnitEvent placeUnitEventWithGeneral =
                   new PlaceUnitEvent(
@@ -569,7 +570,16 @@ public class GameState {
     for (Position from : unitsPositionsCurrentPlayer) {
       Unit unit = board.getUnit(from.x(), from.y());
       if (unit.getUnitType() == UnitType.HEALER) {
-        addValidMoves(possibleMoves, unitsPositionsCurrentPlayer, from, unit);
+        for(Position to : unitsPositionsCurrentPlayer) {
+          Unit toUnit = board.getUnit(to.x(), to.y());
+          if (toUnit.getCurrentHp() != toUnit.getMaxHp()) {
+            List<Position> healingPositions = new ArrayList<>();
+            healingPositions.add(to);
+            addValidMoves(possibleMoves,healingPositions,from,unit);
+          }else {
+            continue;
+          }
+        }
       } else {
         addValidMoves(possibleMoves, unitsPositionsOpponentPlayer, from, unit);
       }
@@ -610,27 +620,46 @@ public class GameState {
   }
 
   public void setDefaultPlacement() {
-    try{
-      Knight generalKnight = new Knight(PlayerType.FIRST_PLAYER);
-      makePlacement(new PlaceUnitEvent(0, 0, generalKnight, PlayerType.FIRST_PLAYER, true, true));
-      makePlacement(new PlaceUnitEvent(1, 0, new Mage(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 0, new Healer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
+    try {
+      Knight general = new Knight(PlayerType.FIRST_PLAYER);
+      makePlacement(new PlaceUnitEvent(0, 0, general, PlayerType.FIRST_PLAYER, true, true));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 0, new Mage(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 0, new Healer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
       makeChangePlayer(new ChangePlayerEvent(PlayerType.FIRST_PLAYER));
 
-      generalKnight = new Knight(PlayerType.SECOND_PLAYER);
+      Knight generalKnight = new Knight(PlayerType.SECOND_PLAYER);
       makePlacement(new PlaceUnitEvent(2, 3, generalKnight, PlayerType.SECOND_PLAYER, true, true));
-      makePlacement(new PlaceUnitEvent(1, 3, new Mage(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 3, new Healer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 3, new Mage(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 3, new Healer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
       makeChangePlayer(new ChangePlayerEvent(PlayerType.SECOND_PLAYER));
-    }catch (GameException e){
+    } catch (GameException e) {
       logger.info("Не удалась стандартная расстановка!");
     }
   }
-
 }
