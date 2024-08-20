@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RandomBot extends Bot{
-    private static final Logger logger = LoggerFactory.getLogger(RandomBot.class);
+    //private static final Logger logger = LoggerFactory.getLogger(RandomBot.class);
 
     @Override
     public PlaceUnitEvent generatePlaceUnitEvent(GameState gameState) {
@@ -142,7 +142,7 @@ public class RandomBot extends Bot{
         // Ключ - это атакующий юнит, значение - это все возможные атаки данного юнита
         // Для первого игрока
         if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-            logger.atInfo().log("Calculating possible actions for First Player");
+           /* logger.atInfo().log("Calculating possible actions for First Player");*/
             unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
             unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
             for (Position from : unitsCurrentPlayer) {
@@ -154,12 +154,12 @@ public class RandomBot extends Bot{
                             if (canActMove(gameState, move)) {
                                 map.put(from, to);
                             } else {
-                                logger.atInfo().log(
+                                /*logger.atInfo().log(
                                         "Invalid action for Healer from ({}, {}) to ({}, {})",
                                         from.x(),
                                         from.y(),
                                         to.x(),
-                                        to.y());
+                                        to.y());*/
                             }
                         }
                     }
@@ -171,8 +171,8 @@ public class RandomBot extends Bot{
                             if (canActMove(gameState, move)) {
                                 map.put(from, to);
                             } else {
-                                logger.atInfo().log(
-                                        "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());
+                               /* logger.atInfo().log(
+                                        "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());*/
                             }
                         }
                     }
@@ -181,7 +181,7 @@ public class RandomBot extends Bot{
             // Если тот кто ходить или тот с чей стороны мы хотим узнать возможные ходы
             // Для второго
         } else if (gameState.getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
-            logger.atInfo().log("Calculating possible actions for Second Player");
+            /*logger.atInfo().log("Calculating possible actions for Second Player");*/
             unitsCurrentPlayer = enumerationPlayerUnits(PlayerType.SECOND_PLAYER, board);
             unitsOpponentPlayer = enumerationPlayerUnits(PlayerType.FIRST_PLAYER, board);
             for (Position from : unitsCurrentPlayer) {
@@ -192,12 +192,12 @@ public class RandomBot extends Bot{
                         if (canActMove(gameState, move)) {
                             map.put(from, to);
                         } else {
-                            logger.atInfo().log(
+                            /*logger.atInfo().log(
                                     "Invalid action for Healer from ({}, {}) to ({}, {})",
                                     from.x(),
                                     from.y(),
                                     to.x(),
-                                    to.y());
+                                    to.y());*/
                         }
                     }
                 }
@@ -207,8 +207,8 @@ public class RandomBot extends Bot{
                     if (canActMove(gameState, move)) {
                         map.put(from, to);
                     } else {
-                        logger.atInfo().log(
-                                "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());
+                       /* logger.atInfo().log(
+                                "Invalid action from ({}, {}) to ({}, {})", from.x(), from.y(), to.x(), to.y());*/
                     }
                 }
             }
@@ -225,7 +225,7 @@ public class RandomBot extends Bot{
         // расстановки
         // Для первого игрока
         if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
-            logger.atInfo().log("Calculating possible placement for First Player");
+            /*logger.atInfo().log("Calculating possible placement for First Player");*/
             cellsCurrentPlayer = enumerationEmptyCells(PlayerType.FIRST_PLAYER, board);
             unitList = enumerationUnit(PlayerType.FIRST_PLAYER);
             for (Position to : cellsCurrentPlayer) {
@@ -243,18 +243,18 @@ public class RandomBot extends Bot{
                         if (canActPlace(gameState, place)) {
                             map.put(to, randUnit);
                         } else {
-                            logger.atInfo().log(
+                            /*logger.atInfo().log(
                                     "Invalid placement for First Player from ({}, {}) for {})",
                                     to.x(),
                                     to.y(),
-                                    randUnit.getUnitType().name());
+                                    randUnit.getUnitType().name());*/
                         }
                     }
                 }
             }
             // Для второго
         } else if (gameState.getCurrentPlayer() == PlayerType.SECOND_PLAYER) {
-            logger.atInfo().log("Calculating possible placement for Second Player");
+            /*logger.atInfo().log("Calculating possible placement for Second Player");*/
             cellsCurrentPlayer = enumerationEmptyCells(PlayerType.SECOND_PLAYER, board);
             unitList = enumerationUnit(PlayerType.SECOND_PLAYER);
             for (Position to : cellsCurrentPlayer) {
@@ -272,11 +272,11 @@ public class RandomBot extends Bot{
                         if (canActPlace(gameState, place)) {
                             map.put(to, randUnit);
                         } else {
-                            logger.atInfo().log(
+                           /* logger.atInfo().log(
                                     "Invalid placement for Second Player from ({}, {}) for {})",
                                     to.x(),
                                     to.y(),
-                                    randUnit.getUnitType().name());
+                                    randUnit.getUnitType().name());*/
                         }
                     }
                 }
@@ -318,7 +318,7 @@ public class RandomBot extends Bot{
             gameState.isValidMove(move);
             result = true;
         } catch (GameException e) {
-            logger.atError().log("Move is invalid: {}", e.getMessage());
+           /* logger.atError().log("Move is invalid: {}", e.getMessage());*/
             result = false;
         }
         return result;
@@ -331,7 +331,7 @@ public class RandomBot extends Bot{
             gameState.isValidPlacement(placeUnitEvent);
             result = true;
         } catch (GameException e) {
-            logger.atError().log("Place is invalid: {}", e.getMessage());
+           /* logger.atError().log("Place is invalid: {}", e.getMessage());*/
             result = false;
         }
         return result;
