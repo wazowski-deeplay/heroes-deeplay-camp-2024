@@ -47,7 +47,8 @@ public class GameAnalisys {
     winners = new PlayerType[countGame];
     avgTimeMove = new long[countGame][2];
     this.gameId = gameId;
-    String path = "C:\\Deeplay\\deeplay-heroes\\botfarm\\src\\main\\java\\io\\deeplay\\camp\\botfarm";
+    String path =
+        "C:\\Users\\Maksim\\IdeaProjects\\ruf-heroes-deeplay-camp-2024\\botfarm\\src\\main\\java\\io\\deeplay\\camp\\botfarm";
     fileOutput = new File(path + "\\resultgame"+gameId+".txt");
     writer = new BufferedWriter(new FileWriter(fileOutput,true));
 

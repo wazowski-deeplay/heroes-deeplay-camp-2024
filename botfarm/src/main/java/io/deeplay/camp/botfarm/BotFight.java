@@ -1,5 +1,6 @@
 package io.deeplay.camp.botfarm;
 
+import io.deeplay.camp.botfarm.bots.MinMaxBot;
 import io.deeplay.camp.botfarm.bots.RandomBot;
 import io.deeplay.camp.game.Game;
 import io.deeplay.camp.game.entities.Unit;
@@ -29,7 +30,7 @@ public class BotFight extends Thread{
     private final int timeSkeep = 0;
     Game game;
     GameAnalisys gameAnalisys;
-    RandomBot botFirst;
+    MinMaxBot botFirst;
     RandomBot botSecond;
     boolean consoleOut = true;
     boolean outInfoGame;
@@ -45,7 +46,7 @@ public class BotFight extends Thread{
 
     Thread threadFight;
 
-    public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) throws IOException {
+    public BotFight(MinMaxBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) throws IOException {
         this.botFirst = botFirst;
         this.botSecond = botSecond;
         this.countGame = countGame;
@@ -87,10 +88,7 @@ public class BotFight extends Thread{
         for (int gameCount = 0; gameCount < countGame; gameCount++) {
 
             game = new Game();
-            executePlace(game.getGameState(), gameCount);
-            game.getGameState().changeCurrentPlayer();
-            executePlace(game.getGameState(), gameCount);
-            game.getGameState().changeCurrentPlayer();
+            game.getGameState().setDefaultPlacement();
             gameAnalisys.setCurrentBoard(game.getGameState().getCurrentBoard().getUnits());
 
             while (game.getGameState().getGameStage() != GameStage.ENDED) {
@@ -113,15 +111,23 @@ public class BotFight extends Thread{
             throws GameException, InterruptedException {
         for (int i = 0; i < 6; i++) {
             if (gameState.getCurrentPlayer() == PlayerType.FIRST_PLAYER) {
+                if (gameState.getGameStage() == GameStage.ENDED) {
+                    break;
+                }
                 long startTimer = System.currentTimeMillis();
-                MakeMoveEvent event = botFirst.generateMakeMoveEvent(gameState);
+                MakeMoveEvent event = botFirst.generateMakeMoveEvent(gameState, PlayerType.FIRST_PLAYER);
                 long endTimer = System.currentTimeMillis();
+                if(event == null){
+                    System.out.println("null");
+                }
+                else{
+                    System.out.println(event.getAttacker()+" "+event.getFrom()+" "+event.getTo());
+                }
                 gameAnalisys.reviewTimeMove(endTimer - startTimer, countGame);
-                if(endTimer - startTimer > 5000){
+                if(endTimer - startTimer > 500000000){
                     GiveUpEvent giveUpEvent = new GiveUpEvent(PlayerType.FIRST_PLAYER);
                     gameState.giveUp(giveUpEvent);
                 }
-
                 if (event == null) {
                     continue;
                 }
@@ -129,11 +135,20 @@ public class BotFight extends Thread{
                 Thread.sleep(timeSkeep);
                 outInFrame(event);
             } else {
+                if (gameState.getGameStage() == GameStage.ENDED) {
+                    break;
+                }
                 long startTimer = System.currentTimeMillis();
                 MakeMoveEvent event = botSecond.generateMakeMoveEvent(gameState);
                 long endTimer = System.currentTimeMillis();
+                if(event == null){
+                    System.out.println("null");
+                }
+                else{
+                    System.out.println(event.getAttacker()+" "+event.getFrom()+" "+event.getTo());
+                }
                 gameAnalisys.reviewTimeMove(endTimer - startTimer, countGame);
-                if(endTimer - startTimer > 5000){
+                if(endTimer - startTimer > 500000000){
                     GiveUpEvent giveUpEvent = new GiveUpEvent(PlayerType.SECOND_PLAYER);
                     gameState.giveUp(giveUpEvent);
                 }
