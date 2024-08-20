@@ -50,7 +50,7 @@ public class MinimaxBot extends Bot {
   }
 
   private MinimaxResult minimax(GameState gameState, int depth, boolean maximizing)
-      throws GameException {
+          throws GameException {
     treeAnalyzer.incrementNodesCount();
     // Базовый случай (Дошли до ограничения глубины или конца игры)
     if (depth == 0 || gameState.getGameStage() == GameStage.ENDED) {
@@ -64,37 +64,18 @@ public class MinimaxBot extends Bot {
       return minimax(newGameState, depth - 1, !maximizing);
     }
 
-    if (maximizing) {
-      return getMaximizingResult(gameState, depth, possibleMoves);
-    } else {
-      return getMinimizingResult(gameState, depth, possibleMoves);
-    }
+    return getBestResult(gameState, depth, possibleMoves, maximizing);
   }
 
   @SneakyThrows
-  private MinimaxResult getMaximizingResult(
-      GameState gameState, int depth, List<MakeMoveEvent> possibleMoves) throws GameException {
-    MinimaxResult bestResult = new MinimaxResult(possibleMoves.get(0), MIN_COST);
+  private MinimaxResult getBestResult(
+          GameState gameState, int depth, List<MakeMoveEvent> possibleMoves, boolean maximizing) throws GameException {
+    MinimaxResult bestResult = new MinimaxResult(possibleMoves.getFirst(), maximizing ? MIN_COST : MAX_COST);
     for (MakeMoveEvent move : possibleMoves) {
       GameState newGameState = gameState.getCopy();
       newGameState.makeMove(move);
-      MinimaxResult result = minimax(newGameState, depth - 1, true);
-      if (result.score > bestResult.score) {
-        bestResult = new MinimaxResult(move, result.score);
-      }
-    }
-    return bestResult;
-  }
-
-  @SneakyThrows
-  private MinimaxResult getMinimizingResult(
-      GameState gameState, int depth, List<MakeMoveEvent> possibleMoves) throws GameException {
-    MinimaxResult bestResult = new MinimaxResult(possibleMoves.get(0), MAX_COST);
-    for (MakeMoveEvent move : possibleMoves) {
-      GameState newGameState = gameState.getCopy();
-      newGameState.makeMove(move);
-      MinimaxResult result = minimax(newGameState, depth - 1, false);
-      if (result.score < bestResult.score) {
+      MinimaxResult result = minimax(newGameState, depth - 1, maximizing);
+      if (maximizing && result.score > bestResult.score || !maximizing && result.score < bestResult.score) {
         bestResult = new MinimaxResult(move, result.score);
       }
     }

@@ -59,7 +59,7 @@ public class MultiThreadMinimaxBot extends Bot {
     private double beta;
 
     public MinimaxTask(
-        GameState gameState, int depth, boolean maximizing, double alpha, double beta) {
+            GameState gameState, int depth, boolean maximizing, double alpha, double beta) {
       this.gameState = gameState;
       this.depth = depth;
       this.maximizing = maximizing;
@@ -73,7 +73,7 @@ public class MultiThreadMinimaxBot extends Bot {
       // Базовый случай (Дошли до ограничения глубины или конца игры)
       if (depth == 0 || gameState.getGameStage() == GameStage.ENDED) {
         return new MinimaxResult(
-            null, gameStateEvaluator.evaluate(gameState, maximizingPlayerType));
+                null, gameStateEvaluator.evaluate(gameState, maximizingPlayerType));
       }
 
       try {
@@ -85,11 +85,7 @@ public class MultiThreadMinimaxBot extends Bot {
           return task.compute();
         }
 
-        if (maximizing) {
-          return getMaximizingResult(possibleMoves);
-        } else {
-          return getMinimizingResult(possibleMoves);
-        }
+        return getBestResult(possibleMoves);
 
       } catch (GameException e) {
         System.out.println("MinimaxBot Error");
@@ -98,38 +94,22 @@ public class MultiThreadMinimaxBot extends Bot {
     }
 
     @SneakyThrows
-    private MinimaxResult getMaximizingResult(List<MakeMoveEvent> possibleMoves)
-        throws GameException {
-      MinimaxResult bestResult = new MinimaxResult(possibleMoves.getFirst(), MIN_COST);
+    private MinimaxResult getBestResult(List<MakeMoveEvent> possibleMoves)
+            throws GameException {
+      MinimaxResult bestResult = new MinimaxResult(possibleMoves.getFirst(), maximizing ? MIN_COST : MAX_COST);
       for (MakeMoveEvent move : possibleMoves) {
         GameState newGameState = gameState.getCopy();
         newGameState.makeMove(move);
-        MinimaxTask task = new MinimaxTask(newGameState, depth - 1, true, alpha, beta);
+        MinimaxTask task = new MinimaxTask(newGameState, depth - 1, maximizing, alpha, beta);
         MinimaxResult result = task.compute();
-        if (result.score > bestResult.score) {
+        if (maximizing && result.score > bestResult.score || !maximizing && result.score < bestResult.score) {
           bestResult = new MinimaxResult(move, result.score);
         }
-        alpha = Math.max(alpha, bestResult.score);
-        if (beta <= alpha) {
-          break;
+        if (maximizing) {
+          alpha = Math.max(alpha, bestResult.score);
+        } else {
+          beta = Math.min(beta, bestResult.score);
         }
-      }
-      return bestResult;
-    }
-
-    @SneakyThrows
-    private MinimaxResult getMinimizingResult(List<MakeMoveEvent> possibleMoves)
-        throws GameException {
-      MinimaxResult bestResult = new MinimaxResult(possibleMoves.getFirst(), MAX_COST);
-      for (MakeMoveEvent move : possibleMoves) {
-        GameState newGameState = gameState.getCopy();
-        newGameState.makeMove(move);
-        MinimaxTask task = new MinimaxTask(newGameState, depth - 1, false, alpha, beta);
-        MinimaxResult result = task.compute();
-        if (result.score < bestResult.score) {
-          bestResult = new MinimaxResult(move, result.score);
-        }
-        beta = Math.min(beta, bestResult.score);
         if (beta <= alpha) {
           break;
         }
