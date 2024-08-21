@@ -21,8 +21,11 @@ import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,12 +51,14 @@ public class GameState {
     gameStage = GameStage.PLACEMENT_STAGE;
   }
 
-  public GameState(GameState gameState) {
-    this.board = new Board(gameState.board);
+  private GameState(GameState gameState) {
+    this.board = gameState.board.getCopy();
     this.gameStage = gameState.gameStage;
     this.currentPlayer = gameState.currentPlayer;
-    this.armyFirst = new Army(gameState.armyFirst, this.board);
-    this.armySecond = new Army(gameState.armySecond, this.board);
+    this.armyFirst = new Army(PlayerType.FIRST_PLAYER);
+    armyFirst.fillArmy(this.board);
+    this.armySecond = new Army(PlayerType.SECOND_PLAYER);
+    armySecond.fillArmy(this.board);
     this.countRound = gameState.countRound;
     this.winner = gameState.winner;
   }
@@ -428,6 +433,7 @@ public class GameState {
             && to.y() == from.y() - 1);
   }
 
+
   private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
@@ -525,15 +531,17 @@ public class GameState {
         if (board.isEmptyCell(col, row)) {
           boolean isLastEmptyCell = board.hasOneEmptyCell(currentPlayer);
           for (UnitType unitType : UnitType.values()) {
-            PlaceUnitEvent placeUnitEventWithoutGeneral =
-                new PlaceUnitEvent(
-                    col,
-                    row,
-                    Unit.createUnitByUnitType(unitType, currentPlayer),
-                    currentPlayer,
-                    !isLastEmptyCell,
-                    false);
-            possiblePlaces.add(placeUnitEventWithoutGeneral);
+            if (!isLastEmptyCell || army.hasGeneral()) {
+              PlaceUnitEvent placeUnitEvent = new PlaceUnitEvent(
+                      col,
+                      row,
+                      Unit.createUnitByUnitType(unitType, currentPlayer),
+                      currentPlayer,
+                      !isLastEmptyCell,
+                      false);
+              possiblePlaces.add(placeUnitEvent);
+            }
+
             if (!army.hasGeneral()) {
               PlaceUnitEvent placeUnitEventWithGeneral =
                   new PlaceUnitEvent(
@@ -633,4 +641,22 @@ public class GameState {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    GameState gameState = (GameState) o;
+    return countRound == gameState.countRound &&
+            Objects.equals(board, gameState.board) &&
+            gameStage == gameState.gameStage &&
+            currentPlayer == gameState.currentPlayer &&
+            Objects.equals(armyFirst, gameState.armyFirst) &&
+            Objects.equals(armySecond, gameState.armySecond) &&
+            winner == gameState.winner;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(board, gameStage, currentPlayer, armyFirst, armySecond, countRound, winner);
+  }
 }

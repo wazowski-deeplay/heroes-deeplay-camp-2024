@@ -35,6 +35,8 @@ public class GameStateTest {
     gameState.getCurrentBoard().setUnit(0, 3, new Archer(PlayerType.SECOND_PLAYER));
     gameState.getCurrentBoard().setUnit(1, 3, new Healer(PlayerType.SECOND_PLAYER));
     gameState.getCurrentBoard().setUnit(2, 3, new Archer(PlayerType.SECOND_PLAYER));
+    gameState.getArmyFirst().fillArmy(gameState.getCurrentBoard());
+    gameState.getArmySecond().fillArmy(gameState.getCurrentBoard());
   }
 
   @Test
@@ -199,6 +201,17 @@ public class GameStateTest {
     assertEquals(48, possiblePlaces.size());
 
   }
+  @Test
+  void getPossiblePlacesLastCellTest() {
+    GameState gameState = new GameState();
+    gameState.getCurrentBoard().setUnit(0, 0, new Healer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(1, 0, new Archer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(2, 0, new Archer(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(0, 1, new Knight(PlayerType.FIRST_PLAYER));
+    gameState.getCurrentBoard().setUnit(1, 1, new Knight(PlayerType.FIRST_PLAYER));
+    List<PlaceUnitEvent> possiblePlaces = gameState.getPossiblePlaces();
+    assertEquals(4, possiblePlaces.size());
+  }
 
   @Test
   void getPossibleMovesKnightsTest() {
@@ -229,5 +242,30 @@ public class GameStateTest {
     List<MakeMoveEvent> possibleMoves = gameState.getPossibleMoves();
     assertEquals(36, possibleMoves.size());
   }
+  @Test
+  public void testGetCopy(){
+    GameState copiedGameState = gameState.getCopy();
 
+    assertNotSame(gameState, copiedGameState);
+
+    assertEquals(gameState.getBoard(), copiedGameState.getBoard());
+    assertEquals(gameState.getGameStage(), copiedGameState.getGameStage());
+    assertEquals(gameState.getCurrentPlayer(), copiedGameState.getCurrentPlayer());
+    assertEquals(gameState.getArmyFirst(), copiedGameState.getArmyFirst());
+    assertEquals(gameState.getArmySecond(), copiedGameState.getArmySecond());
+    assertEquals(gameState.getCountRound(), copiedGameState.getCountRound());
+    assertEquals(gameState.getWinner(), copiedGameState.getWinner());
+
+    copiedGameState.setGameStage(GameStage.MOVEMENT_STAGE);
+    assertNotEquals(gameState.getGameStage(), copiedGameState.getGameStage());
+
+    copiedGameState.setCurrentPlayer(PlayerType.SECOND_PLAYER);
+    assertNotEquals(gameState.getCurrentPlayer(), copiedGameState.getCurrentPlayer());
+
+    copiedGameState.setCountRound(5);
+    assertNotEquals(gameState.getCountRound(), copiedGameState.getCountRound());
+
+    copiedGameState.setWinner(PlayerType.FIRST_PLAYER);
+    assertNotEquals(gameState.getWinner(), copiedGameState.getWinner());
+  }
 }
