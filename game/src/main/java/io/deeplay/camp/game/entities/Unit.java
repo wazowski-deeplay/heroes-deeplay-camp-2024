@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "unitType")
 @JsonSubTypes({
@@ -122,5 +124,28 @@ public abstract class Unit implements GeneralBuff {
       case ARCHER -> new Archer(playerType);
       case HEALER -> new Healer(playerType);
     };
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Unit unit = (Unit) o;
+    return maxHp == unit.maxHp &&
+            currentHp == unit.currentHp &&
+            damage == unit.damage &&
+            accuracy == unit.accuracy &&
+            armor == unit.armor &&
+            isGeneral == unit.isGeneral
+            && isMoved == unit.isMoved
+            && hitTarget == unit.hitTarget
+            && unitType == unit.unitType
+            && playerType == unit.playerType
+            && attackType == unit.attackType;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(maxHp, currentHp, damage, accuracy, armor, isGeneral, unitType, playerType, attackType, isMoved, hitTarget);
   }
 }
