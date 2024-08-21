@@ -1,18 +1,7 @@
 package io.deeplay.camp.game.mechanics;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.deeplay.camp.game.entities.Archer;
-import io.deeplay.camp.game.entities.Army;
-import io.deeplay.camp.game.entities.AttackInfo;
-import io.deeplay.camp.game.entities.AttackType;
-import io.deeplay.camp.game.entities.Board;
-import io.deeplay.camp.game.entities.Defender;
-import io.deeplay.camp.game.entities.Healer;
-import io.deeplay.camp.game.entities.Knight;
-import io.deeplay.camp.game.entities.Mage;
-import io.deeplay.camp.game.entities.Position;
-import io.deeplay.camp.game.entities.Unit;
-import io.deeplay.camp.game.entities.UnitType;
+import io.deeplay.camp.game.entities.*;
 import io.deeplay.camp.game.events.ChangePlayerEvent;
 import io.deeplay.camp.game.events.GiveUpEvent;
 import io.deeplay.camp.game.events.MakeMoveEvent;
@@ -586,13 +575,74 @@ public class GameState {
     return possibleMoves;
   }
 
+  public List<StateChance> getPossibleState(MakeMoveEvent move) throws GameException {
+    List<StateChance> possibleIssue = new ArrayList<>();
+    int AccAttacker = move.getAttacker().getAccuracy();
+    int ArmDefender = getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).getArmor();
+
+    if(move.getAttacker().getUnitType() == UnitType.KNIGHT || move.getAttacker().getUnitType() == UnitType.ARCHER){
+
+      GameState goodVar = this.getCopy();
+      GameState badVar = this.getCopy();
+      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) /20);
+      double badChance = 1 - goodChance;
+
+      int originAcc = this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
+
+      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(50);
+      goodVar.makeMove(move);
+      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      possibleIssue.add(new StateChance(goodVar, goodChance));
+      badVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(-50);
+      badVar.makeMove(move);
+      badVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      possibleIssue.add(new StateChance(badVar, badChance));
+    }
+    if(move.getAttacker().getUnitType() == UnitType.HEALER){
+      int originAcc = this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
+      GameState goodVar = this.getCopy();
+      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(50);
+      goodVar.makeMove(move);
+      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      possibleIssue.add(new StateChance(goodVar, 1));
+
+    }
+    if(move.getAttacker().getUnitType() == UnitType.MAGE){
+
+      GameState goodVar = this.getCopy();
+      GameState badVar = this.getCopy();
+      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) /20);
+      double badChance = 1 - goodChance;
+      int originArm = this.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).getArmor();
+      goodVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(-50);
+      goodVar.makeMove(move);
+      goodVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(originArm);
+      possibleIssue.add(new StateChance(goodVar, goodChance));
+      badVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(50);
+      badVar.makeMove(move);
+      badVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(originArm);
+      possibleIssue.add(new StateChance(badVar, badChance));
+
+    }
+    return possibleIssue;
+  }
+
   private void addValidMoves(
-      List<MakeMoveEvent> possibleMoves, List<Position> targetPositions, Position from, Unit unit) {
+          List<MakeMoveEvent> possibleMoves, List<Position> targetPositions, Position from, Unit unit) {
     for (Position to : targetPositions) {
       if (!unit.isMoved()) {
         MakeMoveEvent move = new MakeMoveEvent(from, to, unit);
         if (canActMove(move)) {
-          possibleMoves.add(move);
+          if (move.getAttacker().getUnitType() == UnitType.HEALER) {
+            if (board.getUnit(to.x(), to.y()).getCurrentHp() != board.getUnit(to.x(), to.y()).getMaxHp()) {
+              possibleMoves.add(move);
+            }
+          } else if (move.getAttacker().getUnitType() == UnitType.MAGE) {
+            possibleMoves.add(move);
+            break;
+          } else {
+            possibleMoves.add(move);
+          }
         }
       }
     }

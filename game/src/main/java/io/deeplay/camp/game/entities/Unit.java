@@ -90,7 +90,7 @@ public abstract class Unit implements GeneralBuff {
     this.accuracy = accuracy;
   }
 
-  protected void setArmor(int armor) {
+  public void setArmor(int armor) {
     this.armor = armor;
   }
 
