@@ -43,15 +43,14 @@ public class AlphaBetaMinimaxBot extends Bot {
   public MakeMoveEvent generateMakeMoveEvent(GameState gameState) {
     maximizingPlayerType = gameState.getCurrentPlayer();
     treeAnalyzer.startMoveStopWatch();
-    MinimaxResult result = minimax(gameState, maxDepth, true, MIN_COST, MAX_COST);
+    MinimaxResult result = minimax(gameState.getCopy(), maxDepth, MIN_COST, MAX_COST, true);
     treeAnalyzer.endMoveStopWatch();
-
     return (MakeMoveEvent) result.event;
   }
 
   private MinimaxResult minimax(
-          GameState gameState, int depth, boolean maximizing, double alpha, double beta)
-          throws GameException {
+      GameState gameState, int depth, double alpha, double beta, boolean maximizing)
+      throws GameException {
     treeAnalyzer.incrementNodesCount();
     // Базовый случай (Дошли до ограничения глубины или конца игры)
     if (depth == 0 || gameState.getGameStage() == GameStage.ENDED) {
@@ -60,33 +59,52 @@ public class AlphaBetaMinimaxBot extends Bot {
 
     List<MakeMoveEvent> possibleMoves = gameState.getPossibleMoves();
     if (possibleMoves.isEmpty()) {
-      GameState newGameState = gameState.getCopy();
-      newGameState.changeCurrentPlayer();
-      return minimax(newGameState, depth - 1, !maximizing, alpha, beta);
+      if (depth == maxDepth) {
+        return new MinimaxResult(null, maximizing ? MIN_COST : MAX_COST);
+      }
+      gameState.changeCurrentPlayer();
+      possibleMoves = gameState.getPossibleMoves();
+      maximizing = !maximizing;
     }
 
-    return getBestResult(gameState, depth, possibleMoves, maximizing, alpha, beta);
+    return maximizing
+        ? maximize(gameState, depth, alpha, beta, possibleMoves)
+        : minimize(gameState, depth, alpha, beta, possibleMoves);
   }
 
-  @SneakyThrows
-  private MinimaxResult getBestResult(
-          GameState gameState, int depth, List<MakeMoveEvent> possibleMoves, boolean maximizing, double alpha, double beta)
-          throws GameException {
-    MinimaxResult bestResult = new MinimaxResult(possibleMoves.getFirst(), maximizing ? MIN_COST : MAX_COST);
+  private MinimaxResult maximize(
+      GameState gameState, int depth, double alpha, double beta, List<MakeMoveEvent> possibleMoves)
+      throws GameException {
+    MinimaxResult bestResult = new MinimaxResult(null, MIN_COST);
     for (MakeMoveEvent move : possibleMoves) {
       GameState newGameState = gameState.getCopy();
       newGameState.makeMove(move);
-      MinimaxResult result = minimax(newGameState, depth - 1, maximizing, alpha, beta);
-      if (maximizing && result.score > bestResult.score || !maximizing && result.score < bestResult.score) {
+      MinimaxResult result = minimax(newGameState, depth - 1, alpha, beta, true);
+      if (result.score > bestResult.score) {
         bestResult = new MinimaxResult(move, result.score);
       }
-      if (maximizing) {
-        alpha = Math.max(alpha, bestResult.score);
-      } else {
-        beta = Math.min(beta, bestResult.score);
-      }
+      alpha = Math.max(alpha, bestResult.score);
       if (beta <= alpha) {
         break;
+      }
+    }
+    return bestResult;
+  }
+
+  private MinimaxResult minimize(
+      GameState gameState, int depth, double alpha, double beta, List<MakeMoveEvent> possibleMoves)
+      throws GameException {
+    MinimaxResult bestResult = new MinimaxResult(null, MAX_COST);
+    for (MakeMoveEvent move : possibleMoves) {
+      GameState newGameState = gameState.getCopy();
+      newGameState.makeMove(move);
+      MinimaxResult result = minimax(newGameState, depth - 1, alpha, beta, false);
+      if (result.score < bestResult.score) {
+        bestResult = new MinimaxResult(move, result.score);
+      }
+      beta = Math.min(beta, bestResult.score);
+      if (beta <= alpha) {
+        break; // Alpha cut-off
       }
     }
     return bestResult;
