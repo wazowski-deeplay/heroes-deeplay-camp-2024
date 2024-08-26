@@ -8,13 +8,13 @@ import io.deeplay.camp.game.events.MakeMoveEvent;
 import io.deeplay.camp.game.events.PlaceUnitEvent;
 import io.deeplay.camp.game.exceptions.ErrorCode;
 import io.deeplay.camp.game.exceptions.GameException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -422,7 +422,6 @@ public class GameState {
             && to.y() == from.y() - 1);
   }
 
-
   private boolean nullUnitMeleeRow(Position from, Unit attacker) {
     return (attacker.getPlayerType() == PlayerType.FIRST_PLAYER
             && getCurrentBoard().countUnitsRow(from.y() + 1) == 0)
@@ -442,12 +441,12 @@ public class GameState {
   }
 
   private void allUnitsDeadByPlayer() {
-    if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).size() == 0) {
+    if (getCurrentBoard().enumerateUnits(0, Board.ROWS / 2).isEmpty()) {
       winner = PlayerType.SECOND_PLAYER;
       gameStage = GameStage.ENDED;
       logger.atInfo().log("Result {}, is {}", winner, gameStage);
     }
-    if (getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).size() == 0) {
+    if (getCurrentBoard().enumerateUnits(Board.ROWS / 2, Board.ROWS).isEmpty()) {
       winner = PlayerType.FIRST_PLAYER;
       gameStage = GameStage.ENDED;
       logger.atInfo().log("Result {}, is {}", winner, gameStage);
@@ -521,7 +520,8 @@ public class GameState {
           boolean isLastEmptyCell = board.hasOneEmptyCell(currentPlayer);
           for (UnitType unitType : UnitType.values()) {
             if (!isLastEmptyCell || army.hasGeneral()) {
-              PlaceUnitEvent placeUnitEvent = new PlaceUnitEvent(
+              PlaceUnitEvent placeUnitEvent =
+                  new PlaceUnitEvent(
                       col,
                       row,
                       Unit.createUnitByUnitType(unitType, currentPlayer),
@@ -580,38 +580,49 @@ public class GameState {
     int AccAttacker = move.getAttacker().getAccuracy();
     int ArmDefender = getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).getArmor();
 
-    if(move.getAttacker().getUnitType() == UnitType.KNIGHT || move.getAttacker().getUnitType() == UnitType.ARCHER){
+    if (move.getAttacker().getUnitType() == UnitType.KNIGHT
+        || move.getAttacker().getUnitType() == UnitType.ARCHER) {
 
       GameState goodVar = this.getCopy();
       GameState badVar = this.getCopy();
-      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) /20);
+      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) / 20);
       double badChance = 1 - goodChance;
 
-      int originAcc = this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
+      int originAcc =
+          this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
 
       goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(50);
       goodVar.makeMove(move);
-      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      goodVar
+          .getCurrentBoard()
+          .getUnit(move.getFrom().x(), move.getFrom().y())
+          .setAccuracy(originAcc);
       possibleIssue.add(new StateChance(goodVar, goodChance));
       badVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(-50);
       badVar.makeMove(move);
-      badVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      badVar
+          .getCurrentBoard()
+          .getUnit(move.getFrom().x(), move.getFrom().y())
+          .setAccuracy(originAcc);
       possibleIssue.add(new StateChance(badVar, badChance));
     }
-    if(move.getAttacker().getUnitType() == UnitType.HEALER){
-      int originAcc = this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
+    if (move.getAttacker().getUnitType() == UnitType.HEALER) {
+      int originAcc =
+          this.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).getAccuracy();
       GameState goodVar = this.getCopy();
       goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(50);
       goodVar.makeMove(move);
-      goodVar.getCurrentBoard().getUnit(move.getFrom().x(), move.getFrom().y()).setAccuracy(originAcc);
+      goodVar
+          .getCurrentBoard()
+          .getUnit(move.getFrom().x(), move.getFrom().y())
+          .setAccuracy(originAcc);
       possibleIssue.add(new StateChance(goodVar, 1));
-
     }
-    if(move.getAttacker().getUnitType() == UnitType.MAGE){
+    if (move.getAttacker().getUnitType() == UnitType.MAGE) {
 
       GameState goodVar = this.getCopy();
       GameState badVar = this.getCopy();
-      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) /20);
+      double goodChance = ((double) (21 - (ArmDefender - AccAttacker)) / 20);
       double badChance = 1 - goodChance;
       int originArm = this.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).getArmor();
       goodVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(-50);
@@ -622,19 +633,19 @@ public class GameState {
       badVar.makeMove(move);
       badVar.getCurrentBoard().getUnit(move.getTo().x(), move.getTo().y()).setArmor(originArm);
       possibleIssue.add(new StateChance(badVar, badChance));
-
     }
     return possibleIssue;
   }
 
   private void addValidMoves(
-          List<MakeMoveEvent> possibleMoves, List<Position> targetPositions, Position from, Unit unit) {
+      List<MakeMoveEvent> possibleMoves, List<Position> targetPositions, Position from, Unit unit) {
     for (Position to : targetPositions) {
       if (!unit.isMoved()) {
         MakeMoveEvent move = new MakeMoveEvent(from, to, unit);
         if (canActMove(move)) {
           if (move.getAttacker().getUnitType() == UnitType.HEALER) {
-            if (board.getUnit(to.x(), to.y()).getCurrentHp() != board.getUnit(to.x(), to.y()).getMaxHp()) {
+            if (board.getUnit(to.x(), to.y()).getCurrentHp()
+                != board.getUnit(to.x(), to.y()).getMaxHp()) {
               possibleMoves.add(move);
             }
           } else if (move.getAttacker().getUnitType() == UnitType.MAGE) {
@@ -668,25 +679,91 @@ public class GameState {
   }
 
   public void setDefaultPlacement() {
-    try{
+    try {
       Knight generalKnight = new Knight(PlayerType.FIRST_PLAYER);
       makePlacement(new PlaceUnitEvent(0, 0, generalKnight, PlayerType.FIRST_PLAYER, true, true));
-      makePlacement(new PlaceUnitEvent(1, 0, new Mage(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 0, new Healer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 0, new Mage(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 0, new Healer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
       makeChangePlayer(new ChangePlayerEvent(PlayerType.FIRST_PLAYER));
 
       generalKnight = new Knight(PlayerType.SECOND_PLAYER);
       makePlacement(new PlaceUnitEvent(2, 3, generalKnight, PlayerType.SECOND_PLAYER, true, true));
-      makePlacement(new PlaceUnitEvent(1, 3, new Mage(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 3, new Healer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
-      makePlacement(new PlaceUnitEvent(0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 3, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 3, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
       makeChangePlayer(new ChangePlayerEvent(PlayerType.SECOND_PLAYER));
-    }catch (GameException e){
+
+    } catch (GameException e) {
+      logger.info("Не удалась стандартная расстановка!");
+    }
+  }
+
+  public void setDefaultPlacementWithoutMage() {
+    try {
+      Knight generalKnight = new Knight(PlayerType.FIRST_PLAYER);
+      makePlacement(new PlaceUnitEvent(0, 0, generalKnight, PlayerType.FIRST_PLAYER, true, true));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 0, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 0, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 1, new Archer(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 1, new Knight(PlayerType.FIRST_PLAYER), PlayerType.FIRST_PLAYER, false, false));
+      makeChangePlayer(new ChangePlayerEvent(PlayerType.FIRST_PLAYER));
+
+      generalKnight = new Knight(PlayerType.SECOND_PLAYER);
+      makePlacement(new PlaceUnitEvent(2, 3, generalKnight, PlayerType.SECOND_PLAYER, true, true));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 3, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 3, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              2, 2, new Archer(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              1, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, true, false));
+      makePlacement(
+          new PlaceUnitEvent(
+              0, 2, new Knight(PlayerType.SECOND_PLAYER), PlayerType.SECOND_PLAYER, false, false));
+      makeChangePlayer(new ChangePlayerEvent(PlayerType.SECOND_PLAYER));
+
+    } catch (GameException e) {
       logger.info("Не удалась стандартная расстановка!");
     }
   }
@@ -696,13 +773,13 @@ public class GameState {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     GameState gameState = (GameState) o;
-    return countRound == gameState.countRound &&
-            Objects.equals(board, gameState.board) &&
-            gameStage == gameState.gameStage &&
-            currentPlayer == gameState.currentPlayer &&
-            Objects.equals(armyFirst, gameState.armyFirst) &&
-            Objects.equals(armySecond, gameState.armySecond) &&
-            winner == gameState.winner;
+    return countRound == gameState.countRound
+        && Objects.equals(board, gameState.board)
+        && gameStage == gameState.gameStage
+        && currentPlayer == gameState.currentPlayer
+        && Objects.equals(armyFirst, gameState.armyFirst)
+        && Objects.equals(armySecond, gameState.armySecond)
+        && winner == gameState.winner;
   }
 
   @Override
