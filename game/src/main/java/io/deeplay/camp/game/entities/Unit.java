@@ -1,5 +1,6 @@
 package io.deeplay.camp.game.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.deeplay.camp.game.mechanics.PlayerType;
@@ -63,6 +64,10 @@ public abstract class Unit implements GeneralBuff {
     this.attackType = unit.getAttackType();
   }
 
+  @JsonIgnore
+
+  public abstract Unit getCopy();
+
   public void setAttack(AttackType attackType) {
     this.attackType = attackType;
   }
@@ -102,6 +107,7 @@ public abstract class Unit implements GeneralBuff {
     this.hitTarget = hitTarget;
   }
 
+  @JsonIgnore
   public boolean isAlive() {
     return currentHp > 0;
   }
