@@ -1,5 +1,6 @@
 package io.deeplay.camp.botfarm;
 
+import io.deeplay.camp.botfarm.bots.Bot;
 import io.deeplay.camp.botfarm.bots.RandomBot;
 import io.deeplay.camp.game.Game;
 import io.deeplay.camp.game.entities.Unit;
@@ -29,8 +30,8 @@ public class BotFight extends Thread{
     private final int timeSkeep = 0;
     Game game;
     GameAnalisys gameAnalisys;
-    RandomBot botFirst;
-    RandomBot botSecond;
+    Bot botFirst;
+    Bot botSecond;
     boolean consoleOut = true;
     boolean outInfoGame;
     final Timer timer = new Timer();
@@ -45,7 +46,7 @@ public class BotFight extends Thread{
 
     Thread threadFight;
 
-    public BotFight(RandomBot botFirst, RandomBot botSecond, int countGame, boolean infoGame) throws IOException {
+    public BotFight(Bot botFirst, Bot botSecond, int countGame, boolean infoGame) throws IOException {
         this.botFirst = botFirst;
         this.botSecond = botSecond;
         this.countGame = countGame;
@@ -61,8 +62,8 @@ public class BotFight extends Thread{
         area1.setTabSize(10);
         contents = new JPanel();
         contents.add(area1);
-        //frame.add(contents);
-        //frame.setVisible(true);
+        frame.add(contents);
+        frame.setVisible(true);
 
         threadFight.start();
 

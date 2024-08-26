@@ -6,7 +6,7 @@ import io.deeplay.camp.game.mechanics.GameState;
 
 public abstract class Bot {
 
-    protected abstract PlaceUnitEvent generatePlaceUnitEvent(GameState gameState);
+    public abstract PlaceUnitEvent generatePlaceUnitEvent(GameState gameState);
 
-    protected abstract MakeMoveEvent generateMakeMoveEvent(GameState gameState);
+    public abstract MakeMoveEvent generateMakeMoveEvent(GameState gameState);
 }
