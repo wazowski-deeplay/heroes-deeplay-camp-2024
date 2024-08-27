@@ -18,7 +18,7 @@ class UnitTest {
   void getMaxHpHealer() {
     Healer unit = new Healer(PlayerType.FIRST_PLAYER);
     int expected = unit.getMaxHp();
-    int actual = 10;
+    int actual = 11;
     Assertions.assertEquals(expected, actual);
   }
 
@@ -34,7 +34,7 @@ class UnitTest {
   void getDamageMage() {
     Mage unit = new Mage(PlayerType.FIRST_PLAYER);
     int expected = unit.getDamage();
-    int actual = 1;
+    int actual = 2;
     Assertions.assertEquals(expected, actual);
   }
 
@@ -42,7 +42,7 @@ class UnitTest {
   void getAccuracyArcher() {
     Archer unit = new Archer(PlayerType.FIRST_PLAYER);
     int expected = unit.getAccuracy();
-    int actual = 6;
+    int actual = 7;
     Assertions.assertEquals(expected, actual);
   }
 
