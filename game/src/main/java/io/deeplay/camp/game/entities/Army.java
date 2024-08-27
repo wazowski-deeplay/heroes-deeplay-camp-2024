@@ -21,6 +21,14 @@ public class Army {
     units = new Unit[6];
   }
 
+  public Army(Army army, PlayerType owner) {
+    this.owner = owner;
+    this.isAliveGeneral = army.isAliveGeneral;
+    this.generalType = army.getGeneralType();
+    this.isBuffed = army.isBuffed;
+    units = new Unit[6];
+  }
+
   public void fillArmy(Board board) {
     int index = 0;
     if (this.owner == PlayerType.FIRST_PLAYER) {
@@ -68,8 +76,8 @@ public class Army {
         for (Unit unit : units) {
           unit.applyBuff(unit, generalType);
         }
+        isBuffed = true;
       }
-      isBuffed = true;
     } else if (isBuffed) {
       for (Unit unit : units) {
         unit.removeBuff(unit, generalType);

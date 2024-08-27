@@ -41,13 +41,13 @@ public class GameState {
   }
 
   private GameState(GameState gameState) {
+    this.armyFirst = new Army(gameState.getArmyFirst(), PlayerType.FIRST_PLAYER);
+    this.armySecond = new Army(gameState.getArmySecond(), PlayerType.SECOND_PLAYER);
     this.board = gameState.board.getCopy();
+    armyFirst.fillArmy(this.board);
+    armySecond.fillArmy(this.board);
     this.gameStage = gameState.gameStage;
     this.currentPlayer = gameState.currentPlayer;
-    this.armyFirst = new Army(PlayerType.FIRST_PLAYER);
-    armyFirst.fillArmy(this.board);
-    this.armySecond = new Army(PlayerType.SECOND_PLAYER);
-    armySecond.fillArmy(this.board);
     this.countRound = gameState.countRound;
     this.winner = gameState.winner;
   }
@@ -65,6 +65,8 @@ public class GameState {
       if (gameStage == GameStage.PLACEMENT_STAGE) {
         gameStage = GameStage.MOVEMENT_STAGE;
       }
+      armyFirst.isAliveGeneral();
+      armySecond.isAliveGeneral();
     }
     if (countRound == 0) {
       winner = winnerOrDraw();

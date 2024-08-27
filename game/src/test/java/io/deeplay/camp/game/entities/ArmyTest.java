@@ -29,7 +29,7 @@ class ArmyTest {
   @Test
   void isAliveGeneralTestBuff() {
     army.isAliveGeneral();
-    Assertions.assertEquals(army.getUnits()[2].getArmor(), 18);
+    Assertions.assertEquals(army.getUnits()[2].getArmor(), 19);
   }
 
   @Test
