@@ -10,6 +10,7 @@ import io.deeplay.camp.game.exceptions.GameException;
 import io.deeplay.camp.game.mechanics.GameState;
 import io.deeplay.camp.game.mechanics.PlayerType;
 import io.deeplay.camp.server.GameParty;
+import io.deeplay.camp.server.InfluxDBService;
 import io.deeplay.camp.server.bot.Bot;
 import io.deeplay.camp.server.bot.RandomBot;
 import io.deeplay.camp.server.exceptions.GamePartyException;
@@ -19,6 +20,7 @@ import lombok.Getter;
 public class AiPlayer extends Player {
   private final Bot bot;
   private final GameParty gameParty;
+  private final InfluxDBService influxDBService = new InfluxDBService();
 
   public AiPlayer(PlayerType playerType, GameParty gameParty) {
     super(playerType);
@@ -33,7 +35,11 @@ public class AiPlayer extends Player {
       switch (gameState.getGameStage()) {
         case PLACEMENT_STAGE -> {
           try {
+            long startTime = System.currentTimeMillis();
             PlaceUnitEvent place = bot.generatePlaceUnitEvent(gameState);
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+            influxDBService.writeData("bot_response","time_response",(double) elapsedTime);
             if (place == null) {
               gameParty.processChangePlayer(new ChangePlayerDto(gameParty.getGamePartyId()));
             } else {
@@ -54,7 +60,12 @@ public class AiPlayer extends Player {
         }
         case MOVEMENT_STAGE -> {
           try {
+            long startTime = System.currentTimeMillis();
             MakeMoveEvent move = bot.generateMakeMoveEvent(gameState);
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+            influxDBService.writeData("bot_response","time_response",(double) elapsedTime);
+
             if (move == null) {
               gameParty.processChangePlayer(new ChangePlayerDto(gameParty.getGamePartyId()));
             } else {

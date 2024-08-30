@@ -37,6 +37,7 @@ allprojects {
         // кодогенерация
         compileOnly("org.projectlombok:lombok:1.18.32")
         annotationProcessor("org.projectlombok:lombok:1.18.32")
+        implementation("com.influxdb:influxdb-client-java:7.2.0")
     }
 
     tasks.test {
