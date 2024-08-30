@@ -13,6 +13,10 @@ import io.deeplay.camp.server.exceptions.GamePartyException;
 import io.deeplay.camp.server.manager.ClientManager;
 import io.deeplay.camp.server.manager.GamePartyManager;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +25,21 @@ public class Session implements Runnable {
   private static final Logger logger = LoggerFactory.getLogger(Session.class);
   private final ClientHandler clientHandler;
   private final GamePartyManager gamePartyManager;
+  private final InfluxDBService influxDBService;
+  private final AtomicInteger requestCount;
+  private final AtomicInteger errorCount;
+  private int sessionCount;
 
-  public Session(Socket clientSocket, GamePartyManager gamePartyManager) {
+
+  public Session(Socket clientSocket, GamePartyManager gamePartyManager, AtomicInteger requestCount, AtomicInteger errorCount, int sessionCount) {
     this.clientHandler = new ClientHandler(clientSocket);
     ClientManager.getInstance().addClient(clientHandler.getClientId(), clientHandler);
     this.gamePartyManager = gamePartyManager;
+    this.influxDBService = new InfluxDBService();
+    this.requestCount = requestCount;
+    this.errorCount = errorCount;
+    this.sessionCount = sessionCount;
+
   }
 
   @Override
@@ -33,16 +47,22 @@ public class Session implements Runnable {
     try {
       String requestJson;
       while ((requestJson = clientHandler.readRequest()) != null) {
+        requestCount.getAndIncrement();
+        long startTime = System.currentTimeMillis();
         ClientDto clientDto = JsonConverter.deserialize(requestJson, ClientDto.class);
-        // Чтобы из клиента каждый раз не тащить его id - будем присваивать его при получении.
-        // Зато теперь id клиента хранится только на сервере
         clientDto.setClientId(clientHandler.getClientId());
         handleRequest(clientDto);
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+
+        influxDBService.writeData("response_time","e_time",(double) elapsedTime);
       }
     } catch (JsonProcessingException e) {
       logger.error("Json Session error", e);
+      errorCount.incrementAndGet();
     } catch (Exception e) {
       logger.error("Session error", e);
+      errorCount.incrementAndGet();
     } finally {
       logger.info("Session closed");
       closeResources();
@@ -85,6 +105,7 @@ public class Session implements Runnable {
           throw new GameManagerException(ConnectionErrorCode.UNIDENTIFIED_ERROR);
       }
     } catch (Exception e) {
+      errorCount.incrementAndGet();
       handleException(e);
     }
   }
@@ -110,6 +131,9 @@ public class Session implements Runnable {
 
   /** Метод закрывает все ресурсы сессии. */
   public void closeResources() {
+    sessionCount--;
+    influxDBService.writeData("game_sesion","count_session",sessionCount);
+    influxDBService.closeInfluxConnection();
     clientHandler.closeResources();
   }
 }
