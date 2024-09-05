@@ -29,8 +29,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GameController {
+  private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+
   /** Модель текущей игры. */
   @Setter private GameModel gameModel;
 
@@ -110,7 +114,7 @@ public class GameController {
             controller.setClickStack(clickStack);
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          logger.error("Ошибка с доступом к ресурсам!");
         }
       }
     }
@@ -331,7 +335,8 @@ public class GameController {
       String request = JsonConverter.serialize(placeUnitDto);
       Client.getInstance().sendMessage(request);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      logger.error("Ошибка с сериализацией!");
+
     }
   }
 
@@ -401,7 +406,8 @@ public class GameController {
       String message = JsonConverter.serialize(makeMoveDto);
       Client.getInstance().sendMessage(message);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      logger.error("Ошибка с сеиализацией!");
+
     }
   }
 
