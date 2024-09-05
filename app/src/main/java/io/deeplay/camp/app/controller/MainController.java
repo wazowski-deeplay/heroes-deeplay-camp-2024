@@ -14,9 +14,12 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Главный контроллер, отвечающий за переход между окнами. */
 public class MainController {
+  private static final Logger logger = LoggerFactory.getLogger(MainController.class);
   /** Главная панель */
   @FXML public BorderPane mainPane;
 
@@ -37,7 +40,7 @@ public class MainController {
       menuController.setMainController(this);
       mainPane.setCenter(menu);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Ошибка с доступом к ресурсам!");
     }
   }
 
@@ -51,7 +54,7 @@ public class MainController {
       gameConfigController.setMainController(this);
       mainPane.setCenter(gameConfig);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Ошибка с доступом к ресурсам!");
     }
   }
 
@@ -65,7 +68,7 @@ public class MainController {
       settingsController.setMainController(this);
       mainPane.setCenter(settings);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Ошибка с доступом к ресурсам!");
     }
   }
 
@@ -80,7 +83,7 @@ public class MainController {
       gameJoinController.setMainController(this);
       mainPane.setCenter(gameJoin);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Ошибка с доступом к ресурсам!");
     }
   }
 
@@ -110,7 +113,7 @@ public class MainController {
       gameStage.setScene(new Scene(gamePane));
       gameStage.show();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      logger.error("Ошибка с доступом к ресурсам!");
     }
   }
 }

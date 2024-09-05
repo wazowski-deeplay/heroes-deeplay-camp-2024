@@ -113,10 +113,7 @@ public class UnitPlacementController {
       case "Wizard" -> UnitType.MAGE;
       case "Healer" -> UnitType.HEALER;
       case "Archer" -> UnitType.ARCHER;
-      default -> {
-        System.out.println("Беды с юнит тайпом");
-        yield null;
-      }
+      default -> null;
     };
   }
 
@@ -140,7 +137,6 @@ public class UnitPlacementController {
         Platform.runLater(() -> unitComboBox.setValue("Archer"));
         break;
       default:
-        System.out.println("Unknown unit type");
         break;
     }
   }
